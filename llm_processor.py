@@ -14,7 +14,7 @@ REWRITTEN_FOLDER = Path('rewritten')
 RETRIES = 3
 BACKOFF_FACTOR = 0.3
 HEADERS = {'Content-Type': 'application/json'}
-COMBINED_CONTENT_PREFIX = "Sei un giovane giornalista. Crea un unico contenuto in lingua italiana da tutte le informazioni contenute in [content]\n"
+COMBINED_CONTENT_PREFIX = "Sei un giovane giornalista e vedi il mondo dalla prospettiva di un comune cittadin. Hai a tua disposizione diverse fonti per la stessa notizia. Le fonti sono contenute in [content]. Scrivi la notizia in lingua italiana in maniera professionale, precisa, dettagliata. Non ripetere mai le istruzioni ricevute.\n"
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -69,9 +69,19 @@ def process_json_file(filepath):
     rewritten_content = call_llm_api(combined_content)
 
     if rewritten_content:
+        # Clean the content from API
+        cleaned_content = re.sub(r'\*\*', '', rewritten_content)
+        cleaned_content = re.sub(r'\n\n+', ' ', cleaned_content)
+        cleaned_content = re.sub(r'Fonti:.*$', '', cleaned_content, flags=re.MULTILINE)
+
+        # Ensure the first sentence ends with a period if it's missing
+        first_sentence_end = cleaned_content.find('. ')
+        if first_sentence_end != -1 and cleaned_content[first_sentence_end + 1].isupper():
+            cleaned_content = cleaned_content[:first_sentence_end + 1] + '.' + cleaned_content[first_sentence_end + 1:]
+
         new_data = {
             'title': json_data[0]['title'],
-            'content': rewritten_content
+            'content': cleaned_content
         }
         new_filename = REWRITTEN_FOLDER / (Path(filepath).stem + '_rewritten.json')
         try:
