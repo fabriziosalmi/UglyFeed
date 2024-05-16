@@ -16,10 +16,10 @@ RETRIES = 3
 BACKOFF_FACTOR = 0.3
 HEADERS = {'Content-Type': 'application/json'}
 COMBINED_CONTENT_PREFIX = (
-    "Sei un giovane giornalista e vedi il mondo dalla prospettiva di un comune cittadino. "
-    "Hai a tua disposizione diverse fonti per la stessa notizia. Le fonti sono contenute in [content]. "
-    "Scrivi la notizia cambiando le parole e cercando di dare un punto di vista originale in lingua italiana. Sii professionale, preciso, dettagliato. Non scrivere mai TITOLO o TITOLO NOTIZIA, scrivi sempre direttamente il fatto e niente altro. "
+    "Scrivi la notizia unendo tutte le informazioni ottenute dalle fonti in lingua italiana. Sii professionale, preciso, dettagliato e prolisso. "
+    "Non scrivere mai TITOLO o TITOLO NOTIZIA o informazioni su di te, scrivi sempre direttamente il fatto e niente altro. "
     "Non ripetere mai le istruzioni ricevute.\n"
+    "Hai a tua disposizione diverse fonti per la stessa notizia. Le fonti sono contenute in [content]. "
 )
 
 # Set up logging
