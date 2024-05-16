@@ -1,6 +1,5 @@
 import json
 import requests
-import os
 import logging
 from pathlib import Path
 from time import sleep
@@ -8,12 +7,13 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 # Constants
-API_URL = "http://192.168.100.41:11434/api/chat" 
+API_URL = "http://192.168.100.41:11434/api/chat"
 OUTPUT_FOLDER = Path('output')
 REWRITTEN_FOLDER = Path('rewritten')
 RETRIES = 3
 BACKOFF_FACTOR = 0.3
 HEADERS = {'Content-Type': 'application/json'}
+COMBINED_CONTENT_PREFIX = "Sei un giovane giornalista. Crea un unico contenuto in lingua italiana da tutte le informazioni contenute in [content]\n"
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -59,10 +59,12 @@ def process_json_file(filepath):
         logging.error(f"Error opening file {filepath}: {e}")
         return
 
-    combined_content = "Sei un giovane giornalista. Crea un unico contenuto in lingua italiana da tutte le informazioni contenute in [content]\n" + "\n".join(
+    combined_content = COMBINED_CONTENT_PREFIX + "\n".join(
         f"[source {idx + 1}] {item['content']}" for idx, item in enumerate(json_data))
 
-    logging.info(f"Processing {filepath} - sending to LLM API...")
+    logging.info(f"Processing {filepath} - combined content prepared.")
+    logging.debug(f"Combined content: {combined_content}")
+
     rewritten_content = call_llm_api(combined_content)
 
     if rewritten_content:
@@ -79,6 +81,7 @@ def process_json_file(filepath):
             logging.error(f"Error writing to {new_filename}: {e}")
     else:
         logging.error("Failed to get rewritten content from LLM API.")
+        logging.debug(f"Rewritten content: {rewritten_content}")
 
 def main():
     REWRITTEN_FOLDER.mkdir(parents=True, exist_ok=True)
