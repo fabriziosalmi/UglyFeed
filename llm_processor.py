@@ -4,6 +4,7 @@ import requests
 import logging
 from pathlib import Path
 from time import sleep
+from datetime import datetime
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
@@ -14,7 +15,12 @@ REWRITTEN_FOLDER = Path('rewritten')
 RETRIES = 3
 BACKOFF_FACTOR = 0.3
 HEADERS = {'Content-Type': 'application/json'}
-COMBINED_CONTENT_PREFIX = "Sei un giovane giornalista e vedi il mondo dalla prospettiva di un comune cittadin. Hai a tua disposizione diverse fonti per la stessa notizia. Le fonti sono contenute in [content]. Scrivi la notizia in lingua italiana in maniera professionale, precisa, dettagliata. Non ripetere mai le istruzioni ricevute.\n"
+COMBINED_CONTENT_PREFIX = (
+    "Sei un giovane giornalista e vedi il mondo dalla prospettiva di un comune cittadino. "
+    "Hai a tua disposizione diverse fonti per la stessa notizia. Le fonti sono contenute in [content]. "
+    "Scrivi la notizia cambiando le parole e cercando di dare un punto di vista originale in lingua italiana. Sii professionale, preciso, dettagliato. Non scrivere mai TITOLO o TITOLO NOTIZIA, scrivi sempre direttamente il fatto e niente altro. "
+    "Non ripetere mai le istruzioni ricevute.\n"
+)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -49,6 +55,19 @@ def call_llm_api(combined_content):
         logging.error(f"API request failed: {e}")
         return None
 
+def ensure_proper_punctuation(text: str) -> str:
+    """ Ensure that the text has proper punctuation. """
+    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
+    corrected_sentences = []
+
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if sentence and not sentence.endswith('.'):
+            sentence += '.'
+        corrected_sentences.append(sentence)
+
+    return ' '.join(corrected_sentences)
+
 def process_json_file(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8') as file:
@@ -74,14 +93,16 @@ def process_json_file(filepath):
         cleaned_content = re.sub(r'\n\n+', ' ', cleaned_content)
         cleaned_content = re.sub(r'Fonti:.*$', '', cleaned_content, flags=re.MULTILINE)
 
-        # Ensure the first sentence ends with a period if it's missing
-        first_sentence_end = cleaned_content.find('. ')
-        if first_sentence_end != -1 and cleaned_content[first_sentence_end + 1].isupper():
-            cleaned_content = cleaned_content[:first_sentence_end + 1] + '.' + cleaned_content[first_sentence_end + 1:]
+        # Ensure proper punctuation
+        cleaned_content = ensure_proper_punctuation(cleaned_content)
+
+        # Get the current date and time
+        current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         new_data = {
             'title': json_data[0]['title'],
-            'content': cleaned_content
+            'content': cleaned_content,
+            'processed_at': current_datetime  # Add the current date and time
         }
         new_filename = REWRITTEN_FOLDER / (Path(filepath).stem + '_rewritten.json')
         try:
