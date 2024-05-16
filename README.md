@@ -26,12 +26,12 @@ UglyCitizen is a Python application designed to retrieve, aggregate, and rewrite
 
 ## Usage
 
-1. Retrieve and aggregate RSS feeds:
+1. Retrieve and aggregate RSS feeds (you can change feeds in the input/feeds.txt file)
     ```sh
     python main.py
     ```
 
-2. Rewrite and save aggregated feeds:
+2. Rewrite and save aggregated feeds (I have Ollama and llama3 running at http://192.168.100.41:11434, You can change it to fit your needs):
     ```sh
     python llm_processor.py
     ```
