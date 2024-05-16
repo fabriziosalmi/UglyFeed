@@ -1,4 +1,9 @@
 nltk
 feedparser
+tqdm
+requests
+beautifulsoup4
+pandas
 numpy
 scikit-learn
+openai  # Confirm usage or remove if not necessary
