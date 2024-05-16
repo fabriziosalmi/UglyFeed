@@ -1,6 +1,6 @@
 # UglyCitizen
 
-UglyCitizen is a Python application designed to retrieve, aggregate, and rewrite news feeds using a large language model. This repository provides the code and necessary files to run the application.
+UglyCitizen is a **simple** Python application designed to retrieve, aggregate, and rewrite news feeds using a large language model. This repository provides the code and necessary files to run the application.
 
 In my own setup I use:
 
