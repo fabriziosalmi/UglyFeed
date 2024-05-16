@@ -1,3 +1,4 @@
+import os
 import argparse
 import time
 from rss_reader import fetch_feeds_from_file
@@ -22,9 +23,17 @@ def main(similarity_threshold):
     total_files_saved = len(group_sizes)
 
     elapsed_time = time.time() - start_time
-    print(f"RSS feed processing complete. {total_files_saved} grouped articles have been saved to the output directory.")
+    print(f"RSS feed processing complete. {total_files_saved} different articles are now grouped.")
     print(f"Details of groups saved: {group_sizes}")
     print(f"(Took {elapsed_time:.2f} seconds)")
+
+    # Additional output to summarize file generation
+    print("Summarizing output files:")
+    output_files = os.listdir('output')
+    for filename in output_files:
+        path = os.path.join('output', filename)
+        print(f"{filename}: {sum(1 for line in open(path))} lines")
+    print(f"Total output files: {len(output_files)}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process RSS feeds and group similar articles based on a similarity threshold.')
@@ -32,4 +41,3 @@ if __name__ == "__main__":
                         help='Set the similarity threshold for grouping articles (default: 0.5).')
     args = parser.parse_args()
     main(args.threshold)
-
