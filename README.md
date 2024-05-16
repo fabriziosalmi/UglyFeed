@@ -7,6 +7,8 @@ In my own setup I use:
 - a mac laptop to test/run the repository scripts and retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader)
 - a linux LLM inference server running [llama3](https://ollama.com/library/llama3) (I use Ollama)
 
+> _It is crucial to acknowledge the potential misuse of this tool. The use of adversarial prompts and models can easily lead to the creation of spam, fake news, and other malicious content. This application should not be used with the intent to deceive or mislead others. Be a responsible user and prioritize ethical practices when utilizing language models and AI technologies._
+
 ## Features
 
 - 📡 Retrieve RSS feeds
