@@ -9,12 +9,12 @@ In my own setup I use:
 
 ## Features
 
-- Retrieve RSS feeds
-- Aggregate feeds based on similarity
-- Rewrite aggregated feeds using a language model
-- Save rewritten feeds to JSON files
-- Convert JSON to valid RSS feed
-- Serve XML feed via HTTP server
+- 📡 Retrieve RSS feeds
+- 🧮 Aggregate feeds based on similarity
+- 🤖 Rewrite aggregated feeds using a language model
+- 💾 Save rewritten feeds to JSON files
+- 🔁 Convert JSON to valid RSS feed
+- 🌐 Serve XML feed via HTTP server
 
 ## Installation
 
