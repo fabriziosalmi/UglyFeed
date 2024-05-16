@@ -2,6 +2,8 @@
 
 _quick and dirty initial upload_
 
+_under active dev then expect the unexpected :)_
+
 - Execute main.py to retrieve feeds and merge by similarity
 - Execute llm_processor.py to rewrite and save merged feeds to json
 
