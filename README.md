@@ -28,7 +28,8 @@ In my own setup I use:
     ```sh
     pip install -r requirements.txt
     ```
-
+3. Optional: properly setup a custom system prompt on your LLM inference server.
+   
 ## Usage
 
 1. Retrieve and aggregate RSS feeds (you can change feeds in the input/feeds.txt file)
