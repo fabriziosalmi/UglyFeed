@@ -1,6 +1,11 @@
 # UglyCitizen
 
-UglyCitizen is a Python application designed to retrieve, aggregate, and rewrite news feeds using a language model. This repository provides the code and necessary files to run the application.
+UglyCitizen is a Python application designed to retrieve, aggregate, and rewrite news feeds using a large language model. This repository provides the code and necessary files to run the application.
+
+In my own setup I use:
+
+- a mac laptop to test/run the repository scripts and retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader)
+- a linux LLM inference server running [llama3](https://ollama.com/library/llama3) (I use Ollama but I can test it on LMStudio and I'll provide feedback)
 
 ## Features
 
