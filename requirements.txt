@@ -1,0 +1,4 @@
+nltk
+feedparser
+numpy
+scikit-learn
