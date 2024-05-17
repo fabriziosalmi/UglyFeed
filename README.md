@@ -19,6 +19,24 @@ Supported setup:
 - 🔁 Convert JSON to valid RSS feed
 - 🌐 Serve XML feed via HTTP server
 
+## Quick start
+
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/fabriziosalmi/uglycitizen.git
+    cd uglycitizen
+    ```
+
+2. Install the required dependencies:
+    ```sh
+    pip install -r requirements.txt
+    ```
+3. Execute startup script:
+    ```sh
+    chmod +x uglyfeed.sh
+    ./uglyfeed.sh
+    ```
+
 ## Installation
 
 1. Clone the repository:
@@ -55,17 +73,14 @@ Supported setup:
     python serve.py
     ```
 
-Expected output:
+5 Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores (an additional weighted aggregated score is provided too)
+    ```sh
+    python evaluate.py
+    ```
+    
+6. Optional
 
-```
-python serve.py
-Serving uglyfeed.xml at: http://YOUR_LAN_IP:8000/uglyfeed.xml
-```
-
-5. Optional
-
-- 🎛️  You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or by creating a new model with your customized prompt [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
-- 📈 You can automatically evaluate your generated data against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores by running the `evaluate.py` script (which gives you also a weighted aggregated score)
+- 🎛️ You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
   
 ## Project Structure
 
