@@ -39,7 +39,7 @@ Supported setup:
     python main.py
     ```
 
-2. Rewrite and save aggregated feeds (I have Ollama and llama3 running at http://192.168.100.41:11434, You can change it to fit your needs):
+2. Rewrite and save aggregated feeds (I have Ollama and llama3 or phi3 running at http://localhost:11434, You can change it to fit your needs):
     ```sh
     python llm_processor.py
     ```
