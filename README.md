@@ -6,7 +6,7 @@ Supported setup:
 
 - any computer able to run python and connect to Internet to test/run the repository scripts and to retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader) or any other RSS reader
 - [Ollama](https://ollama.com/download) LLM inference server running [llama3](https://ollama.com/library/llama3) (if you care about quality) or [phi3](https://ollama.com/library/phi3) (if you care about speed)
-- optional: customize system prompt. If you want to customize the system prompt to get better generations you can do that on Ollama by creating a new model with a new prompt template or just change system prompt by using [OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama.
+- You can customize system prompt by using [OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama. 
 
 > _It is crucial to acknowledge the potential misuse of this tool. The use of adversarial prompts and models can easily lead to the creation of spam, fake news, and other malicious content. This application should not be used with the intent to deceive or mislead others. Be a responsible user and prioritize ethical practices when utilizing language models and AI technologies._
 
