@@ -92,9 +92,13 @@ def process_json_file(filepath):
         cleaned_content = re.sub(r'\*\*', '', rewritten_content)
         cleaned_content = re.sub(r'\n\n+', ' ', cleaned_content)
         cleaned_content = re.sub(r'Fonti:.*$', '', cleaned_content, flags=re.MULTILINE)
+        cleaned_content = re.sub(r'Fonte:.*$', '', cleaned_content, flags=re.MULTILINE)
 
         # Ensure proper punctuation
         cleaned_content = ensure_proper_punctuation(cleaned_content)
+
+        # Get all links from the original JSON data
+        links = [item['link'] for item in json_data if 'link' in item]
 
         # Get the current date and time
         current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -102,8 +106,10 @@ def process_json_file(filepath):
         new_data = {
             'title': json_data[0]['title'],
             'content': cleaned_content,
-            'processed_at': current_datetime  # Add the current date and time
+            'processed_at': current_datetime,  # Add the current date and time
+            'links': links  # Add the links
         }
+
         new_filename = REWRITTEN_FOLDER / (Path(filepath).stem + '_rewritten.json')
         try:
             with open(new_filename, 'w', encoding='utf-8') as outfile:
