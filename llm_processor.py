@@ -9,7 +9,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 # Constants
-API_URL = "http://192.168.100.41:11434/api/chat"
+API_URL = "http://127.0.0.1:11434/api/chat"
 OUTPUT_FOLDER = Path('output')
 REWRITTEN_FOLDER = Path('rewritten')
 RETRIES = 3
