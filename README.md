@@ -73,7 +73,7 @@ Supported setup:
     python serve.py
     ```
 
-5 Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores (an additional weighted aggregated score is provided too)
+5. Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores (an additional weighted aggregated score is provided too)
     ```sh
     python evaluate.py
     ```
