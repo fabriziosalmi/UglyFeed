@@ -58,7 +58,7 @@ Expected output:
 
 ```
 python serve.py
-Serving uglyfeed.xml at: http://192.168.100.6:8000/uglyfeed.xml
+Serving uglyfeed.xml at: http://YOUR_LAN_IP:8000/uglyfeed.xml
 ```
 
 5. Optional
