@@ -19,24 +19,6 @@ Supported setup:
 - 🔁 Convert JSON to valid RSS feed
 - 🌐 Serve XML feed via HTTP server
 
-## Quick start
-
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/fabriziosalmi/uglycitizen.git
-    cd uglycitizen
-    ```
-
-2. Install the required dependencies:
-    ```sh
-    pip install -r requirements.txt
-    ```
-3. Execute startup script:
-    ```sh
-    chmod +x uglyfeed.sh
-    ./uglyfeed.sh
-    ```
-
 ## Installation
 
 1. Clone the repository:
