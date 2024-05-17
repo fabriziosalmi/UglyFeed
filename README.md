@@ -61,8 +61,11 @@ python serve.py
 Serving uglyfeed.xml at: http://192.168.100.6:8000/uglyfeed.xml
 ```
 
-🎛️  You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or by creating a new model with your customized prompt [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
+5. Optional
 
+- 🎛️  You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or by creating a new model with your customized prompt [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
+- 📈 You can automatically evaluate your generated data against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores by running the `evaluate.py` script (which gives you also a weighted aggregated score)
+  
 ## Project Structure
 
 - `main.py`: Retrieves and aggregates RSS feeds.
