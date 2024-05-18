@@ -1,88 +1,92 @@
-from fastapi import FastAPI, Request, HTTPException, status
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-import httpx
+import requests
 import logging
-import os
+import json
 
+# Initialize FastAPI app
 app = FastAPI()
 
-# Configuration
-# this proxy convert ollama api requests into OpenAI api requests (wider audience and tools)
-# proxy will run on port 8028 then just update llm_processor.py LLM API port to 8028 and you are done!
-OPENAI_API_URL = os.getenv("OPENAI_API_URL", "http://localhost:11434/v1/chat/completions")
-
-# Setup logging
+# Configure logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
-# Define request and response models
-class OllamaRequest(BaseModel):
-    prompt: str
+# Configuration for local OpenAI API
+OPENAI_API_URL = 'http://localhost:11434/v1/chat/completions'
 
-class OpenAIMessage(BaseModel):
-    role: str
-    content: str
-
-class OpenAIRequest(BaseModel):
-    model: str
-    messages: list[OpenAIMessage]
-
-class OpenAIResponseChoice(BaseModel):
-    message: OpenAIMessage
-
-class OpenAIResponse(BaseModel):
-    id: str
-    model: str
-    created: int
-    choices: list[OpenAIResponseChoice]
-
-class OllamaResponse(BaseModel):
-    id: str
-    model: str
-    created: int
-    response: str
-
-@app.post("/api/chat", response_model=OllamaResponse)
-async def proxy_ollama_to_openai(ollama_request: OllamaRequest):
+@app.post('/api/chat')
+async def chat_completions(request: Request):
     try:
-        # Transform Ollama request to OpenAI format
-        openai_request = OpenAIRequest(
-            model="phi3",
-            messages=[
-                OpenAIMessage(role="user", content=ollama_request.prompt)
-            ]
-        )
+        # Capture the request data from the client
+        ollama_data = await request.json()
+        logging.info(f"Received Ollama API request: {json.dumps(ollama_data, indent=2)}")
 
-        # Send the transformed request to OpenAI API
-        async with httpx.AsyncClient() as client:
-            response = await client.post(OPENAI_API_URL, json=openai_request.dict())
-            response.raise_for_status()
+        # Transform Ollama API request to OpenAI API request
+        openai_request_data = transform_ollama_to_openai(ollama_data)
+        logging.info(f"Transformed OpenAI API request: {json.dumps(openai_request_data, indent=2)}")
 
-        # Transform OpenAI response back to Ollama format
-        openai_response = OpenAIResponse(**response.json())
-        ollama_response = OllamaResponse(
-            id=openai_response.id,
-            model=openai_response.model,
-            created=openai_response.created,
-            response=openai_response.choices[0].message.content
-        )
+        # Forward the transformed request to OpenAI API
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.post(OPENAI_API_URL, headers=headers, json=openai_request_data)
 
-        return ollama_response
+        # Check for HTTP errors
+        response.raise_for_status()
 
-    except httpx.HTTPStatusError as e:
-        logger.error(f"HTTP error occurred: {e.response.status_code} - {e.response.text}")
-        raise HTTPException(
-            status_code=e.response.status_code,
-            detail=f"Error communicating with OpenAI API: {e.response.text}"
-        )
+        # Transform the OpenAI API response to Ollama API response format
+        openai_response_data = response.json()
+        logging.info(f"Received OpenAI API response: {json.dumps(openai_response_data, indent=2)}")
+        transformed_response_data = transform_openai_to_ollama(openai_response_data)
+        logging.info(f"Transformed Ollama API response: {json.dumps(transformed_response_data, indent=2)}")
+
+        # Send the transformed response back to the client
+        return JSONResponse(content=transformed_response_data)
+
+    except requests.exceptions.RequestException as e:
+        logging.error(f"API request failed: {e}")
+        return JSONResponse(content={"error": str(e)}, status_code=500)
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
-        )
+        logging.error(f"Error: {e}")
+        return JSONResponse(content={"error": str(e)}, status_code=400)
 
-if __name__ == "__main__":
+def transform_ollama_to_openai(ollama_data):
+    messages = [
+        {
+            "role": message["role"],
+            "content": message["content"]
+        }
+        for message in ollama_data.get("messages", [])
+    ]
+
+    return {
+        "model": ollama_data.get("model", "phi3"),
+        "messages": messages,
+        "temperature": 0,
+        "max_tokens": 4096
+    }
+
+def transform_openai_to_ollama(openai_data):
+    choices = openai_data.get("choices", [])
+    if choices:
+        first_choice = choices[0]
+        message = {
+            "role": first_choice.get("message", {}).get("role", "assistant"),
+            "content": first_choice.get("message", {}).get("content", "")
+        }
+    else:
+        message = {
+            "role": "assistant",
+            "content": ""
+        }
+
+    return {
+        "id": openai_data.get("id"),
+        "model": openai_data.get("model"),
+        "created": openai_data.get("created"),
+        "message": message,
+        "usage": openai_data.get("usage", {})
+    }
+
+if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8028)
+    uvicorn.run(app, host='0.0.0.0', port=8028)
