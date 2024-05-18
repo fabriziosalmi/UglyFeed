@@ -75,6 +75,8 @@ Supported setup:
 - `rss_reader.py`: Reads RSS feeds.
 - `similarity_checker.py`: Checks similarity between feeds.
 - `json2rss.py`: Convert JSON to RSS feed
+- `evaluate.py`: Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity
+- `proxy.py`: Serve HTTP proxy on port 8028 to transparently handle Ollama API to OpenAI API communications
 - `serve.py`: Serve RSS XML via HTTP server
 - `input/`: Directory for input files (if any).
 - `requirements.txt`: List of dependencies.
