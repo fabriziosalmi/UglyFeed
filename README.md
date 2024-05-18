@@ -32,7 +32,7 @@ Supported setup:
     ```sh
     pip install -r requirements.txt
     ```
-3. Optional: properly setup a custom system prompt on your LLM inference server.
+3. ⚠️ Optional: properly setup a custom system prompt on your LLM inference server.
    
 ## Usage
 
@@ -41,27 +41,29 @@ Supported setup:
     python main.py
     ```
 
-2. Rewrite and save aggregated feeds (I have Ollama and llama3 or phi3 running at http://localhost:11434, You can change it to fit your needs):
+2. ⚠️ Optional: run proxy.py if you have OpenAI API compatbile server and change API port to 8028 in llm_processor.py
+   
+3. Rewrite and save aggregated feeds (I have Ollama and llama3 or phi3 running at http://localhost:11434, You can change it to fit your needs):
     ```sh
     python llm_processor.py
     ```
     
-3. Convert JSON to RSS feed
+4. Convert JSON to RSS feed
     ```sh
     python json2rss.py
     ```
     
-4. Serve RSS XML via HTTP server
+5. Serve RSS XML via HTTP server
     ```sh
     python serve.py
     ```
 
-5. Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores (an additional weighted aggregated score is provided too)
+6. Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores (an additional weighted aggregated score is provided too)
     ```sh
     python evaluate.py
     ```
     
-6. Optional
+7. Optional
 
 - 🎛️ You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
   
