@@ -58,13 +58,12 @@ Supported setup:
     python serve.py
     ```
 
-6. Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores (an additional weighted aggregated score is provided too)
+Optional:
+
+- 📈 Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity scores (an additional weighted aggregated score is provided too)
     ```sh
     python evaluate.py
     ```
-    
-7. Optional
-
 - 🎛️ You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
   
 ## Project Structure
