@@ -46,7 +46,7 @@ Properly setup a custom system prompt on your LLM inference server.
     python main.py
     ```
    
-2. Rewrite and save aggregated feeds using LLM API:
+2. Rewrite and save aggregated feeds using supported LLM API:
 
  - Ollama API
     ```sh
