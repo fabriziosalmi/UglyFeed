@@ -68,10 +68,11 @@ Properly setup a custom system prompt on your LLM inference server.
     ```
 
 Optional:
-📈 Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity, METEOR, Edit Distance, BoW Cosine Similarity scores (an additional weighted aggregated score is provided too and you can change weights of course)
     ```
     python evaluate.py
     ```
+📈 Evaluate generated content against BLEU-1, Jaccard Similarity, ROUGE-L, TF-IDF Cosine Similarity, METEOR, Edit Distance, BoW Cosine Similarity scores (an additional weighted aggregated score is provided too and you can change weights of course)
+
 
 | Output File | Model | BLEU-1 | Jaccard Similarity | ROUGE-L | TF-IDF Cosine Similarity | METEOR | Edit Distance | BoW Cosine Similarity | Aggregated Score |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
