@@ -103,7 +103,8 @@ Optional:
 
 Note: llama3 (8b) and phi3 models are the ones provided by Ollama.
 
-- 🎛️ You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
+Optional: 
+🎛️ You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
   
 ## Project Structure
 
