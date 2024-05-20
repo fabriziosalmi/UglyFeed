@@ -5,10 +5,11 @@ from pathlib import Path
 from datetime import datetime
 from openai import OpenAI
 
-# Initialize OpenAI client
-client = OpenAI(api_key="sk-proj-XXX")
-
 # Constants
+LLM_API_URL = "https://api.openai.com/v1/chat/completions" # Change this to any OpenAI API compatible LLM inference endpoint
+LLM_MODEL = "gpt-3.5-turbo"  # Change this to switch between models (e.g., "gpt-4")
+API_KEY = ""  # Add your OpenAI API key here
+
 OUTPUT_FOLDER = Path('output')
 REWRITTEN_FOLDER = Path('rewritten')
 COMBINED_CONTENT_PREFIX = (
@@ -18,6 +19,9 @@ COMBINED_CONTENT_PREFIX = (
     "Hai a tua disposizione diverse fonti per la stessa notizia. Le fonti sono contenute in [content]. "
 )
 
+# Initialize OpenAI client
+client = OpenAI(api_key=API_KEY)
+
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -25,7 +29,7 @@ def call_llm_api(combined_content):
     """ Sends combined content to the OpenAI API and receives a rewritten version. """
     try:
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=LLM_MODEL,
             messages=[
                 {"role": "system", "content": "You are a professional assistant, skilled in composing detailed and accurate news articles from multiple sources."},
                 {"role": "user", "content": combined_content}
