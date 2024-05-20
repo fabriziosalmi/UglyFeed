@@ -26,7 +26,7 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/fabriziosalmi/uglycitizen.git
+    git clone https://github.com/fabriziosalmi/UglyFeed.git
     cd uglycitizen
     ```
 
