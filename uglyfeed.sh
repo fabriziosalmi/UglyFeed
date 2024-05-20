@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# replace llm_processor.py with llm_processor_openai.py to use OpenAI models
+
 # Script configuration (easily maintainable)
 scripts=(
     "main.py"
