@@ -2,6 +2,7 @@
 
 _NEWS_
 > - released: openai api added (llm_processor_openai.py), just run it instead of llm_processor.py
+> - released: evaluate.py now check generated content against 25 evaluation metrics 
 > - ongoing: dockerizing the application, overall improvements (docs, comments)
 
 UglyFeed is a **simple** Python application designed to retrieve, aggregate, and rewrite news feeds using a large language model. This repository provides the code and necessary files to run the application.
