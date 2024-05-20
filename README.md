@@ -2,13 +2,15 @@
 
 UglyFeed is a **simple** Python application designed to retrieve, aggregate, evaluate and rewrite news feeds using a large language model. This repository provides the code and necessary files to run the application.
 
-Supported setup:
+**Setup**
 
 - You need python and an Internet connection to test/run the repository scripts and to retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader) or any other RSS reader
-- [Ollama](https://ollama.com/download) or any OpenAI API compatible LLM inference server (you need to run proxy.py in that case) running [llama3](https://ollama.com/library/llama3) (better) or [phi3](https://ollama.com/library/phi3) (faster)
 
+**Support models**
 
-> _It is crucial to acknowledge the potential misuse of this tool. The use of adversarial prompts and models can easily lead to the creation of spam, fake news, and other malicious content. This application should not be used with the intent to deceive or mislead others. Be a responsible user and prioritize ethical practices when utilizing language models and AI technologies._
+- App GPT models via OpenAI API (OpenAI API key required) using `llm_processor_openai.py`
+- Local models like [llama3](https://ollama.com/library/llama3) (better) or [phi3](https://ollama.com/library/phi3) via [Ollama](https://ollama.com/download) API using `llm_processor.py`
+- Local and remote models via OpenAI API compatible API by running `proxy.py` before `llm_processor.py`
 
 ## Features
 
@@ -136,6 +138,10 @@ Optional:
 ## Contribution
 
 Feel free to open issues or submit pull requests. Any contributions are welcome!
+
+**Disclaimer**
+
+> _It is crucial to acknowledge the potential misuse of this tool. The use of adversarial prompts and models can easily lead to the creation of misleading content. This application should not be used with the intent to deceive or mislead others. Be a responsible user and prioritize ethical practices when utilizing language models and AI technologies._
 
 ## License
 
