@@ -5,7 +5,7 @@ _NEWS_
 > - evaluate.py now check generated content against 25 evaluation metrics 
 > - dockerizing the application, overall improvements (docs, comments)
 
-UglyFeed is a **simple** Python application designed to retrieve, aggregate, and rewrite news feeds using a large language model. This repository provides the code and necessary files to run the application.
+UglyFeed is a **simple** Python application designed to retrieve, aggregate, evaluate and rewrite news feeds using a large language model. This repository provides the code and necessary files to run the application.
 
 Supported setup:
 
