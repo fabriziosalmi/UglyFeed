@@ -78,7 +78,8 @@ Optional:
 ## Project Structure
 
 - `main.py`: Retrieves and aggregates RSS feeds.
-- `llm_processor.py`: Rewrites aggregated feeds using a language model.
+- `llm_processor.py`: Rewrites aggregated feeds using a language model and Ollama API.
+- `llm_processor_openai.py`: Rewrites aggregated feeds using a language model and OpenAI API.
 - `json_manager.py`: Manages JSON file operations.
 - `rss_reader.py`: Reads RSS feeds.
 - `similarity_checker.py`: Checks similarity between feeds.
