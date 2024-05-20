@@ -36,7 +36,8 @@ Supported setup:
     ```sh
     pip install -r requirements.txt
     ```
-3. ⚠️ Optional: properly setup a custom system prompt on your LLM inference server.
+Optional: 
+Properly setup a custom system prompt on your LLM inference server.
    
 ## Usage
 
@@ -44,20 +45,24 @@ Supported setup:
     ```sh
     python main.py
     ```
-
-2. ⚠️ Optional: run proxy.py if you have OpenAI API compatbile server and change API port to 8028 in llm_processor.py
    
-3. Rewrite and save aggregated feeds (I have Ollama and llama3 or phi3 running at http://localhost:11434, You can change it to fit your needs):
+2. Rewrite and save aggregated feeds using LLM API:
+
+ - Ollama API
     ```sh
     python llm_processor.py
     ```
+ - OpenAI API
+    ```sh
+    python llm_processor_openai.py
+    ```
     
-4. Convert JSON to RSS feed
+3. Convert JSON to RSS feed
     ```sh
     python json2rss.py
     ```
     
-5. Serve RSS XML via HTTP server
+4. Serve RSS XML via HTTP server
     ```sh
     python serve.py
     ```
