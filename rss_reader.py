@@ -19,10 +19,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 TAG_RE = re.compile(r"<[^<]+?>")
 
+
 def fetch_feeds_from_file(file_path: str) -> List[Dict]:
     """Fetch and parse RSS feeds from a file containing URLs with progress display."""
     articles = []
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         urls = file.readlines()
 
     for url in tqdm(urls, desc="Fetching and parsing RSS feeds"):
@@ -35,9 +36,11 @@ def fetch_feeds_from_file(file_path: str) -> List[Dict]:
             })
     return articles
 
+
 def sanitize_filename(filename: str) -> str:
     """Remove invalid characters and spaces from filenames."""
     return re.sub(r'[<>:"/\\|?*\n\r\']+', '', filename).replace(',', '_').replace(' ', '_')
+
 
 def generate_title(articles: List[Dict]) -> str:
     """Generate a title based on the most common significant words in article titles."""
@@ -46,23 +49,28 @@ def generate_title(articles: List[Dict]) -> str:
     significant_words = [word for word, count in word_counts.most_common(10) if len(word) > 3][:3]
     return ' '.join(significant_words)
 
+
 def concatenate_article(article: Dict[str, str]) -> str:
     """Concatenate title and content of an article."""
     return f"{article['title']} {article['content']}"
+
 
 def compute_tfidf(texts: List[str]) -> np.ndarray:
     """Compute the TF-IDF matrix for a list of texts."""
     vectorizer = TfidfVectorizer()
     return vectorizer.fit_transform(texts)
 
+
 def calculate_pairwise_similarities(tfidf_matrix: np.ndarray) -> np.ndarray:
     """Calculate the cosine similarity matrix for the TF-IDF matrix."""
     return cosine_similarity(tfidf_matrix)
+
 
 def cluster_articles(cosine_sim_matrix: np.ndarray) -> List[int]:
     """Cluster articles using DBSCAN based on the cosine similarity matrix."""
     clustering = DBSCAN(metric='precomputed', min_samples=2, eps=0.5).fit(1 - cosine_sim_matrix)
     return clustering.labels_
+
 
 def merge_cluster_articles(cluster_labels: List[int], articles: List[Dict[str, str]]) -> List[str]:
     """Merge articles within each cluster."""
@@ -78,6 +86,7 @@ def merge_cluster_articles(cluster_labels: List[int], articles: List[Dict[str, s
     merged_texts = [" ".join(cluster) for cluster in cluster_dict.values()]
     return merged_texts
 
+
 def calculate_average_similarity(merged_texts: List[str]) -> float:
     """Calculate the average pairwise cosine similarity of merged texts."""
     if len(merged_texts) <= 1:
@@ -91,6 +100,7 @@ def calculate_average_similarity(merged_texts: List[str]) -> float:
 
     num_comparisons = len(similarities)
     return np.sum(similarities) / num_comparisons if num_comparisons > 0 else 0.0
+
 
 def calculate_similarity(articles: List[Dict[str, str]]) -> float:
     """
@@ -127,8 +137,9 @@ def calculate_similarity(articles: List[Dict[str, str]]) -> float:
 
         return average_similarity
     except Exception as e:
-        logging.error(f"An error occurred while calculating similarity: {e}")
+        logging.error("An error occurred while calculating similarity: %s", e)
         return 0.0
+
 
 def process_article(article: Dict) -> Dict:
     """Remove HTML tags and unwanted fields from articles."""
@@ -138,22 +149,32 @@ def process_article(article: Dict) -> Dict:
     article_copy.pop('time', None)
     return article_copy
 
+
 def save_articles_to_json(articles: List[Dict], directory: str, seen_articles: set) -> None:
     """Save unique articles to a JSON file."""
     os.makedirs(directory, exist_ok=True)
-    unique_articles = [article for article in articles if hashlib.md5((article['title'] + article['content']).encode()).hexdigest() not in seen_articles]
-    seen_articles.update({hashlib.md5((article['title'] + article['content']).encode()).hexdigest() for article in unique_articles})
+    unique_articles = [
+        article for article in articles if hashlib.md5(
+            (article['title'] + article['content']).encode()).hexdigest() not in seen_articles
+    ]
+    seen_articles.update({
+        hashlib.md5((article['title'] + article['content']).encode()).hexdigest() for article in unique_articles
+    })
 
     if unique_articles:
         now = datetime.datetime.now()
-        filename = f"{now.strftime('%Y%m%d_%H%M')}_{sanitize_filename(generate_title(unique_articles))}_Q{len(unique_articles)}_S{calculate_similarity(unique_articles):.2f}.json"
+        filename = (
+            f"{now.strftime('%Y%m%d_%H%M')}_{sanitize_filename(generate_title(unique_articles))}_Q"
+            f"{len(unique_articles)}_S{calculate_similarity(unique_articles):.2f}.json"
+        )
         file_path = os.path.join(directory, filename)
         try:
             with open(file_path, 'w', encoding='utf-8') as file:
                 json.dump(unique_articles, file, ensure_ascii=False, indent=4)
-            logging.info(f"Saved {file_path} with {len(unique_articles)} items.")
+            logging.info("Saved %s with %d items.", file_path, len(unique_articles))
         except IOError as e:
-            logging.error(f"Failed to save {file_path}: {e}")
+            logging.error("Failed to save %s: %s", file_path, e)
+
 
 def save_grouped_articles(articles_groups: List[List[Dict]], directory: str) -> List[int]:
     """Save groups of articles to JSON files."""
