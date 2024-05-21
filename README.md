@@ -2,16 +2,6 @@
 
 UglyFeed is a **simple** Python application designed to **retrieve**, **aggregate**, **rewrite** and **evaluate** content (RSS feeds) using a large language model. This repository provides the code and necessary files to run the application.
 
-**Setup**
-
-- You need python and an Internet connection to test/run the repository scripts and to retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader) or any other RSS reader
-
-**Support models**
-
-- GPT models by OpenAI (OpenAI API key required) using `llm_processor_openai.py`
-- Local models like [llama3](https://ollama.com/library/llama3) (better) or [phi3](https://ollama.com/library/phi3) (faster) via [Ollama](https://ollama.com/download) API using `llm_processor.py`
-- Local and remote models via OpenAI compatible API by running `proxy.py` before `llm_processor.py`
-
 ## Features
 
 - 📡 Retrieve RSS feeds
@@ -21,6 +11,16 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - 💾 Save rewritten feeds to JSON files
 - 🔁 Convert JSON to valid RSS feed
 - 🌐 Serve XML feed via HTTP server
+
+**Setup**
+
+- You need python and an Internet connection to test/run the repository scripts and to retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader) or any other RSS reader
+
+**Support models**
+
+- GPT models by OpenAI (OpenAI API key required) using `llm_processor_openai.py`
+- Local models like [llama3](https://ollama.com/library/llama3) (better) or [phi3](https://ollama.com/library/phi3) (faster) via [Ollama](https://ollama.com/download) API using `llm_processor.py`
+- Local and remote models via OpenAI compatible API by running `proxy.py` before `llm_processor.py`
 
 ## Installation
 
