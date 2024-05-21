@@ -71,36 +71,6 @@ Optional:
     ```
 📈 Evaluate generated content against several metrics (an aggregated score is provided too).
 
-I compared the performance of five state-of-the-art language models: GPT-4o, GPT-4, GPT-3.5, LLaMA3, and Phi3. The models were assessed on various natural language processing metrics across multiple files, providing a detailed analysis of their capabilities. Below is a summary of the results:
-
-**Overview of Metrics**
-
-The models were evaluated using the following metrics:
-- BLEU-1
-- Jaccard Similarity
-- ROUGE-L
-- TF-IDF Cosine Similarity
-- METEOR
-- Edit Distance
-- BoW Cosine Similarity
-- WER (Word Error Rate)
-- CIDEr
-- Hamming Distance
-- F1 Score
-- Overlap Coefficient
-- Dice Coefficient
-- Longest Common Subsequence
-- Levenshtein Distance
-- Average Token Length
-- Type-Token Ratio
-- Gunning Fog Index
-- Automated Readability Index
-- Lexical Diversity
-- Syntactic Complexity
-- Readability Consensus
-- Entropy
-- Aggregated Score
-
 Optional: 
 🎛️ You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
   
