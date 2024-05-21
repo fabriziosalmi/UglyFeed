@@ -60,10 +60,8 @@ def compare_json_files(output_file, rewritten_file):
     ari = automated_readability_index(reference)
     lex_div = lexical_diversity(reference)
     synt_comp = syntactic_complexity(reference)
-    perplexity = calculate_perplexity(reference)
     readability = readability_consensus(reference)
     ent = entropy(reference)
-    sub_score = subjectivity_score(reference)
 
     # Store metrics in a dictionary
     scores = {
@@ -89,10 +87,8 @@ def compare_json_files(output_file, rewritten_file):
         "Automated Readability Index": ari,
         "Lexical Diversity": lex_div,
         "Syntactic Complexity": synt_comp,
-        "Perplexity": perplexity,
         "Readability Consensus": readability,
         "Entropy": ent,
-        "Subjectivity Score": sub_score,
     }
 
     # Calculate Aggregated Score (weighted average, customizable)
@@ -118,10 +114,8 @@ def compare_json_files(output_file, rewritten_file):
         "Automated Readability Index": 0.03,  # Lower weight for readability
         "Lexical Diversity": 0.05,  # Moderate weight for vocabulary variety
         "Syntactic Complexity": 0.05,  # Moderate weight for sentence structure complexity
-        "Perplexity": 0.05,  # Moderate weight for predictability of text
         "Readability Consensus": 0.05,  # Moderate weight for aggregated readability score
         "Entropy": 0.05,  # Moderate weight for text complexity
-        "Subjectivity Score": 0.05,  # Moderate weight for subjectivity level
     }
 
     aggregated_score = sum(weights[metric] * scores[metric] for metric in weights)
@@ -425,12 +419,6 @@ def syntactic_complexity(text):
     return avg_sentence_length + num_complex_sentences / len(sentences)
 
 
-def calculate_perplexity(text):
-    """Calculates the perplexity of the text using a language model."""
-    # Dummy implementation, requires a language model to compute perplexity
-    return len(text)  # Placeholder
-
-
 def readability_consensus(text):
     """Calculates a readability consensus score using multiple readability indices."""
     text_str = " ".join(text)
@@ -452,13 +440,6 @@ def entropy(text):
     freq = Counter(text)
     probs = [freq[key] / len(text) for key in freq]
     return -sum(p * math.log(p, 2) for p in probs)
-
-
-def subjectivity_score(text):
-    """Calculates the subjectivity score of the text."""
-    text_str = " ".join(text)
-    # Dummy implementation, a real implementation would use a subjectivity model
-    return textstat.text_standard(text_str, float_output=True) / 100  # Placeholder
 
 
 def save_results_to_json(results, path):
