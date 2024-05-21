@@ -8,3 +8,5 @@ numpy
 scikit-learn
 openai
 spacy
+jiwer
+textstat
