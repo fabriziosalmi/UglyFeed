@@ -66,13 +66,8 @@ Properly setup a custom system prompt on your LLM inference server.
     ```
 
 Optional:
-    ```
-    python evaluate.py
-    ```
-📈 Evaluate generated content against several metrics (an aggregated score is provided too).
-
-Optional: 
-🎛️ You can customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
+- 📈 Evaluate generated content against several metrics (an aggregated score is provided too) by running `python evaluate.py`
+- 🎛️ You can easily customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
   
 ## Project Structure
 
