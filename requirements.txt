@@ -6,4 +6,5 @@ beautifulsoup4
 pandas
 numpy
 scikit-learn
-openai  # Confirm usage or remove if not necessary
+openai
+spacy
