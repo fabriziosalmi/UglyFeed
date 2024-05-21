@@ -23,6 +23,40 @@ results_json_path = "evaluation_results.json"
 results_html_path = "evaluation_results.html"
 
 
+import json
+
+def normalize_for_aggregated_score(scores, reference):
+    max_values = {
+        "Edit Distance": len(reference),  # Set based on the length of the string
+        "WER": 1,  # Word Error Rate is a ratio, and its maximum is 1
+        "CIDEr": 10,  # Set a context-dependent maximum CIDEr score
+        "Hamming Distance": len(reference),  # Set based on the length of the string
+        "Levenshtein Distance": len(reference),  # Set based on the length of the string
+        "Average Token Length": 10,  # Set a context-dependent maximum token length
+        "Gunning Fog Index": 20,  # Set a context-dependent maximum index value
+        "Automated Readability Index": 20,  # Set a context-dependent maximum index value
+        "Syntactic Complexity": 100,  # Set a context-dependent maximum value
+        "Readability Consensus": 200,  # Set a context-dependent maximum value
+        "Entropy": 5,  # Set a context-dependent maximum value
+    }
+
+    normalized_scores = {}
+    
+    for metric in scores:
+        if metric in max_values:
+            if metric in ["Edit Distance", "WER", "Hamming Distance", "Levenshtein Distance"]:  # Metrics where lower is better
+                normalized_scores[metric] = (1 - (scores[metric] / max_values[metric])) * 100
+            else:  # Metrics where higher is better
+                normalized_scores[metric] = (scores[metric] / max_values[metric]) * 100
+        elif metric in ["BLEU-1", "Jaccard Similarity", "ROUGE-L", "TF-IDF Cosine Similarity", "METEOR", "BoW Cosine Similarity", "F1 Score", "Overlap Coefficient", "Dice Coefficient", "Longest Common Subsequence", "Type-Token Ratio", "Lexical Diversity"]:
+            normalized_scores[metric] = scores[metric] * 100
+        elif metric in ["Gunning Fog Index", "Automated Readability Index", "Entropy"]:  # Metrics where lower is better
+            normalized_scores[metric] = (1 - (scores[metric] / max_values[metric])) * 100
+        else:
+            normalized_scores[metric] = scores[metric]  # No normalization needed for these metrics
+    
+    return normalized_scores
+
 def compare_json_files(output_file, rewritten_file):
     """Compares JSON files, calculates multiple metrics, and aggregates them."""
 
@@ -91,37 +125,41 @@ def compare_json_files(output_file, rewritten_file):
         "Entropy": ent,
     }
 
+    # Normalize scores for aggregated score calculation
+    normalized_scores = normalize_for_aggregated_score(scores, reference)
+    
     # Calculate Aggregated Score (weighted average, customizable)
     weights = {
-        "BLEU-1": 0.1,  # Higher weight for n-gram precision
+        "BLEU-1": 0.12,  # Higher weight for n-gram precision
         "Jaccard Similarity": 0.05,  # Moderate weight for token overlap
         "ROUGE-L": 0.1,  # Higher weight for sequence matching
-        "TF-IDF Cosine Similarity": 0.1,  # High weight for semantic similarity
-        "METEOR": 0.1,  # High weight for overall content quality
+        "TF-IDF Cosine Similarity": 0.12,  # High weight for semantic similarity
+        "METEOR": 0.12,  # High weight for overall content quality
         "Edit Distance": 0.05,  # Moderate weight for precise character-level matching
         "BoW Cosine Similarity": 0.1,  # High weight for word occurrence similarity
-        "WER": 0.05,  # Moderate weight for word error rate
-        "CIDEr": 0.05,  # Moderate weight for detail relevance
-        "Hamming Distance": 0.03,  # Lower weight for binary differences
-        "F1 Score": 0.1,  # High weight for combined precision and recall
-        "Overlap Coefficient": 0.05,  # Moderate weight for set overlap
-        "Dice Coefficient": 0.05,  # Moderate weight similar to F1
-        "Longest Common Subsequence": 0.05,  # Moderate weight for sequence similarity
-        "Levenshtein Distance": 0.05,  # Moderate weight for minimal edits
+        "WER": 0.04,  # Moderate weight for word error rate
+        "CIDEr": 0.06,  # Slightly higher weight for detail relevance
+        "Hamming Distance": 0.02,  # Lower weight for binary differences
+        "F1 Score": 0.12,  # High weight for combined precision and recall
+        "Overlap Coefficient": 0.04,  # Moderate weight for set overlap
+        "Dice Coefficient": 0.04,  # Moderate weight similar to F1
+        "Longest Common Subsequence": 0.04,  # Moderate weight for sequence similarity
+        "Levenshtein Distance": 0.04,  # Moderate weight for minimal edits
         "Average Token Length": 0.02,  # Lower weight for readability
         "Type-Token Ratio": 0.02,  # Lower weight for lexical diversity
-        "Gunning Fog Index": 0.03,  # Lower weight for readability
-        "Automated Readability Index": 0.03,  # Lower weight for readability
-        "Lexical Diversity": 0.05,  # Moderate weight for vocabulary variety
+        "Gunning Fog Index": 0.02,  # Lower weight for readability
+        "Automated Readability Index": 0.02,  # Lower weight for readability
+        "Lexical Diversity": 0.03,  # Slightly lower weight for vocabulary variety
         "Syntactic Complexity": 0.05,  # Moderate weight for sentence structure complexity
-        "Readability Consensus": 0.05,  # Moderate weight for aggregated readability score
-        "Entropy": 0.05,  # Moderate weight for text complexity
+        "Readability Consensus": 0.03,  # Slightly lower weight for aggregated readability score
+        "Entropy": 0.03,  # Slightly lower weight for text complexity
     }
 
-    aggregated_score = sum(weights[metric] * scores[metric] for metric in weights)
+    aggregated_score = sum(weights[metric] * normalized_scores[metric] for metric in weights)
     scores["Aggregated Score"] = aggregated_score
 
     return scores
+
 
 
 def calculate_bleu(reference, candidate, n=4, smoothing=None):
