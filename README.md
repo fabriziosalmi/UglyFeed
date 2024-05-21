@@ -71,7 +71,7 @@ Optional:
     ```
 📈 Evaluate generated content against 25 metrics (an aggregated score is provided too).
 
-I compared the performance of five state-of-the-art language models: GPT-4 OpenAI (GPT-4O), GPT-4, GPT-3.5, LLaMA3, and Phi3. The models were assessed on various natural language processing metrics across multiple files, providing a detailed analysis of their capabilities. Below is a summary of the results:
+I compared the performance of five state-of-the-art language models: GPT-4o, GPT-4, GPT-3.5, LLaMA3, and Phi3. The models were assessed on various natural language processing metrics across multiple files, providing a detailed analysis of their capabilities. Below is a summary of the results:
 
 **Overview of Metrics**
 
