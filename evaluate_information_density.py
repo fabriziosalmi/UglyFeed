@@ -88,6 +88,11 @@ def main(file_path):
     lang = detect_language(text)
     metrics, normalized_metrics, aggregated_score = evaluate_information_density_metrics(text, lang)
 
+    output = {
+        "Information and Density Metrics": metrics,
+        "Aggregated Information and Density Score": aggregated_score
+    }
+
     print("Text Information and Density Metrics:")
     for metric, score in metrics.items():
         print(f"{metric}: {score:.4f}")
@@ -95,6 +100,12 @@ def main(file_path):
     for metric, score in normalized_metrics.items():
         print(f"{metric}: {score:.4f}")
     print(f"\nAggregated Information and Density Score: {aggregated_score:.4f}")
+
+    # Export results to JSON
+    output_file_path = file_path.replace(".json", "_metrics_information_density.json")
+    with open(output_file_path, 'w') as out_file:
+        json.dump(output, out_file, indent=4)
+    print(f"Metrics exported to {output_file_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

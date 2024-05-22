@@ -69,7 +69,7 @@ def calculate_information_density(text):
 
 def evaluate_cohesion_information_density_metrics(text, lang):
     nlp = get_spacy_model(lang)
-
+    
     metrics = {
         "Coh-Metrix Scores": calculate_coh_metrix_scores(text),
         "Cohesion Score": calculate_cohesion_score(text),
@@ -99,7 +99,7 @@ def evaluate_cohesion_information_density_metrics(text, lang):
     }
 
     aggregated_score = sum(normalized_metrics[metric] * weights[metric] for metric in normalized_metrics) * 100
-
+    
     return metrics, normalized_metrics, aggregated_score
 
 def main(file_path):
@@ -115,6 +115,11 @@ def main(file_path):
         lang = detect_language(text)
         metrics, normalized_metrics, aggregated_score = evaluate_cohesion_information_density_metrics(text, lang)
 
+        output = {
+            "Text Cohesion and Information Density Metrics": metrics,
+            "Aggregated Text Cohesion and Information Density Score": aggregated_score
+        }
+
         print("Text Cohesion and Information Density Metrics:")
         for metric, score in metrics.items():
             print(f"{metric}: {score:.4f}")
@@ -122,6 +127,12 @@ def main(file_path):
         for metric, score in normalized_metrics.items():
             print(f"{metric}: {score:.4f}")
         print(f"\nAggregated Cohesion and Information Density Score: {aggregated_score:.4f}")
+
+        # Export results to JSON
+        output_file_path = file_path.replace(".json", "_metrics_cohesion_information_density.json")
+        with open(output_file_path, 'w') as out_file:
+            json.dump(output, out_file, indent=4)
+        print(f"Metrics exported to {output_file_path}")
 
     except FileNotFoundError:
         print(f"Error: The file {file_path} does not exist.")

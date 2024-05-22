@@ -7,19 +7,6 @@ import sys
 import numpy as np
 import textstat
 
-# evaluate frequency metrics against single json file
-# python evaluate_frequency.py rewritten/20240521_2322-content-Q5-S0.87_rewritten.json
-#
-# Text Frequency Metrics:
-# Stopword Ratio: 0.2655
-# Hapax Legomena Ratio: 0.5345
-# Hapax Dislegomena Ratio: 0.0836
-# Mean Sentence Length: 22.9167
-# Mean Word Length: 4.9782
-# Syllable per Word: 1.5200
-# Clause per Sentence: 2.5833
-# Aggregated Frequency Score: 3.2882
-
 # Ensure nltk resources are downloaded
 nltk.download("punkt")
 nltk.download("averaged_perceptron_tagger")
@@ -110,7 +97,7 @@ def evaluate_frequency_metrics(text):
     }
 
     aggregated_score = sum(metrics[metric] * weights.get(metric, 0) for metric in metrics)
-    
+
     return metrics, aggregated_score
 
 def main(file_path):
@@ -124,10 +111,21 @@ def main(file_path):
 
     metrics, aggregated_score = evaluate_frequency_metrics(text)
 
+    output = {
+        "Text Frequency Metrics": metrics,
+        "Aggregated Frequency Score": aggregated_score
+    }
+
     print("Text Frequency Metrics:")
     for metric, score in metrics.items():
         print(f"{metric}: {score:.4f}")
     print(f"Aggregated Frequency Score: {aggregated_score:.4f}")
+
+    # Export results to JSON
+    output_file_path = file_path.replace(".json", "_metrics_frequency.json")
+    with open(output_file_path, 'w') as out_file:
+        json.dump(output, out_file, indent=4)
+    print(f"Metrics exported to {output_file_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

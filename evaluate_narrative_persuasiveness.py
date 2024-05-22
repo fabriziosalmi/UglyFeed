@@ -85,7 +85,7 @@ def evaluate_narrative_persuasiveness_metrics(text):
     }
 
     aggregated_score = sum(metrics[metric] * weights[metric] for metric in metrics) * 100
-
+    
     return metrics, aggregated_score
 
 def main(file_path):
@@ -99,10 +99,22 @@ def main(file_path):
 
     metrics, aggregated_score = evaluate_narrative_persuasiveness_metrics(text)
 
+    output = {
+        "Narrative Persuasiveness Metrics": metrics,
+        "Aggregated Narrative Persuasiveness Score": aggregated_score
+    }
+
     print("Text Narrative and Persuasiveness Metrics:")
     for metric, score in metrics.items():
         print(f"{metric}: {score:.4f}")
     print(f"Aggregated Narrative and Persuasiveness Score: {aggregated_score:.4f}")
+
+
+    # Export results to JSON
+    output_file_path = file_path.replace(".json", "_metrics_narrative_persuasiveness.json")
+    with open(output_file_path, 'w') as out_file:
+        json.dump(output, out_file, indent=4)
+    print(f"Metrics exported to {output_file_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

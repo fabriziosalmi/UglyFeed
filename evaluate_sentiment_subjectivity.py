@@ -50,7 +50,7 @@ def evaluate_sentiment_subjectivity_metrics(text, lang):
     sentences = sent_tokenize(text)
     sentiments = []
     subjectivities = []
-
+    
     for sentence in sentences:
         polarity, subjectivity = calculate_sentiment(sentence)
         sentiments.append(polarity)
@@ -72,7 +72,7 @@ def evaluate_sentiment_subjectivity_metrics(text, lang):
     }
 
     aggregated_score = sum(metrics[metric] * weights[metric] for metric in metrics) * 100
-
+    
     return metrics, aggregated_score
 
 def main(file_path):
@@ -87,10 +87,21 @@ def main(file_path):
     lang = detect_language(text)
     metrics, aggregated_score = evaluate_sentiment_subjectivity_metrics(text, lang)
 
+    output = {
+        "Sentiment and Subjectivity Metrics": metrics,
+        "Aggregated Sentiment and Subjectivity Score": aggregated_score
+    }
+
     print("Text Sentiment and Subjectivity Metrics:")
     for metric, score in metrics.items():
         print(f"{metric}: {score:.4f}")
     print(f"Aggregated Sentiment and Subjectivity Score: {aggregated_score:.4f}")
+
+    # Export results to JSON
+    output_file_path = file_path.replace(".json", "_metrics_sentiment_subjectivity.json")
+    with open(output_file_path, 'w') as out_file:
+        json.dump(output, out_file, indent=4)
+    print(f"Metrics exported to {output_file_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

@@ -115,6 +115,11 @@ def main(file_path):
         lang = detect_language(text)
         metrics, normalized_metrics, aggregated_score = evaluate_cohesion_information_density_metrics(text, lang)
 
+        output = {
+            "Cohesion Information Density Metrics": metrics,
+            "Aggregated Cohesion Information Density Score": aggregated_score
+        }
+
         print("Text Cohesion and Information Density Metrics:")
         for metric, score in metrics.items():
             print(f"{metric}: {score:.4f}")
@@ -123,12 +128,20 @@ def main(file_path):
             print(f"{metric}: {score:.4f}")
         print(f"\nAggregated Cohesion and Information Density Score: {aggregated_score:.4f}")
 
+        # Export results to JSON
+        output_file_path = file_path.replace(".json", "_metrics_cohesion_information_density.json")
+        with open(output_file_path, 'w') as out_file:
+            json.dump(output, out_file, indent=4)
+        print(f"Metrics exported to {output_file_path}")
+
     except FileNotFoundError:
         print(f"Error: The file {file_path} does not exist.")
     except json.JSONDecodeError:
         print("Error: The provided file is not a valid JSON file.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

@@ -85,7 +85,7 @@ def evaluate_punctuation_function_word_metrics(text, lang):
     }
 
     aggregated_score = sum(normalized_metrics[metric] * weights[metric] for metric in normalized_metrics) * 100
-
+    
     return metrics, normalized_metrics, aggregated_score
 
 def main(file_path):
@@ -100,6 +100,11 @@ def main(file_path):
     lang = detect_language(text)
     metrics, normalized_metrics, aggregated_score = evaluate_punctuation_function_word_metrics(text, lang)
 
+    output = {
+        "Punctuation and Function Word Metrics": metrics,
+        "Aggregated Punctuation and Function Word Score": aggregated_score
+    }
+
     print("Text Punctuation and Function Word Metrics:")
     for metric, score in metrics.items():
         if isinstance(score, dict):
@@ -110,6 +115,12 @@ def main(file_path):
     for metric, score in normalized_metrics.items():
         print(f"{metric}: {score:.4f}")
     print(f"\nAggregated Punctuation and Function Word Score: {aggregated_score:.4f}")
+
+    # Export results to JSON
+    output_file_path = file_path.replace(".json", "_metrics_punctuation_function.json")
+    with open(output_file_path, 'w') as out_file:
+        json.dump(output, out_file, indent=4)
+    print(f"Metrics exported to {output_file_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

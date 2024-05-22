@@ -31,7 +31,7 @@ def get_spacy_model(lang):
 
 # Define extended keywords for emotional and analytical thinking in both languages
 emotional_keywords_en = [
-    "happy", "sad", "angry", "joy", "fear", "love", "hate", "excited", "depressed", "anxious",
+    "happy", "sad", "angry", "joy", "fear", "love", "hate", "excited", "depressed", "anxious", 
     "grateful", "hopeful", "nervous", "scared", "relieved", "proud", "ashamed", "frustrated",
     "content", "delighted", "miserable", "furious", "terrified", "ecstatic", "heartbroken", "melancholy",
     "peaceful", "jealous", "enthusiastic", "guilty", "affectionate", "lonely", "bored", "resentful",
@@ -43,7 +43,7 @@ emotional_keywords_en = [
 ]
 
 analytical_keywords_en = [
-    "analyze", "logic", "reason", "evidence", "data", "rationale", "study", "investigate",
+    "analyze", "logic", "reason", "evidence", "data", "rationale", "study", "investigate", 
     "examine", "evaluate", "systematic", "objective", "methodical", "quantitative", "qualitative",
     "deduce", "hypothesis", "theory", "experiment", "survey", "statistics", "model", "framework",
     "paradigm", "approach", "analysis", "conclusion", "inference", "interpret", "variable", "algorithm",
@@ -54,7 +54,7 @@ analytical_keywords_en = [
 ]
 
 emotional_keywords_it = [
-    "felice", "triste", "arrabbiato", "gioia", "paura", "amore", "odio", "eccitato", "depresso", "ansioso",
+    "felice", "triste", "arrabbiato", "gioia", "paura", "amore", "odio", "eccitato", "depresso", "ansioso", 
     "grato", "speranzoso", "nervoso", "spaventato", "sollevato", "orgoglioso", "vergognoso", "frustrato",
     "contento", "deliziato", "miserabile", "furioso", "terrorizzato", "estatico", "struggente", "melanconico",
     "sereno", "geloso", "entusiasta", "colpevole", "affettuoso", "solitario", "annoiato", "risentito",
@@ -66,7 +66,7 @@ emotional_keywords_it = [
 ]
 
 analytical_keywords_it = [
-    "analizzare", "logica", "ragione", "prova", "dati", "ragionamento", "studio", "indagare",
+    "analizzare", "logica", "ragione", "prova", "dati", "ragionamento", "studio", "indagare", 
     "esaminare", "valutare", "sistematico", "obiettivo", "metodico", "quantitativo", "qualitativo",
     "dedurre", "ipotesi", "teoria", "esperimento", "sondaggio", "statistiche", "modello", "quadro",
     "paradigma", "approccio", "analisi", "conclusione", "inferenza", "interpretare", "variabile", "algoritmo",
@@ -111,7 +111,7 @@ def evaluate_emotional_analytical_metrics(text, lang):
     }
 
     aggregated_score = sum(normalized_metrics[metric] * weights[metric] for metric in normalized_metrics) * 100
-
+    
     return metrics, normalized_metrics, aggregated_score
 
 def main(file_path):
@@ -126,6 +126,11 @@ def main(file_path):
     lang = detect_language(text)
     metrics, normalized_metrics, aggregated_score = evaluate_emotional_analytical_metrics(text, lang)
 
+    output = {
+        "Emotional and Analytical Metrics": metrics,
+        "Aggregated Emotional and Analytical Score": aggregated_score
+    }
+
     print("Text Emotional and Analytical Metrics:")
     for metric, score in metrics.items():
         print(f"{metric}: {score:.4f}")
@@ -133,6 +138,12 @@ def main(file_path):
     for metric, score in normalized_metrics.items():
         print(f"{metric}: {score:.4f}")
     print(f"\nAggregated Emotional and Analytical Score: {aggregated_score:.4f}")
+
+    # Export results to JSON
+    output_file_path = file_path.replace(".json", "_metrics_emotional_analytical.json")
+    with open(output_file_path, 'w') as out_file:
+        json.dump(output, out_file, indent=4)
+    print(f"Metrics exported to {output_file_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

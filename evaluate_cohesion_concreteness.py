@@ -13,7 +13,8 @@ nltk.download("wordnet")
 nltk.download('words')
 
 # lexicon (initial tentative)
-# you would replace these with actual data from a lexicon
+# Placeholder lists for concreteness, imageability, and age of acquisition scores
+# In a real scenario, you would replace these with actual data from a lexicon
 concreteness_lexicon = {
     'en': {
         "dog": 5, "cat": 5, "happiness": 1, "justice": 1, "car": 5, "tree": 5, "freedom": 2,
@@ -159,7 +160,7 @@ def evaluate_cohesion_concreteness_metrics(text):
     }
 
     aggregated_score = sum(metrics[metric] * weights[metric] for metric in metrics) * 100
-
+    
     return metrics, aggregated_score
 
 def main(file_path):
@@ -173,10 +174,21 @@ def main(file_path):
 
     metrics, aggregated_score = evaluate_cohesion_concreteness_metrics(text)
 
+    output = {
+        "Cohesion Concreteness": metrics,
+        "Aggregated Cohesion Concreteness Score": aggregated_score
+    }
+
     print("Text Cohesion and Concreteness Metrics:")
     for metric, score in metrics.items():
         print(f"{metric}: {score:.4f}")
     print(f"Aggregated Cohesion and Concreteness Score: {aggregated_score:.4f}")
+
+    # Export results to JSON
+    output_file_path = file_path.replace(".json", "_metrics_cohesion_concreteness.json")
+    with open(output_file_path, 'w') as out_file:
+        json.dump(output, out_file, indent=4)
+    print(f"Metrics exported to {output_file_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
