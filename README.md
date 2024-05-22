@@ -12,9 +12,10 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - 🔁 Convert JSON to valid RSS feed
 - 🌐 Serve XML feed via HTTP server
 
-**Setup**
+**Requirements**
 
-- You need python and an Internet connection to test/run the repository scripts and to retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader) or any other RSS reader like [NetNewsWire](https://netnewswire.com/)
+- You need python and an Internet connection 
+- To retrieve the final RSS XML feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on OSX and [NetNewsWire](https://netnewswire.com/) on mobile
 
 **Support models**
 
