@@ -17,10 +17,10 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - You need python and an Internet connection 
 - To retrieve the final RSS XML feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on OSX and [NetNewsWire](https://netnewswire.com/) on mobile but any RSS reader will work ☕️
 
-**Support models**
+**Supported API and models**
 
-- GPT models by OpenAI (OpenAI API key required) using `llm_processor_openai.py`
-- Local models like [llama3](https://ollama.com/library/llama3) (better) or [phi3](https://ollama.com/library/phi3) (faster) via [Ollama](https://ollama.com/download) API using `llm_processor.py`
+- OpenAI API (gpt-3.5-turbo, gpt4, gpt4o) using `llm_processor_openai.py`
+- Ollama API (all models like [llama3](https://ollama.com/library/llama3) or [phi3](https://ollama.com/library/phi3) via [Ollama](https://ollama.com) using `llm_processor.py`
 - Local and remote models via OpenAI compatible API by running `proxy.py` before `llm_processor.py`
 
 ## Installation
