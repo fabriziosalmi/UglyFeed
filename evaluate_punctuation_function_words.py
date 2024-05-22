@@ -6,8 +6,8 @@ from collections import Counter
 from langdetect import detect
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("stopwords")
+nltk.download("punkt", quiet=True)
+nltk.download("stopwords", quiet=True)
 
 # Define function to detect language
 def detect_language(text):

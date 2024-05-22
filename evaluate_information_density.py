@@ -7,9 +7,9 @@ from langdetect import detect
 import spacy
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("stopwords")
-nltk.download("averaged_perceptron_tagger")
+nltk.download("punkt", quiet=True)
+nltk.download("stopwords", quiet=True)
+nltk.download("averaged_perceptron_tagger", quiet=True)
 
 # Load the spaCy models for both English and Italian
 nlp_en = spacy.load("en_core_web_sm")

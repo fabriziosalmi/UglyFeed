@@ -8,9 +8,9 @@ from nltk.corpus import stopwords
 from langdetect import detect
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("stopwords")
-nltk.download("wordnet")
+nltk.download("punkt", quiet=True)
+nltk.download("stopwords", quiet=True)
+nltk.download("wordnet", quiet=True)
 
 # Define sentiment analysis functions
 def calculate_sentiment(text):

@@ -8,9 +8,9 @@ from collections import Counter
 from langdetect import detect
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("stopwords")
-nltk.download("wordnet")
+nltk.download("punkt", quiet=True)
+nltk.download("stopwords", quiet=True)
+nltk.download("wordnet", quiet=True)
 
 # Load the spaCy models for both English and Italian
 nlp_en = spacy.load("en_core_web_sm")

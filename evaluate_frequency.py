@@ -8,9 +8,9 @@ import numpy as np
 import textstat
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("averaged_perceptron_tagger")
-nltk.download("stopwords")
+nltk.download("punkt", quiet=True)
+nltk.download("averaged_perceptron_tagger", quiet=True)
+nltk.download("stopwords", quiet=True)
 
 def bigram_frequency(text):
     words = word_tokenize(text)

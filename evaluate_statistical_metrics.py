@@ -9,9 +9,9 @@ from collections import Counter
 from lexical_diversity import lex_div as ld
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("stopwords")
-nltk.download("wordnet")
+nltk.download("punkt", quiet=True)
+nltk.download("stopwords", quiet=True)
+nltk.download("wordnet", quiet=True)
 
 # Function to calculate Jaro-Winkler Distance
 def calculate_jaro_winkler_distance(text1, text2):
