@@ -14,7 +14,7 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 
 **Setup**
 
-- You need python and an Internet connection to test/run the repository scripts and to retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader) or any other RSS reader
+- You need python and an Internet connection to test/run the repository scripts and to retrieve the final RSS XML feed via [FluentReader](https://github.com/yang991178/fluent-reader) or any other RSS reader like [NetNewsWire](https://netnewswire.com/)
 
 **Support models**
 
