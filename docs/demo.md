@@ -84,3 +84,7 @@ Total output files: 6
 RSS feed successfully created at uglyfeeds/uglyfeed.xml
 Serving uglyfeed.xml at: http://192.168.100.6:8000/uglyfeed.xml
 ```
+
+Viewing single item on FluentReader
+
+![demo](https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/docs/demo.png)
