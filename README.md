@@ -45,7 +45,7 @@ Properly setup a custom system prompt on your LLM inference server.
     python main.py
     ```
 
-   Optional: You can extract RSS urls from local or remote OPML file by running 'opml2feeds.py'
+   Optional: You can extract RSS urls from local or remote OPML file by running 'opml2feeds.py source OPML_file_or_URL' (check code, barely tested)
 
 2. Rewrite and save aggregated feeds using supported LLM API:
 
