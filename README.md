@@ -19,8 +19,8 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 
 **Supported API and models**
 
-- OpenAI API (gpt-3.5-turbo, gpt4, gpt4o) using `llm_processor_openai.py`
-- Ollama API (all models like [llama3](https://ollama.com/library/llama3) or [phi3](https://ollama.com/library/phi3)) using `llm_processor.py`
+- OpenAI API (gpt-3.5-turbo, gpt4, gpt4o)
+- Ollama API (all models like [llama3](https://ollama.com/library/llama3) or [phi3](https://ollama.com/library/phi3))
 - Local and remote models via OpenAI compatible API by running `proxy.py` before `llm_processor.py` (can have bugs)
 
 ## Installation
