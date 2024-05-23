@@ -25,20 +25,20 @@ def create_rss_feed(json_data, output_path):
     channel = SubElement(rss, 'channel')
 
     title = SubElement(channel, 'title')
-    title.text = "UglyCitizen News Feed"
+    title.text = "Feed di Notizie UglyCitizen"
 
     link = SubElement(channel, 'link')
-    link.text = "https://github.com/fabriziosalmi/uglycitizen"
+    link.text = "https://github.com/fabriziosalmi/UglyFeed"
 
     description = SubElement(channel, 'description')
-    description.text = "Aggregated and rewritten news feed by UglyCitizen"
+    description.text = "Feed di notizie aggregato e riscritto da UglyCitizen"
 
     language = SubElement(channel, 'language')
-    language.text = "en-us"
+    language.text = "it"
 
     # Add the atom:link element
     atom_link = SubElement(channel, 'atom:link')
-    atom_link.set('href', 'https://github.com/fabriziosalmi/uglycitizen/uglyfeeds/uglyfeed.xml')
+    atom_link.set('href', 'https://github.com/fabriziosalmi/UglyFeed/uglyfeeds/uglyfeed.xml')
     atom_link.set('rel', 'self')
     atom_link.set('type', 'application/rss+xml')
 
@@ -46,10 +46,18 @@ def create_rss_feed(json_data, output_path):
         item_element = SubElement(channel, 'item')
 
         item_title = SubElement(item_element, 'title')
-        item_title.text = item.get('title', 'No Title')
+        item_title.text = item.get('title', 'Nessun Titolo')
 
         item_description = SubElement(item_element, 'description')
-        item_description.text = item.get('content', 'No Content')
+        content = item.get('content', 'Nessun Contenuto')
+        
+        # Append source links to the description
+        if 'links' in item:
+            content += "<br/><br/><small>Fonti:</small><br/>"
+            for link in item['links']:
+                content += f'<small><a href="{link}" target="_blank">{link}</a></small><br/>'
+        
+        item_description.text = content
 
         pubDate = SubElement(item_element, 'pubDate')
         processed_at = item.get('processed_at', datetime.now().isoformat())
@@ -57,7 +65,7 @@ def create_rss_feed(json_data, output_path):
 
         # Add guid element
         guid = SubElement(item_element, 'guid')
-        guid.text = "https://github.com/fabriziosalmi/uglycitizen/{}".format(urllib.parse.quote(item.get('title', 'No Title')))
+        guid.text = "https://github.com/fabriziosalmi/UglyFeed/{}".format(urllib.parse.quote(item.get('title', 'Nessun Titolo')))
 
     tree = ElementTree(rss)
     tree.write(output_path, encoding='utf-8', xml_declaration=True)
@@ -74,7 +82,7 @@ def main():
         create_rss_feed(json_data, output_path)
         print(f'RSS feed successfully created at {output_path}')
     else:
-        print('No JSON files found in the rewritten directory.')
+        print('Nessun file JSON trovato nella directory riscritta.')
 
 if __name__ == '__main__':
     main()
