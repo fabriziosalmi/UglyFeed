@@ -73,10 +73,10 @@ Properly setup a custom system prompt on your LLM inference server.
     ```
 
 Optional:
-- 📈 Evaluate generated content against several metrics (an aggregated score is provided too) by running `python evaluate_against_reference.py` (evaluate comparison metrics of generated files against the reference files) and `process_multiple_metrics.py` (evaluate only the generated content files against different metrics)
-- 🎛️ You can easily customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
-- 🕒 You can put main.py and llm_processor.py as cronjobs to have fresh content automatically updated on your RSS reader
-- 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on
+- 📈 Evaluate generated content against several metrics (an aggregated score is provided too) by running `python evaluate_against_reference.py` (evaluate comparison metrics of generated files against the reference files) and `process_multiple_metrics.py` (evaluate only the generated content files against different metrics).
+- 🎛️ You can easily customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md).
+- 🕒 You can setup a cronjob to have fresh content automatically updated on your RSS reader bu executing all files in the order specified.
+- 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on.
 
 
 ## Project Structure
@@ -87,10 +87,10 @@ Optional:
 - `json_manager.py`: Manages JSON file operations.
 - `rss_reader.py`: Reads RSS feeds.
 - `similarity_checker.py`: Checks similarity between feeds.
-- `json2rss.py`: Convert JSON to RSS feed
-- `evaluate.py`: Evaluate generated content against several metrics
-- `proxy.py`: Serve HTTP proxy on port 8028 to transparently handle Ollama API to OpenAI API communications (initial workaround, use llm_processor_openai.py instead)
-- `serve.py`: Serve RSS XML via HTTP server
+- `json2rss.py`: Convert JSON to RSS feed.
+- `evaluate.py`: Evaluate generated content against several metrics.
+- `proxy.py`: Serve HTTP proxy on port 8028 to transparently handle Ollama API to OpenAI API communications (initial workaround, use llm_processor_openai.py instead).
+- `serve.py`: Serve RSS XML via HTTP server.
 - `input/`: Directory for input files (if any).
 - `requirements.txt`: List of dependencies.
 
