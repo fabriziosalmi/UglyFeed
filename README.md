@@ -19,9 +19,9 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 
 **Supported API and models**
 
-- OpenAI API (gpt-3.5-turbo, gpt4, gpt4o)
+- OpenAI API (`gpt-3.5-turbo`, `gpt4`, `gpt4o`)
 - Ollama API (all models like [llama3](https://ollama.com/library/llama3) or [phi3](https://ollama.com/library/phi3))
-- Local and remote models via OpenAI compatible API by running `proxy.py` before `llm_processor.py` (can have bugs)
+- Local and remote models via OpenAI compatible API by running `proxy.py` before `llm_processor.py` (barely tested)
 
 ## Installation
 
@@ -40,7 +40,7 @@ Properly setup a custom system prompt on your LLM inference server.
    
 ## Usage
 
-1. Retrieve and aggregate RSS feeds (you can change feeds in the input/feeds.txt file)
+1. Retrieve and aggregate RSS feeds (you can change feeds in the `input/feeds.txt` file)
     ```sh
     python main.py
     ```
@@ -58,6 +58,8 @@ Properly setup a custom system prompt on your LLM inference server.
     python llm_processor_openai.py --api_key sk-proj-xxxxxxxxxxxxxxx --model gpt-3.5-turbo
     ```
 
+   (replace sk-proj-xxxxxxxxxxxxxxx with your OpenAI API key)
+   
     Optional: You can change prompt/role, just look into the **prompts** folder. By using specific prompts You can force specific languages to use for generation.
    
 3. Convert JSON to RSS feed
