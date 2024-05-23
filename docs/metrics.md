@@ -1,3 +1,7 @@
+# Metrics
+
+## Evaluation of the generated content
+
 | **Metric Group**                          | **Metric**                          | **Range**           | **Interpretation**                                                                 |
 |-------------------------------------------|-------------------------------------|---------------------|-----------------------------------------------------------------------------------|
 | **Noun and Verb Metrics**                 | Concrete Noun Ratio                 | 0 to 1              | Higher values indicate a greater use of concrete nouns, making the text more tangible. |
@@ -43,6 +47,37 @@
 |                                           | Mean Word Length                    | 0 to ∞              | Average length of words in the text; higher values indicate longer words.              |
 |                                           | Syllable per Word                   | 0 to ∞              | Average number of syllables per word; higher values indicate more complex words.       |
 |                                           | Clause per Sentence                 | 0 to ∞              | Average number of clauses per sentence; higher values indicate more complex sentence structures. |
+
+## Evaluation of the generated content against the reference
+
+| **Metric**                   | **Range**           | **Interpretation**                                                                                 |
+|------------------------------|---------------------|-----------------------------------------------------------------------------------------------------|
+| **BLEU-1**                   | 0 to 1              | Measures n-gram precision, with 1 being a perfect match to the reference text.                      |
+| **Jaccard Similarity**       | 0 to 1              | Measures the similarity between two sets, with 1 being identical sets.                               |
+| **ROUGE-L**                  | 0 to 1              | Measures the longest common subsequence, indicating how well the order of words is preserved.        |
+| **TF-IDF Cosine Similarity** | 0 to 1              | Measures the cosine similarity between two texts based on TF-IDF vectors, with 1 being identical.    |
+| **METEOR**                   | 0 to 1              | Measures precision, recall, and synonymy, with 1 being a perfect match to the reference text.        |
+| **Edit Distance**            | 0 to ∞              | Measures the number of edits needed to transform one text into another, with 0 being identical texts.|
+| **BoW Cosine Similarity**    | 0 to 1              | Measures the cosine similarity between two texts based on Bag-of-Words vectors, with 1 being identical.|
+| **WER**                      | 0 to 1              | Measures the word error rate, with 0 being a perfect match to the reference text.                    |
+| **CIDEr**                    | 0 to ∞              | Measures consensus in image description generation, higher scores indicate better quality.           |
+| **Hamming Distance**         | 0 to ∞              | Measures the number of positions at which the corresponding symbols differ, with 0 being identical texts.|
+| **F1 Score**                 | 0 to 1              | Measures the balance between precision and recall, with 1 being perfect precision and recall.        |
+| **Overlap Coefficient**      | 0 to 1              | Measures the overlap between two sets, with 1 being identical sets.                                  |
+| **Dice Coefficient**         | 0 to 1              | Measures the similarity between two sets, with 1 being identical sets.                               |
+| **Longest Common Subsequence**| 0 to ∞              | Measures the length of the longest subsequence common to both texts, higher values indicate more similarity.|
+| **Levenshtein Distance**     | 0 to ∞              | Measures the minimum number of single-character edits needed to change one text into the other, with 0 being identical texts.|
+| **Readability Score**        | 0 to ∞              | Measures how easy a text is to read, higher scores indicate more difficult texts.                     |
+| **Sentence BLEU**            | 0 to 1              | Measures n-gram precision for individual sentences, with 1 being a perfect match.                    |
+| **SMOG Index**               | 0 to ∞              | Measures the years of education needed to understand a text, higher scores indicate more difficult texts.|
+| **ARI Score**                | 0 to ∞              | Automated Readability Index, higher scores indicate more difficult texts.                             |
+| **NIST Score**               | 0 to ∞              | Measures precision while giving more weight to informative n-grams, higher scores indicate better quality.|
+| **LSA Similarity**           | 0 to 1              | Measures the similarity between two texts using Latent Semantic Analysis, with 1 being identical.     |
+| **Sentiment Analysis**       | -1 to 1             | Measures the sentiment of the text, with -1 being very negative, 0 being neutral, and 1 being very positive.|
+| **Lexical Density**          | 0 to 1              | Measures the proportion of content words in a text, with higher values indicating more information-rich texts.|
+| **Gunning Fog Index**        | 0 to ∞              | Measures the years of formal education needed to understand a text, higher scores indicate more difficult texts.|
+| **Coleman Liau Index**       | 0 to ∞              | Measures the years of education needed to understand a text, higher scores indicate more difficult texts.|
+| **Automated Readability Index** | 0 to ∞           | Measures the readability of a text, higher scores indicate more difficult texts.                      |
 
 
 
