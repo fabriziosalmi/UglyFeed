@@ -51,7 +51,7 @@ Properly setup a custom system prompt on your LLM inference server.
 
  - Ollama API
     ```sh
-    python llm_processor.py
+    python llm_processor.py --api_url http://127.0.0.1:11434/api/chat --model llama3
     ```
  - OpenAI API
     ```sh
