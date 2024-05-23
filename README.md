@@ -55,7 +55,7 @@ Properly setup a custom system prompt on your LLM inference server.
     ```
  - OpenAI API
     ```sh
-    python llm_processor_openai.py
+    python llm_processor_openai.py --api_key sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxx --model gpt-3.5-turbo
     ```
     
 3. Convert JSON to RSS feed
