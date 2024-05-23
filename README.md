@@ -58,7 +58,7 @@ Properly setup a custom system prompt on your LLM inference server.
     python llm_processor_openai.py --api_key sk-proj-xxxxxxxxxxxxxxx --model gpt-3.5-turbo
     ```
 
-    Optional: You can change prompt/role, just look into the **prompts** folder. Using specific prompts You can force specific language to use for generation.
+    Optional: You can change prompt/role, just look into the **prompts** folder. By using specific prompts You can force specific languages to use for generation.
    
 3. Convert JSON to RSS feed
     ```sh
