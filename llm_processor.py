@@ -2,6 +2,7 @@ import re
 import json
 import requests
 import logging
+import argparse
 from pathlib import Path
 from time import sleep
 from datetime import datetime
@@ -9,7 +10,6 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 # Constants
-API_URL = "http://127.0.0.1:11434/api/chat"
 OUTPUT_FOLDER = Path('output')
 REWRITTEN_FOLDER = Path('rewritten')
 RETRIES = 3
@@ -45,15 +45,15 @@ def requests_retry_session(retries=RETRIES, backoff_factor=BACKOFF_FACTOR, statu
     session.mount('https://', adapter)
     return session
 
-def call_llm_api(combined_content):
+def call_llm_api(api_url, model, combined_content):
     """ Sends combined content to the LLM API and receives a rewritten version. """
     data = json.dumps({
-        "model": "llama3",
+        "model": model,
         "messages": [{"role": "user", "content": combined_content}],
         "stream": False
     })
     try:
-        response = requests_retry_session().post(API_URL, data=data, headers=HEADERS)
+        response = requests_retry_session().post(api_url, data=data, headers=HEADERS)
         response.raise_for_status()
         return response.json()['message']['content']
     except requests.RequestException as e:
@@ -73,7 +73,7 @@ def ensure_proper_punctuation(text: str) -> str:
 
     return ' '.join(corrected_sentences)
 
-def process_json_file(filepath):
+def process_json_file(filepath, api_url, model):
     try:
         with open(filepath, 'r', encoding='utf-8') as file:
             json_data = json.load(file)
@@ -90,7 +90,7 @@ def process_json_file(filepath):
     logging.info(f"Processing {filepath} - combined content prepared.")
     logging.debug(f"Combined content: {combined_content}")
 
-    rewritten_content = call_llm_api(combined_content)
+    rewritten_content = call_llm_api(api_url, model, combined_content)
 
     if rewritten_content:
         # Clean the content from API
@@ -127,6 +127,12 @@ def process_json_file(filepath):
         logging.debug(f"Rewritten content: {rewritten_content}")
 
 def main():
+    parser = argparse.ArgumentParser(description='Process JSON files and call LLM API.')
+    parser.add_argument('--api_url', type=str, required=True, help='The URL of the LLM API.')
+    parser.add_argument('--model', type=str, required=True, help='The model to use for the LLM API.')
+
+    args = parser.parse_args()
+
     REWRITTEN_FOLDER.mkdir(parents=True, exist_ok=True)
 
     json_files = list(OUTPUT_FOLDER.glob('*.json'))
@@ -136,7 +142,7 @@ def main():
 
     for filepath in json_files:
         logging.info(f"Processing file: {filepath}")
-        process_json_file(filepath)
+        process_json_file(filepath, args.api_url, args.model)
 
 if __name__ == "__main__":
     main()
