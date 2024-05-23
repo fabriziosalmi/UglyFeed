@@ -57,7 +57,9 @@ Properly setup a custom system prompt on your LLM inference server.
     ```sh
     python llm_processor_openai.py --api_key sk-proj-xxxxxxxxxxxxxxx --model gpt-3.5-turbo
     ```
-    
+
+    Optional: You can change prompt/role, just look into the **prompts** folder.
+   
 3. Convert JSON to RSS feed
     ```sh
     python json2rss.py
