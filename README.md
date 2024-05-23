@@ -69,7 +69,7 @@ Properly setup a custom system prompt on your LLM inference server.
     ```
 
 Optional:
-- 📈 Evaluate generated content against several metrics (an aggregated score is provided too) by running `python evaluate.py`
+- 📈 Evaluate generated content against several metrics (an aggregated score is provided too) by running `python evaluate_against_reference.py` (eval the generated against the reference) and `evaluate_combined.py` (eval only the generated content)
 - 🎛️ You can easily customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
 - 🕒 You can put main.py and llm_processor.py as cronjobs to have fresh content automatically updated on your RSS reader
 
