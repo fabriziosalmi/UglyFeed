@@ -23,6 +23,7 @@ An overview of the script's architecture, highlighting major components and thei
 ## List of scripts (ongoing.. back here soon for updates ^_^)
 
 - [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
+- [json2rss.py]()
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 ---
@@ -151,6 +152,162 @@ python3 serve.py
 This command starts a server to serve the processed RSS data.
 
 This script provides a guided, interactive way to process and serve RSS feeds using different language model APIs, ensuring flexibility and ease of use.
+
+## json2rss.py
+
+### Overview
+This Python script processes JSON files containing news articles and generates an RSS feed. It reads JSON files from a specified directory, extracts relevant information, and creates an RSS feed in XML format. The script aims to automate the conversion of JSON-formatted news data into a standard RSS feed that can be used for news aggregation.
+
+### Installation
+To set up this script in your environment, follow these steps:
+
+1. **Ensure Python 3 is installed** on your system.
+
+2. **Install necessary Python packages**:
+   This script uses the built-in Python libraries, so no additional packages are required. However, if you use a virtual environment, you can set it up as follows:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. **Set up the directory structure**:
+   Ensure that you have a directory named `rewritten` containing your `_rewritten.json` files.
+
+### Usage
+To run the script, follow these steps:
+
+1. **Place your JSON files**:
+   Ensure your `_rewritten.json` files are located in the `rewritten` directory.
+
+2. **Execute the script**:
+   Run the script using Python:
+   ```bash
+   python3 script.py
+   ```
+
+3. **Check the output**:
+   The RSS feed will be generated in the `uglyfeeds` directory as `uglyfeed.xml`.
+
+### Functionality
+The script includes the following key functions:
+
+- **read_json_files(directory)**: Reads all JSON files ending with `_rewritten.json` from the specified directory and returns their content as a list of dictionaries.
+
+- **create_rss_feed(json_data, output_path)**: Creates an RSS feed in XML format using the provided JSON data and saves it to the specified output path.
+
+- **main()**: Main function that orchestrates the reading of JSON files, RSS feed creation, and directory setup.
+
+### Input/Output
+**Input**:
+- JSON files located in the `rewritten` directory. Each file should have a filename ending with `_rewritten.json`.
+
+**Output**:
+- An RSS feed saved as `uglyfeed.xml` in the `uglyfeeds` directory.
+
+### Code Structure
+The script is structured as follows:
+
+1. **Imports and Namespace Registration**:
+   ```python
+   import json
+   import os
+   import urllib.parse
+   from datetime import datetime
+   from xml.etree.ElementTree import Element, SubElement, ElementTree, register_namespace
+
+   register_namespace('atom', 'http://www.w3.org/2005/Atom')
+   ```
+
+2. **read_json_files(directory)**:
+   Reads JSON files from a directory.
+   ```python
+   def read_json_files(directory):
+       json_data = []
+       for filename in os.listdir(directory):
+           if filename.endswith('_rewritten.json'):
+               filepath = os.path.join(directory, filename)
+               with open(filepath, 'r') as f:
+                   data = json.load(f)
+                   json_data.append(data)
+       return json_data
+   ```
+
+3. **create_rss_feed(json_data, output_path)**:
+   Constructs an RSS feed from the JSON data and writes it to the output path.
+   ```python
+   def create_rss_feed(json_data, output_path):
+       rss = Element('rss')
+       rss.set('version', '2.0')
+       rss.set('xmlns:atom', 'http://www.w3.org/2005/Atom')
+
+       channel = SubElement(rss, 'channel')
+
+       title = SubElement(channel, 'title')
+       title.text = "Feed di Notizie UglyCitizen"
+
+       link = SubElement(channel, 'link')
+       link.text = "https://github.com/fabriziosalmi/UglyFeed"
+
+       description = SubElement(channel, 'description')
+       description.text = "Feed di notizie aggregato e riscritto da UglyCitizen"
+
+       language = SubElement(channel, 'language')
+       language.text = "it"
+
+       atom_link = SubElement(channel, 'atom:link')
+       atom_link.set('href', 'https://github.com/fabriziosalmi/UglyFeed/uglyfeeds/uglyfeed.xml')
+       atom_link.set('rel', 'self')
+       atom_link.set('type', 'application/rss+xml')
+
+       for item in json_data:
+           item_element = SubElement(channel, 'item')
+
+           item_title = SubElement(item_element, 'title')
+           item_title.text = item.get('title', 'Nessun Titolo')
+
+           item_description = SubElement(item_element, 'description')
+           content = item.get('content', 'Nessun Contenuto')
+
+           if 'links' in item:
+               content += "<br/><br/><small>Fonti:</small><br/>"
+               for link in item['links']:
+                   content += f'<small><a href="{link}" target="_blank">{link}</a></small><br/>'
+
+           item_description.text = content
+
+           pubDate = SubElement(item_element, 'pubDate')
+           processed_at = item.get('processed_at', datetime.now().isoformat())
+           pubDate.text = datetime.strptime(processed_at, '%Y-%m-%d %H:%M:%S').strftime('%a, %d %b %Y %H:%M:%S GMT')
+
+           guid = SubElement(item_element, 'guid')
+           guid.text = "https://github.com/fabriziosalmi/UglyFeed/{}".format(urllib.parse.quote(item.get('title', 'Nessun Titolo')))
+
+       tree = ElementTree(rss)
+       tree.write(output_path, encoding='utf-8', xml_declaration=True)
+   ```
+
+4. **main()**:
+   Sets up directories, reads JSON data, and creates the RSS feed.
+   ```python
+   def main():
+       rewritten_dir = 'rewritten'
+       output_path = os.path.join('uglyfeeds', 'uglyfeed.xml')
+
+       os.makedirs('uglyfeeds', exist_ok=True)
+
+       json_data = read_json_files(rewritten_dir)
+
+       if json_data:
+           create_rss_feed(json_data, output_path)
+           print(f'RSS feed successfully created at {output_path}')
+       else:
+           print('Nessun file JSON trovato nella directory riscritta.')
+
+   if __name__ == '__main__':
+       main()
+   ```
+
+This script provides a straightforward way to convert JSON news data into an RSS feed, making it easy to integrate with RSS readers or news aggregation services.
 
 ## evaluate_cohesion_concreteness.py
 
