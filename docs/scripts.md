@@ -1,5 +1,19 @@
 # Scripts documentation
 Welcome to the Scripts Documentation section. This comprehensive guide provides detailed information and instructions for each script in our project. I use to complete the docs also to catch some placeholder functions around the code and replace it with usable stuff :)
+
+**Demo script**
+- [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
+
+**Main scripts**
+- [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#mainpy)
+- [llm_processor.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#llm_processorpy)
+- [llm_processor_openai.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#llm_processor_openaipy)
+- [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#json2rsspy)
+- [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#servepy)
+
+**Optional scripts**
+- [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
+
 Each script's documentation includes the following sections:
 
 - **Overview**
@@ -19,21 +33,6 @@ Information about the expected input formats and the structure of the output dat
 
 - **Code Structure**
 An overview of the script's architecture, highlighting major components and their interactions, to give users a clear understanding of how the script is built.
-
-## List of scripts (ongoing.. back here soon for updates ^_^)
-
-**Demo script**
-- [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
-
-**Main scripts**
-- [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#mainpy)
-- [llm_processor.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#llm_processorpy)
-- [llm_processor_openai.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#llm_processor_openaipy)
-- [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#json2rsspy)
-- [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#servepy)
-
-**Optional scripts**
-- [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 
 ---
