@@ -20,7 +20,7 @@ import numpy as np
 # Aggregated Semantic Score: 0.3316
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
+nltk.download("punkt", quiet=True)
 
 # Load pre-trained SentenceTransformer model
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
