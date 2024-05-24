@@ -22,13 +22,19 @@ An overview of the script's architecture, highlighting major components and thei
 
 ## List of scripts (ongoing.. back here soon for updates ^_^)
 
+**Demo script**
 - [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
+
+**Main scripts**
 - [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#mainpy)
 - [llm_processor.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#llm_processorpy)
 - [llm_processor_openai.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#llm_processor_openaipy)
 - [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#json2rsspy)
 - [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#servepy)
+
+**Optional scripts**
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
+
 
 ---
 ## demo.sh
