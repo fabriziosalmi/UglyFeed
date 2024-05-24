@@ -23,7 +23,7 @@ An overview of the script's architecture, highlighting major components and thei
 ## List of scripts (ongoing.. back here soon for updates ^_^)
 
 - [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
-- [json2rss.py]()
+- [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#json2rsspy)
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 ---
