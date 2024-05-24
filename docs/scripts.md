@@ -12,8 +12,9 @@ Welcome to the Scripts Documentation section. This comprehensive guide provides 
 - [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#servepy)
 
 **Optional scripts**
+
 - [evaluate_against_reference.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_against_referencepy)
-- [process_multiple_metrics.py]()
+- [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#process_multiple_metricspy)
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 Each script's documentation includes the following sections:
