@@ -25,7 +25,7 @@ An overview of the script's architecture, highlighting major components and thei
 - [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#mainpy)
 - [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
 - [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#json2rsspy)
-- [serve.py()
+- [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#servepy)
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 ---
