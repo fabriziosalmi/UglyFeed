@@ -182,7 +182,7 @@ To run the script, follow these steps:
 2. **Execute the script**:
    Run the script using Python:
    ```bash
-   python3 script.py
+   python3 json2rss.py
    ```
 
 3. **Check the output**:
