@@ -15,7 +15,7 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 **Requirements**
 
 - You need python and an Internet connection 
-- To retrieve the final RSS XML feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on OSX and [NetNewsWire](https://netnewswire.com/) on mobile but any RSS reader will work ☕️
+- To retrieve the final RSS XML feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on OSX and [NetNewsWire](https://netnewswire.com/) on mobile but [any RSS reader](https://github.com/topics/rss-reader) will work!
 
 **Supported API and models**
 
