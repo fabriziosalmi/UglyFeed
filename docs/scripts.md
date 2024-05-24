@@ -12,6 +12,7 @@ Welcome to the Scripts Documentation section. This comprehensive guide provides 
 - [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#servepy)
 
 **Optional scripts**
+- [evaluate_against_reference.py]()
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 Each script's documentation includes the following sections:
@@ -1203,6 +1204,206 @@ The script is structured as follows:
    ```
 
 This script provides a simple and effective way to serve an RSS feed file locally, making it easily accessible for testing or local use.
+
+## evaluate_against_reference.py
+
+### Overview
+This Python script evaluates rewritten JSON files against their original versions using various metrics to determine the quality of the rewritten content. It calculates multiple text similarity and readability metrics, normalizes the scores, and aggregates them into a final evaluation score.
+
+### Installation
+To set up this script in your environment, follow these steps:
+
+1. **Ensure Python 3 is installed** on your system.
+
+2. **Install necessary Python packages**:
+   This script relies on several Python libraries. Install them using:
+   ```bash
+   pip install nltk textstat spacy scikit-learn textblob pandas
+   python -m spacy download en_core_web_sm
+   ```
+
+3. **Ensure NLTK resources are downloaded**:
+   The script will download necessary NLTK resources if they are not already available.
+
+4. **Set up the directory structure**:
+   Ensure you have `output` and `rewritten` directories containing the respective JSON files.
+
+### Usage
+To run the script, simply execute it using Python:
+```bash
+python evaluate_against_reference.py
+```
+
+### Functionality
+The script includes the following key functions:
+
+- **normalize_for_aggregated_score**: Normalizes the scores for different metrics to a common scale.
+- **compare_json_files**: Compares two JSON files using various similarity and readability metrics.
+- **save_individual_metrics**: Saves the individual metric results for each comparison.
+- **calculate_bleu**: Calculates the BLEU score.
+- **custom_sentence_bleu**: Custom implementation of sentence-level BLEU score.
+- **flatten_json**: Flattens nested JSON objects.
+- **jaccard_similarity**: Calculates the Jaccard similarity between two lists.
+- **rouge_l_similarity**: Calculates the ROUGE-L similarity.
+- **tfidf_cosine_similarity**: Calculates TF-IDF cosine similarity.
+- **calculate_meteor**: Calculates the METEOR score.
+- **calculate_edit_distance**: Calculates the edit distance.
+- **bow_cosine_similarity**: Calculates Bag-of-Words cosine similarity.
+- **calculate_wer**: Calculates Word Error Rate (WER).
+- **calculate_cider**: Calculates the CIDEr score.
+- **hamming_distance**: Calculates the Hamming distance.
+- **f1_score**: Calculates the F1 score.
+- **overlap_coefficient**: Calculates the overlap coefficient.
+- **dice_coefficient**: Calculates the Dice coefficient.
+- **longest_common_subsequence**: Calculates the longest common subsequence.
+- **levenshtein_distance**: Calculates the Levenshtein distance.
+- **readability_score**: Calculates the readability score.
+- **smog_index**: Calculates the SMOG index.
+- **ari_score**: Calculates the Automated Readability Index (ARI) score.
+- **nist_score**: Calculates the NIST score.
+- **lsa_similarity**: Calculates Latent Semantic Analysis (LSA) similarity.
+- **sentiment_analysis**: Performs sentiment analysis.
+- **lexical_density**: Calculates lexical density.
+- **gunning_fog_index**: Calculates the Gunning Fog index.
+- **coleman_liau_index**: Calculates the Coleman-Liau index.
+- **automated_readability_index**: Calculates the Automated Readability Index.
+- **save_results_to_json**: Saves the evaluation results to a JSON file.
+- **save_results_to_html**: Saves the evaluation results to an HTML file.
+
+### Input/Output
+**Input**:
+- JSON files located in the `output` and `rewritten` directories. Each pair of files should have matching names, with the rewritten files suffixed by `_rewritten.json`.
+
+**Output**:
+- A JSON file (`evaluation_results.json`) containing the evaluation results.
+- An HTML file (`evaluation_results.html`) containing a formatted view of the evaluation results.
+
+### Code Structure
+The script is structured as follows:
+
+1. **Imports and Setup**:
+   ```python
+   import json
+   import os
+   import difflib
+   import nltk
+   from nltk.tokenize import word_tokenize
+   from nltk.translate.meteor_score import meteor_score
+   from collections import Counter
+   from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+   from sklearn.metrics.pairwise import cosine_similarity
+   import pandas as pd
+   import math
+   from functools import reduce
+   from sklearn.decomposition import TruncatedSVD
+   from textblob import TextBlob
+   import textstat
+   import spacy
+
+   # Ensure nltk resources are downloaded
+   nltk.download("punkt", quiet=True)
+   nltk.download("wordnet", quiet=True)
+   nltk.download("omw-1.4", quiet=True)
+
+   # Load spacy model
+   nlp = spacy.load("en_core_web_sm")
+
+   output_folder = "output"
+   rewritten_folder = "rewritten"
+   results_json_path = "reports/evaluation_results.json"
+   results_html_path = "reports/evaluation_results.html"
+   ```
+
+2. **Normalization Function**:
+   ```python
+   def normalize_for_aggregated_score(scores, reference):
+       # Normalize scores for aggregated scoring
+       # ... (implementation details)
+   ```
+
+3. **Comparison Function**:
+   ```python
+   def compare_json_files(output_file, rewritten_file):
+       # Compare two JSON files using various metrics
+       # ... (implementation details)
+   ```
+
+4. **Save Individual Metrics**:
+   ```python
+   def save_individual_metrics(output_file, metrics):
+       # Save individual metric results for each comparison
+       # ... (implementation details)
+   ```
+
+5. **Metric Calculation Functions**:
+   Implement various text similarity and readability metrics.
+   ```python
+   def calculate_bleu(reference, candidate, n=4, smoothing=None):
+       # Calculate BLEU score
+       # ... (implementation details)
+
+   def custom_sentence_bleu(references, hypothesis):
+       # Custom implementation of sentence-level BLEU score
+       # ... (implementation details)
+
+   # Other metric calculation functions...
+   ```
+
+6. **Helper Functions**:
+   Implement various helper functions used in metric calculations.
+   ```python
+   def flatten_json(data, prefix=""):
+       # Flatten nested JSON objects
+       # ... (implementation details)
+
+   def jaccard_similarity(list1, list2):
+       # Calculate Jaccard similarity
+       # ... (implementation details)
+
+   # Other helper functions...
+   ```
+
+7. **Save Results Functions**:
+   Functions to save results to JSON and HTML files.
+   ```python
+   def save_results_to_json(results, path):
+       # Save evaluation results to JSON
+       # ... (implementation details)
+
+   def save_results_to_html(results, path):
+       # Save evaluation results to HTML
+       # ... (implementation details)
+   ```
+
+8. **Main Evaluation Loop**:
+   Evaluate all rewritten files against their original versions.
+   ```python
+   rewritten_files = [f for f in os.listdir(rewritten_folder) if f.endswith("_rewritten.json")]
+
+   all_results = []
+   for rewritten_file in rewritten_files:
+       rewritten_path = os.path.join(rewritten_folder, rewritten_file)
+
+       output_file = rewritten_file.replace("_rewritten.json", ".json")
+       output_path = os.path.join(output_folder, output_file)
+
+       if os.path.isfile(output_path):
+           print("\nEvaluating:", output_file)
+           result = compare_json_files(output_path, rewritten_path)
+           if result:
+               all_results.append(result)
+               save_individual_metrics(rewritten_file, result)
+       else:
+           print(f"WARNING: No corresponding file found in 'output' for {rewritten_file}")
+
+   save_results_to_json(all_results, results_json_path)
+   save_results_to_html(all_results, results_html_path)
+
+   print(f"Results saved to {results_json_path} and {results_html_path}")
+   ```
+
+This script provides a comprehensive evaluation of rewritten news articles against their original versions, offering insights into the quality and coherence of the rewritten content.
+
 
 ## evaluate_cohesion_concreteness.py
 
