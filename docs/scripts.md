@@ -15,7 +15,7 @@ Welcome to the Scripts Documentation section. This comprehensive guide provides 
 
 - [evaluate_against_reference.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_against_referencepy)
 - [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#process_multiple_metricspy)
-- [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
+- [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy) and many more (ongoing docs updates..)
 
 Each script's documentation includes the following sections:
 
