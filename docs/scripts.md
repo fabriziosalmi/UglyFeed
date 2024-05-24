@@ -24,6 +24,131 @@ An overview of the script's architecture, highlighting major components and thei
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 ---
+## demo.sh
+
+### Overview
+This script is designed to automate the process of interacting with different language model APIs (OpenAI or Ollama) to process RSS feeds and serve the processed data. It guides the user through selecting an API, specifying model parameters, and then runs a sequence of Python scripts to handle the data processing and serving.
+
+### Installation
+To set up this script in your environment, follow these steps:
+
+1. **Clone the repository (if applicable)**:
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
+
+2. **Install Python dependencies**:
+   Ensure you have Python 3 installed. Install the required Python packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set up environment variables** (if necessary):
+   - For OpenAI API, ensure you have an API key.
+   - For Ollama API, ensure the Ollama API is running and accessible.
+
+### Usage
+To run the script, follow these steps:
+
+1. **Make the script executable** (if it isn't already):
+   ```bash
+   chmod +x script.sh
+   ```
+
+2. **Run the script**:
+   ```bash
+   ./script.sh
+   ```
+
+3. **Follow the prompts**:
+   - Enter the RSS feeds.
+   - Select the API (Ollama or OpenAI).
+   - Provide the necessary API keys or URLs.
+   - Choose the appropriate language model.
+
+### Functionality
+The script consists of several key functions:
+
+- **prompt**: Prompts the user for input and returns the input.
+- **select_api**: Guides the user through selecting the API (Ollama or OpenAI).
+- **select_llm_model**: Prompts the user to select the appropriate language model based on the chosen API.
+
+After gathering the necessary inputs, the script:
+1. **Saves the RSS feeds** to a file.
+2. **Starts the main processing** by running `main.py`.
+3. **Processes the feeds** using the selected API and model (`llm_processor.py` or `llm_processor_openai.py`).
+4. **Converts the processed data** to RSS format using `json2rss.py`.
+5. **Serves the processed data** using `serve.py`.
+
+### Input/Output
+**Input**:
+- A list of RSS feeds provided by the user.
+- API selection (Ollama or OpenAI).
+- Specific model selection within the chosen API.
+- API keys or URLs for authentication.
+
+**Output**:
+- Processed RSS feeds saved in the specified format.
+- A running server providing access to the processed data.
+
+### Code Structure
+The script is organized as follows:
+
+1. **User Input Section**:
+   - Prompts for RSS feeds, API selection, and model selection.
+   
+2. **API and Model Configuration**:
+   - Saves the RSS feeds to `input/feeds.txt`.
+   - Prompts for API keys or URLs.
+
+3. **Execution of Processing Scripts**:
+   - Runs `main.py` to initiate the processing.
+   - Runs the appropriate LLM processing script based on user selection (`llm_processor.py` for Ollama, `llm_processor_openai.py` for OpenAI).
+
+4. **Conversion and Serving**:
+   - Converts the processed data to RSS format using `json2rss.py`.
+   - Starts the server using `serve.py`.
+
+### Detailed Script Breakdown
+
+**1. Prompt for RSS Feeds**:
+```bash
+echo "Please enter up to 100 RSS feeds, either separated by spaces or one per line. Enter an empty line to finish:"
+rss_feeds=()
+while IFS= read -r line; do
+  [[ -z "$line" ]] && break
+  rss_feeds+=("$line")
+done
+```
+This block collects the RSS feeds from the user.
+
+**2. Select API**:
+```bash
+select_api
+```
+This function prompts the user to choose between Ollama and OpenAI APIs.
+
+**3. Select LLM Model**:
+```bash
+select_llm_model
+```
+Based on the selected API, this function prompts the user to choose a language model.
+
+**4. Execute Processing Scripts**:
+```bash
+python3 main.py
+python3 llm_processor.py --model phi3 --api_url "$ollama_url"
+```
+These lines run the main processing script and the appropriate LLM processing script.
+
+**5. Serve Processed Data**:
+```bash
+python3 serve.py
+```
+This command starts a server to serve the processed RSS data.
+
+This script provides a guided, interactive way to process and serve RSS feeds using different language model APIs, ensuring flexibility and ease of use.
 
 ## evaluate_cohesion_concreteness.py
 
