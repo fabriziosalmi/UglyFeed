@@ -4,9 +4,9 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 import sys
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("averaged_perceptron_tagger")
-nltk.download("stopwords")
+nltk.download("punkt", quiet=True)
+nltk.download("averaged_perceptron_tagger", quiet=True)
+nltk.download("stopwords", quiet=True)
 
 # Define words indicative of narrative and persuasive content in both languages
 # Define words indicative of narrative and persuasive content in both languages
