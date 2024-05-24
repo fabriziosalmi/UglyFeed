@@ -17,7 +17,7 @@ Welcome to the Scripts Documentation section. This comprehensive guide provides 
 - [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#process_multiple_metricspy)
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy) and many more (ongoing docs updates..)
 
-Each script's documentation includes the following sections:
+#### Each script's documentation includes the following sections:
 
 - **Overview**
 A brief introduction to the script, explaining its purpose and the specific problem it aims to solve.
