@@ -1,6 +1,6 @@
 # Scripts documentation
 
-- [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/new/main/docs#evaluate_cohesion_concretenesspy)
+- [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 Welcome to the Scripts Documentation section. This comprehensive guide provides detailed information and instructions for each script in our project. 
 Each script's documentation includes the following sections:
