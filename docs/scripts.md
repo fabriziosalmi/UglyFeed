@@ -27,6 +27,188 @@ An overview of the script's architecture, highlighting major components and thei
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 ---
+
+## main.py
+
+### Overview
+This Python script processes RSS feeds, groups similar articles based on a similarity threshold, and saves the grouped articles as JSON files. It is designed to automate the aggregation and organization of news articles from various RSS feeds, making it easier to identify and manage similar content.
+
+### Installation
+To set up this script in your environment, follow these steps:
+
+1. **Ensure Python 3 is installed** on your system.
+
+2. **Install necessary Python packages**:
+   This script may depend on additional packages for RSS fetching, similarity checking, and JSON handling. Ensure you have them installed by running:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set up the directory structure**:
+   Ensure you have an `input` directory containing your `feeds.txt` file and create an `output` directory for the results:
+   ```bash
+   mkdir -p input output
+   ```
+
+### Usage
+To run the script, follow these steps:
+
+1. **Place your RSS feeds list**:
+   Ensure your `feeds.txt` file with RSS feed URLs is located in the `input` directory.
+
+2. **Execute the script** with the desired similarity threshold:
+   ```bash
+   python3 main.py --threshold 0.5
+   ```
+   Adjust the `--threshold` value as needed.
+
+3. **Check the output**:
+   The grouped articles will be saved as JSON files in the `output` directory.
+
+### Functionality
+The script includes the following key functions:
+
+- **fetch_feeds_from_file(input_file_path)**: Reads RSS feed URLs from a file and fetches the articles.
+
+- **group_similar_articles(articles, similarity_threshold)**: Groups articles based on a similarity threshold.
+
+- **save_grouped_articles(grouped_articles, output_dir)**: Saves the grouped articles as JSON files.
+
+### Input/Output
+**Input**:
+- A text file named `feeds.txt` located in the `input` directory. This file should contain RSS feed URLs, one per line.
+
+**Output**:
+- JSON files saved in the `output` directory. Each file contains grouped articles based on the specified similarity threshold.
+
+### Code Structure
+The script is structured as follows:
+
+1. **Imports and Argument Parsing**:
+   ```python
+   import os
+   import argparse
+   import time
+   from rss_reader import fetch_feeds_from_file
+   from similarity_checker import group_similar_articles
+   from json_manager import save_grouped_articles
+   ```
+
+2. **Main Function**:
+   Orchestrates the entire process of fetching, grouping, and saving articles.
+   ```python
+   def main(similarity_threshold: float) -> None:
+       print("Starting RSS feed processing...")
+       input_file_path = 'input/feeds.txt'
+       start_time = time.time()
+
+       print("Fetching and parsing RSS feeds...")
+       articles = fetch_feeds_from_file(input_file_path)
+       print(f"Total articles fetched and parsed: {len(articles)}")
+
+       print(f"Grouping articles based on similarity (threshold={similarity_threshold})...")
+       grouped_articles = group_similar_articles(articles, similarity_threshold)
+       print(f"Total groups formed: {len(grouped_articles)}")
+
+       print("Saving grouped articles to JSON files...")
+       group_sizes = save_grouped_articles(grouped_articles, 'output')
+       total_files_saved = len(group_sizes)
+
+       elapsed_time = time.time() - start_time
+       print(f"RSS feed processing complete. {total_files_saved} different articles are now grouped.")
+       print(f"Details of groups saved: {group_sizes}")
+       print(f"(Took {elapsed_time:.2f} seconds)")
+
+       print("Summarizing output files:")
+       output_files = os.listdir('output')
+       for filename in output_files:
+           path = os.path.join('output', filename)
+           with open(path, 'r', encoding='utf-8') as file:
+               line_count = sum(1 for _ in file)
+           print(f"{filename}: {line_count} lines")
+       print(f"Total output files: {len(output_files)}")
+   ```
+
+3. **Argument Parsing and Script Execution**:
+   Parses command-line arguments and runs the main function.
+   ```python
+   if __name__ == "__main__":
+       parser = argparse.ArgumentParser(
+           description='Process RSS feeds and group similar articles based on a similarity threshold.'
+       )
+       parser.add_argument(
+           '-t', '--threshold', type=float, default=0.5,
+           help='Set the similarity threshold for grouping articles (default: 0.5).'
+       )
+       args = parser.parse_args()
+       main(args.threshold)
+   ```
+
+### Detailed Script Breakdown
+
+**1. Imports and Argument Parsing**:
+   Imports necessary modules and sets up command-line argument parsing.
+   ```python
+   import os
+   import argparse
+   import time
+   from rss_reader import fetch_feeds_from_file
+   from similarity_checker import group_similar_articles
+   from json_manager import save_grouped_articles
+   ```
+
+**2. Main Function**:
+   Processes the RSS feeds, groups similar articles, and saves them.
+   ```python
+   def main(similarity_threshold: float) -> None:
+       print("Starting RSS feed processing...")
+       input_file_path = 'input/feeds.txt'
+       start_time = time.time()
+
+       print("Fetching and parsing RSS feeds...")
+       articles = fetch_feeds_from_file(input_file_path)
+       print(f"Total articles fetched and parsed: {len(articles)}")
+
+       print(f"Grouping articles based on similarity (threshold={similarity_threshold})...")
+       grouped_articles = group_similar_articles(articles, similarity_threshold)
+       print(f"Total groups formed: {len(grouped_articles)}")
+
+       print("Saving grouped articles to JSON files...")
+       group_sizes = save_grouped_articles(grouped_articles, 'output')
+       total_files_saved = len(group_sizes)
+
+       elapsed_time = time.time() - start_time
+       print(f"RSS feed processing complete. {total_files_saved} different articles are now grouped.")
+       print(f"Details of groups saved: {group_sizes}")
+       print(f"(Took {elapsed_time:.2f} seconds)")
+
+       print("Summarizing output files:")
+       output_files = os.listdir('output')
+       for filename in output_files:
+           path = os.path.join('output', filename)
+           with open(path, 'r', encoding='utf-8') as file:
+               line_count = sum(1 for _ in file)
+           print(f"{filename}: {line_count} lines")
+       print(f"Total output files: {len(output_files)}")
+   ```
+
+**3. Argument Parsing and Script Execution**:
+   Parses the similarity threshold argument and runs the main function.
+   ```python
+   if __name__ == "__main__":
+       parser = argparse.ArgumentParser(
+           description='Process RSS feeds and group similar articles based on a similarity threshold.'
+       )
+       parser.add_argument(
+           '-t', '--threshold', type=float, default=0.5,
+           help='Set the similarity threshold for grouping articles (default: 0.5).'
+       )
+       args = parser.parse_args()
+       main(args.threshold)
+   ```
+
+This script provides a comprehensive solution for processing and organizing RSS feed articles, making it easier to manage and analyze large volumes of news content.
+
 ## demo.sh
 
 ### Overview
