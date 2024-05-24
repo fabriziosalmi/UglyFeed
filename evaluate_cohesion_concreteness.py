@@ -6,11 +6,11 @@ import sys
 import numpy as np
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("averaged_perceptron_tagger")
-nltk.download("stopwords")
-nltk.download("wordnet")
-nltk.download('words')
+nltk.download("punkt", quiet=True)
+nltk.download("averaged_perceptron_tagger", quiet=True)
+nltk.download("stopwords", quiet=True)
+nltk.download("wordnet", quiet=True)
+nltk.download('words', quiet=True)
 
 # lexicon (initial tentative)
 # Placeholder lists for concreteness, imageability, and age of acquisition scores
