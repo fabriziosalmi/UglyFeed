@@ -76,7 +76,7 @@ Properly setup a custom system prompt on your LLM inference server.
 Optional:
 - 📈 Evaluate generated content against several [metrics](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md) (an aggregated score is provided too) by running `python evaluate_against_reference.py` (evaluate comparison metrics of generated files against the reference files) and `process_multiple_metrics.py` (evaluate only the generated content files against different metrics).
 - 🎛️ You can easily customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md).
-- 🕒 You can setup a cronjob to have fresh content automatically updated on your RSS reader bu executing all files in the order specified.
+- 🕒 You can setup a cronjob to have fresh content automatically updated on your RSS reader by executing all files in the order specified (an automation script is under development)
 - 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on.
 
 
