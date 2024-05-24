@@ -1,5 +1,5 @@
 # Scripts documentation
-Welcome to the Scripts Documentation section. This comprehensive guide provides detailed information and instructions for each script in our project. 
+Welcome to the Scripts Documentation section. This comprehensive guide provides detailed information and instructions for each script in our project. I use to complete the docs also to catch some placeholder functions around the code and replace it with usable stuff :)
 Each script's documentation includes the following sections:
 
 - **Overview**
