@@ -25,6 +25,7 @@ An overview of the script's architecture, highlighting major components and thei
 - [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#mainpy)
 - [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
 - [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#json2rsspy)
+- [serve.py()
 - [evaluate_cohesion_concreteness.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_cohesion_concretenesspy)
 
 ---
@@ -491,6 +492,170 @@ The script is structured as follows:
    ```
 
 This script provides a straightforward way to convert JSON news data into an RSS feed, making it easy to integrate with RSS readers or news aggregation services.
+
+## serve.py
+
+### Overview
+This Python script sets up a simple HTTP server to serve an RSS feed file (`uglyfeed.xml`) from a specified directory (`uglyfeeds`). It is designed to provide easy access to the RSS feed by hosting it locally, making it accessible via a web browser or any RSS feed reader.
+
+### Installation
+To set up this script in your environment, follow these steps:
+
+1. **Ensure Python 3 is installed** on your system.
+
+2. **Set up the directory structure**:
+   Ensure that you have an `uglyfeeds` directory containing the `uglyfeed.xml` file.
+
+### Usage
+To run the script, follow these steps:
+
+1. **Place the RSS feed file**:
+   Ensure your `uglyfeed.xml` file is located in the `uglyfeeds` directory.
+
+2. **Execute the script**:
+   Run the script using Python:
+   ```bash
+   python3 serve.py
+   ```
+
+3. **Access the RSS feed**:
+   Open a web browser or RSS reader and navigate to the URL displayed in the console (e.g., `http://<local_ip>:8000/uglyfeed.xml`).
+
+### Functionality
+The script includes the following key components:
+
+- **UglyFeedHandler**: A custom HTTP request handler that serves the `uglyfeed.xml` file when the root URL (`/`) is accessed.
+
+- **get_local_ip()**: A function to retrieve the local IP address of the machine running the server.
+
+- **run(server_class, handler_class, port)**: Sets up and starts the HTTP server, making the RSS feed file accessible.
+
+### Input/Output
+**Input**:
+- The `uglyfeed.xml` file located in the `uglyfeeds` directory.
+
+**Output**:
+- An HTTP server running locally, serving the `uglyfeed.xml` file, accessible via a web browser or RSS reader.
+
+### Code Structure
+The script is structured as follows:
+
+1. **Imports and Directory Setup**:
+   ```python
+   import http.server
+   import socket
+   import os
+   from urllib.parse import urljoin
+
+   uglyfeeds_dir = 'uglyfeeds'
+   uglyfeed_file = 'uglyfeed.xml'
+   os.chdir(uglyfeeds_dir)
+   ```
+
+2. **UglyFeedHandler Class**:
+   Custom HTTP request handler to serve the `uglyfeed.xml` file.
+   ```python
+   class UglyFeedHandler(http.server.SimpleHTTPRequestHandler):
+       def do_GET(self):
+           if self.path == '/':
+               self.path = f'/{uglyfeed_file}'
+           return super().do_GET()
+   ```
+
+3. **get_local_ip() Function**:
+   Retrieves the local IP address of the machine running the server.
+   ```python
+   def get_local_ip():
+       s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+       try:
+           s.connect(('10.254.254.254', 1))
+           local_ip = s.getsockname()[0]
+       except Exception:
+           local_ip = '127.0.0.1'
+       finally:
+           s.close()
+       return local_ip
+   ```
+
+4. **run() Function**:
+   Sets up and starts the HTTP server.
+   ```python
+   def run(server_class=http.server.HTTPServer, handler_class=UglyFeedHandler, port=8000):
+       server_address = ('', port)
+       httpd = server_class(server_address, handler_class)
+       local_ip = get_local_ip()
+       final_url = urljoin(f'http://{local_ip}:{port}/', uglyfeed_file)
+       print(f'Serving {uglyfeed_file} at: {final_url}')
+       httpd.serve_forever()
+   ```
+
+5. **Script Execution**:
+   Starts the server when the script is executed directly.
+   ```python
+   if __name__ == '__main__':
+       run()
+   ```
+
+### Detailed Script Breakdown
+
+**1. Imports and Directory Setup**:
+   Sets up the environment and changes to the directory containing the `uglyfeed.xml` file.
+   ```python
+   import http.server
+   import socket
+   import os
+   from urllib.parse import urljoin
+
+   uglyfeeds_dir = 'uglyfeeds'
+   uglyfeed_file = 'uglyfeed.xml'
+   os.chdir(uglyfeeds_dir)
+   ```
+
+**2. UglyFeedHandler Class**:
+   Custom handler to serve the `uglyfeed.xml` file at the root URL.
+   ```python
+   class UglyFeedHandler(http.server.SimpleHTTPRequestHandler):
+       def do_GET(self):
+           if self.path == '/':
+               self.path = f'/{uglyfeed_file}'
+           return super().do_GET()
+   ```
+
+**3. get_local_ip() Function**:
+   Function to determine the local IP address for serving the file.
+   ```python
+   def get_local_ip():
+       s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+       try:
+           s.connect(('10.254.254.254', 1))
+           local_ip = s.getsockname()[0]
+       except Exception:
+           local_ip = '127.0.0.1'
+       finally:
+           s.close()
+       return local_ip
+   ```
+
+**4. run() Function**:
+   Sets up the server and starts serving the `uglyfeed.xml` file.
+   ```python
+   def run(server_class=http.server.HTTPServer, handler_class=UglyFeedHandler, port=8000):
+       server_address = ('', port)
+       httpd = server_class(server_address, handler_class)
+       local_ip = get_local_ip()
+       final_url = urljoin(f'http://{local_ip}:{port}/', uglyfeed_file)
+       print(f'Serving {uglyfeed_file} at: {final_url}')
+       httpd.serve_forever()
+   ```
+
+**5. Script Execution**:
+   Runs the server when the script is executed directly.
+   ```python
+   if __name__ == '__main__':
+       run()
+   ```
+
+This script provides a simple and effective way to serve an RSS feed file locally, making it easily accessible for testing or local use.
 
 ## evaluate_cohesion_concreteness.py
 
