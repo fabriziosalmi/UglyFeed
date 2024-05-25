@@ -85,14 +85,17 @@ Optional:
 - `main.py`: Retrieves and aggregates RSS feeds.
 - `llm_processor.py`: Rewrites aggregated feeds using a language model and Ollama API.
 - `llm_processor_openai.py`: Rewrites aggregated feeds using a language model and OpenAI API.
-- `json_manager.py`: Manages JSON file operations.
-- `rss_reader.py`: Reads RSS feeds.
-- `similarity_checker.py`: Checks similarity between feeds.
+- `json_manager.py`: Used by main.py, manages JSON file operations. 
+- `rss_reader.py`: Used by main.py, reads RSS feeds.
+- `similarity_checker.py`: Used by main.py, checks similarity between feeds.
 - `json2rss.py`: Convert JSON to RSS feed.
-- `evaluate.py`: Evaluate generated content against several metrics.
+- `evaluate_against_reference.py`: Evaluate metrics of generated content against reference content.
+- `process_multiple_metrics.py`: Evaluate metrics of generated content.
 - `proxy.py`: Serve HTTP proxy on port 8028 to transparently handle Ollama API to OpenAI API communications (initial workaround, use llm_processor_openai.py instead).
 - `serve.py`: Serve RSS XML via HTTP server.
-- `input/`: Directory for input files (if any).
+- `input/`: Directory for feeds list file
+- `output`: Directory for aggregated (for similarity) feeds.
+- `rewritten`: Directory for rewritten content and evaluation metrics.
 - `requirements.txt`: List of dependencies.
 
 ## Contribution
