@@ -94,8 +94,9 @@ Optional:
 - `proxy.py`: Serve HTTP proxy on port 8028 to transparently handle Ollama API to OpenAI API communications (initial workaround, use llm_processor_openai.py instead).
 - `serve.py`: Serve RSS XML via HTTP server.
 - `input/`: Directory for feeds list file
-- `output`: Directory for aggregated (for similarity) feeds.
-- `rewritten`: Directory for rewritten content and evaluation metrics.
+- `output/`: Directory for aggregated (for similarity) feeds.
+- `rewritten/`: Directory for rewritten content and evaluation metrics.
+- `uglyfeeds/`: Used by serve.py is the directory where the uglyfeed.xml is served via HTTP
 - `requirements.txt`: List of dependencies.
 
 ## Contribution
