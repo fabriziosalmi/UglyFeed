@@ -1,5 +1,3 @@
-You can use RSSHub to create RSS from any kind of source, examples:
-
 Here are examples of how to create feeds from various sources using RSSHub:
 
 ### 1. YouTube Channel
