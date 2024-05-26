@@ -74,4 +74,109 @@ To access these feeds, you would typically prepend your RSSHub server URL to the
 https://rsshub.example.com/youtube/channel/UC_x5XG1OV2P6uZZ5FSM9Ttw
 ```
 
-You can customize these examples based on your specific needs and the IDs or keywords relevant to your interests.
+### 7. Twitter User
+To create a feed from a Twitter user's timeline, use the following path:
+```
+/twitter/user/:id
+```
+**Example:**
+```
+/twitter/user/jack
+```
+This creates an RSS feed for the Twitter user `jack`.
+
+### 8. Instagram User
+To create a feed from an Instagram user's posts, use the following path:
+```
+/instagram/user/:id
+```
+**Example:**
+```
+/instagram/user/natgeo
+```
+This creates an RSS feed for the Instagram user `natgeo`.
+
+### 9. GitHub Repository Releases
+To create a feed for releases of a GitHub repository, use the following path:
+```
+/github/release/:user/:repo
+```
+**Example:**
+```
+/github/release/vuejs/vue
+```
+This creates an RSS feed for the releases of the `vue` repository under the `vuejs` user.
+
+### 10. Reddit Subreddit
+To create a feed from a subreddit, use the following path:
+```
+/reddit/subreddit/:subreddit
+```
+**Example:**
+```
+/reddit/subreddit/programming
+```
+This creates an RSS feed for the `programming` subreddit.
+
+### 11. Hacker News
+To create a feed from Hacker News, use the following path:
+```
+/hackernews/:section
+```
+**Example:**
+```
+/hackernews/frontpage
+```
+This creates an RSS feed for the front page of Hacker News.
+
+### 12. Jianshu User
+To create a feed from a Jianshu user, use the following path:
+```
+/jianshu/user/:id
+```
+**Example:**
+```
+/jianshu/user/9f8b1e4c5c7a
+```
+This creates an RSS feed for the Jianshu user with the ID `9f8b1e4c5c7a`.
+
+### 13. Bilibli Channel
+To create a feed from a Bilibili user's channel, use the following path:
+```
+/bilibili/user/video/:uid
+```
+**Example:**
+```
+/bilibili/user/video/2267573
+```
+This creates an RSS feed for the Bilibili user with the UID `2267573`.
+
+### 14. Steam News
+To create a feed for Steam news for a specific app, use the following path:
+```
+/steam/news/:appid
+```
+**Example:**
+```
+/steam/news/440
+```
+This creates an RSS feed for the Steam news of the app with the AppID `440` (Team Fortress 2).
+
+### 15. Product Hunt
+To create a feed for Product Hunt's popular products, use the following path:
+```
+/producthunt/today
+```
+**Example:**
+```
+/producthunt/today
+```
+This creates an RSS feed for today's popular products on Product Hunt.
+
+### Example URLs
+To access these feeds, prepend your RSSHub server URL to these paths. For example, if your RSSHub server is hosted at `https://rsshub.example.com`, the full URL for the Twitter user example would be:
+```
+https://rsshub.example.com/twitter/user/jack
+```
+
+Feel free to customize these routes based on your specific needs and the IDs or keywords relevant to your interests.
