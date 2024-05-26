@@ -78,7 +78,7 @@ Optional:
 - 🎛️ You can easily customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md).
 - 🕒 You can setup a cronjob to have fresh content automatically updated on your RSS reader by executing all files in the order specified (an automation script is under development)
 - 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on.
-
+- You can create RSS from any content by using RSSHub and rewrite its feeds by using UglyFeed.
 
 ## Project Structure
 
