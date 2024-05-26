@@ -68,12 +68,6 @@ To create a feed from arXiv papers, use the following path:
 ```
 This creates an RSS feed for arXiv papers in the `cs.LG` (Machine Learning) category.
 
-### Example URLs
-To access these feeds, you would typically prepend your RSSHub server URL to these paths. For example, if your RSSHub server is hosted at `https://rsshub.example.com`, the full URL for the YouTube channel example would be:
-```
-https://rsshub.example.com/youtube/channel/UC_x5XG1OV2P6uZZ5FSM9Ttw
-```
-
 ### 7. Twitter User
 To create a feed from a Twitter user's timeline, use the following path:
 ```
