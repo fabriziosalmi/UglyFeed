@@ -39,7 +39,7 @@ Properly setup a custom system prompt on your LLM inference server.
    
 ## Usage
 
-1. Setup options (similarity, API and model) by making your changes into the `config.yaml` file
+1. Setup options (similarity, API, model and the CONTENT_PREFIX) by making your changes into the `config.yaml` file
 
 2. Retrieve and aggregate RSS feeds (you can change feeds in the `input/feeds.txt` file)
     ```sh
