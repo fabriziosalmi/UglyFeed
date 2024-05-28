@@ -1,12 +1,17 @@
 import os
 import argparse
 import time
+import yaml
 from rss_reader import fetch_feeds_from_file
 from similarity_checker import group_similar_articles
 from json_manager import save_grouped_articles
 
+def load_config(config_path: str) -> dict:
+    """Load configuration from a YAML file."""
+    with open(config_path, 'r') as file:
+        return yaml.safe_load(file)
 
-def main(similarity_threshold: float) -> None:
+def main(config: dict) -> None:
     """Main function to process RSS feeds and group similar articles."""
     print("Starting RSS feed processing...")
     input_file_path = 'input/feeds.txt'
@@ -16,8 +21,11 @@ def main(similarity_threshold: float) -> None:
     articles = fetch_feeds_from_file(input_file_path)
     print(f"Total articles fetched and parsed: {len(articles)}")
 
+    similarity_threshold = config['similarity_threshold']
+    similarity_options = config['similarity_options']
+
     print(f"Grouping articles based on similarity (threshold={similarity_threshold})...")
-    grouped_articles = group_similar_articles(articles, similarity_threshold)
+    grouped_articles = group_similar_articles(articles, similarity_threshold, similarity_options)
     print(f"Total groups formed: {len(grouped_articles)}")
 
     print("Saving grouped articles to JSON files...")
@@ -39,14 +47,14 @@ def main(similarity_threshold: float) -> None:
         print(f"{filename}: {line_count} lines")
     print(f"Total output files: {len(output_files)}")
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Process RSS feeds and group similar articles based on a similarity threshold.'
     )
     parser.add_argument(
-        '-t', '--threshold', type=float, default=0.5,
-        help='Set the similarity threshold for grouping articles (default: 0.5).'
+        '-c', '--config', type=str, default='config.yaml',
+        help='Path to the configuration file (default: config.yaml).'
     )
     args = parser.parse_args()
-    main(args.threshold)
+    config = load_config(args.config)
+    main(config)
