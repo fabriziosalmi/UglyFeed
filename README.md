@@ -39,34 +39,29 @@ Properly setup a custom system prompt on your LLM inference server.
    
 ## Usage
 
-1. Retrieve and aggregate RSS feeds (you can change feeds in the `input/feeds.txt` file)
+1. Setup options (similarity, API and model) by making your changes into the `config.yaml` file
+
+2. Retrieve and aggregate RSS feeds (you can change feeds in the `input/feeds.txt` file)
     ```sh
     python main.py
     ```
 
    Optional: You can extract RSS urls from local or remote OPML file by running `python opml2feeds.py source OPML_file_or_URL` (check code, barely tested)
 
-2. Rewrite and save aggregated feeds using supported LLM API:
+3. Rewrite and save aggregated feeds using configured LLM API:
 
- - Ollama API
     ```sh
-    python llm_processor.py --api_url http://127.0.0.1:11434/api/chat --model llama3
+    python llm_processor.py
     ```
- - OpenAI API
-    ```sh
-    python llm_processor_openai.py --api_key sk-proj-xxxxxxxxxxxxxxx --model gpt-3.5-turbo
-    ```
-
-   (replace `sk-proj-xxxxxxxxxxxxxxx` with your [OpenAI API key](https://platform.openai.com/api-keys))
    
     Optional: You can change prompt/role, just look into the **prompts** folder. By using specific prompts You can force specific languages to use for generation.
    
-3. Convert JSON to RSS feed
+4. Convert JSON to RSS feed
     ```sh
     python json2rss.py
     ```
     
-4. Serve RSS XML via HTTP server
+5. Serve RSS XML via HTTP server
     ```sh
     python serve.py
     ```
