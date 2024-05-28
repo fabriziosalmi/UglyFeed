@@ -71,10 +71,9 @@ Optional and integrations:
 - 🎛️ Customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
 - 🎛️ Customize user prompt, check the **prompts** folder for inspiration
 - 🎛️ Force specific languages to use for generation just by using specific prompts
-- 📈 Evaluate generated content against several [metrics](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md) (an aggregated score is provided too) by running:  - `python evaluate_against_reference.py`: evaluate comparison metrics of generated files against the reference files
- - `process_multiple_metrics.py`: evaluate only the generated content files against different metrics
+- 📈 Evaluate generated content against several [metrics](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md) (an aggregated score is provided too) by running `python evaluate_against_reference.py` to evaluate comparison metrics of generated files against the reference files or `python process_multiple_metrics.py` to evaluate only the generated content files against different metrics
 - 🕒 Setup a cronjob to have fresh content automatically updated on your RSS reader by executing all files in the order specified
-- 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on.
+- 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on
 
 ## Project Structure
 
