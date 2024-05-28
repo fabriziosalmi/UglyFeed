@@ -1,9 +1,6 @@
 # Scripts documentation
 Welcome to the Scripts Documentation section. This comprehensive guide provides detailed information and instructions for each script in our project. I use to complete the docs also to catch some placeholder functions around the code and replace it with usable stuff :)
 
-**Demo script**
-- [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
-
 **Main scripts**
 - [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/main.py.md)
 - [llm_processor.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/llm_processor.py.md)
