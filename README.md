@@ -2,6 +2,9 @@
 
 UglyFeed is a **simple** Python application designed to **retrieve**, **aggregate**, **filter**, **rewrite**, **evaluate** and **serve** content (RSS feeds) written by a large language model. This repository provides the code and necessary files to run the application.
 
+![UglyFeed](https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/docs/UglyFeed.png)
+
+
 ## Features
 
 - 📡 Retrieve RSS feeds
