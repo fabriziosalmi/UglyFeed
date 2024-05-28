@@ -75,16 +75,15 @@ Optional:
 
 ## Project Structure
 
+- `config.yaml`: Configuration options for the application
 - `main.py`: Retrieves and aggregates RSS feeds.
-- `llm_processor.py`: Rewrites aggregated feeds using a language model and Ollama API.
-- `llm_processor_openai.py`: Rewrites aggregated feeds using a language model and OpenAI API.
+- `llm_processor.py`: Rewrites aggregated feeds using a language model LLM APIs.
 - `json_manager.py`: Used by main.py, manages JSON file operations. 
 - `rss_reader.py`: Used by main.py, reads RSS feeds.
 - `similarity_checker.py`: Used by main.py, checks similarity between feeds.
 - `json2rss.py`: Convert JSON to RSS feed.
 - `evaluate_against_reference.py`: Evaluate metrics of generated content against reference content.
 - `process_multiple_metrics.py`: Evaluate metrics of generated content.
-- `proxy.py`: Serve HTTP proxy on port 8028 to transparently handle Ollama API to OpenAI API communications (initial workaround, use llm_processor_openai.py instead).
 - `serve.py`: Serve RSS XML via HTTP server.
 - `input/`: Directory for feeds list file
 - `output/`: Directory for aggregated (for similarity) feeds.
