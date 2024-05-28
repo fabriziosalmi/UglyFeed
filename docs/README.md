@@ -14,6 +14,9 @@ Welcome to the project documentation section. This comprehensive guide provides 
 **Evaluation metrics**
 - [Metrics documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md)
 
+**Sources**
+- [Create RSS from any source via RSSHub](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/sources.md)
+
 #### Notes
 Each script's documentation includes the following sections:
 
