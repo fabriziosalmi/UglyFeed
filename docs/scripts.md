@@ -9,8 +9,8 @@ Welcome to the Scripts Documentation section. This comprehensive guide provides 
 
 **Optional scripts**
 
-- [evaluate_against_reference.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#evaluate_against_referencepy)
-- [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#process_multiple_metricspy)
+- [evaluate_against_reference.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/evaluate_against_reference.py.md)
+- [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/process_multiple_metrics.py.md)
 
 #### Each script's documentation includes the following sections:
 
