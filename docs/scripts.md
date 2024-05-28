@@ -5,10 +5,10 @@ Welcome to the Scripts Documentation section. This comprehensive guide provides 
 - [demo.sh](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#demosh)
 
 **Main scripts**
-- [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#mainpy)
-- [llm_processor.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#llm_processorpy)
-- [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#json2rsspy)
-- [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/scripts.md#servepy)
+- [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/main.py.md)
+- [llm_processor.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/llm_processor.py.md)
+- [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/json2rss.py.md)
+- [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/serve.py.md)
 
 **Optional scripts**
 
