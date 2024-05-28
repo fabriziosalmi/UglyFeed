@@ -1,23 +1,28 @@
+# Similarity configuration settings
 similarity_threshold: 0.5
 similarity_options:
-  min_samples: 3
-  eps: 0.5
+  min_samples: 3  # Minimum number of samples in a cluster for DBSCAN
+  eps: 0.5       # Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN
 
+# API configuration settings
 api_config:
   # Uncomment the relevant API configuration and comment the other to switch APIs
+  
   # OpenAI API configuration
   # openai_api_url: "https://api.openai.com/v1/chat/completions"
-  # openai_api_key: ""
-  # openai_model: "gpt-3.5-turbo"
+  # openai_api_key: ""  # Enter your OpenAI API key here
+  # openai_model: "gpt-3.5-turbo"  # Model to use from OpenAI
 
   # Ollama API configuration
-  ollama_api_url: "http://localhost:11434/api/chat"
-  ollama_model: "phi3"
+  ollama_api_url: "http://localhost:11434/api/chat"  # URL for local Ollama API server
+  ollama_model: "phi3"  # Model to use from Ollama (tested and working by using both phi3 and llama3)
 
+# Folder configuration settings
 folders:
-  output_folder: "output"
-  rewritten_folder: "rewritten"
+  output_folder: "output"       # Directory for storing aggregated feeds
+  rewritten_folder: "rewritten" # Directory for storing rewritten content
 
+# Content generation settings
 content_prefix: >
   In qualità di giornalista esperto, utilizza un tono professionale, preciso e dettagliato.
   Non includere titoli, informazioni personali o dettagli sulle fonti.
@@ -27,7 +32,8 @@ content_prefix: >
   assicurandoti che il risultato finale sia chiaro, completo, coerente e informativo.
   Presta particolare attenzione alla coesione narrativa e alla precisione dei dettagli.
   Sintetizza le informazioni se necessario, mantenendo sempre la qualità e la rilevanza.
-  Il contenuto generato deve essere in italiano.
+  Il contenuto generato deve essere in italiano.  # Ensure the generated content is in Italian
 
-max_items: 10
-max_age_days: 30
+# Limit settings for content retrieval and processing
+max_items: 50          # Maximum number of items to process
+max_age_days: 10       # Maximum age of items in days to be considered
