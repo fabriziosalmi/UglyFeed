@@ -28,3 +28,6 @@ content_prefix: >
   Presta particolare attenzione alla coesione narrativa e alla precisione dei dettagli.
   Sintetizza le informazioni se necessario, mantenendo sempre la qualità e la rilevanza.
   Il contenuto generato deve essere in italiano.
+
+max_items: 10
+max_age_days: 30
