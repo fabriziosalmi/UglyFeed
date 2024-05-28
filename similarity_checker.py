@@ -10,9 +10,9 @@ import spacy
 
 # Instructions to download necessary NLTK and spaCy resources
 import nltk
-nltk.download('wordnet')
-nltk.download('stopwords')
-nltk.download('omw-1.4')  # For multi-language support
+nltk.download('wordnet', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('omw-1.4', quiet=True)  # For multi-language support
 
 # Download spaCy model if not already downloaded
 try:
