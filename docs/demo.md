@@ -66,29 +66,10 @@ Total output files: 6
 2024-05-23 22:55:55,117 - INFO - Processing file: output/20240523_2255-crosetto_ambulanza_ministro-Q4-S0.48.json
 2024-05-23 22:55:55,118 - INFO - Processing output/20240523_2255-crosetto_ambulanza_ministro-Q4-S0.48.json - combined content prepared.
 2024-05-23 22:57:06,578 - INFO - Rewritten file saved to rewritten/20240523_2255-crosetto_ambulanza_ministro-Q4-S0.48_rewritten.json
-2024-05-23 22:57:06,578 - INFO - Processing file: output/20240523_2255-caso_falso_testamento-Q2-S0.57.json
-2024-05-23 22:57:06,578 - INFO - Processing output/20240523_2255-caso_falso_testamento-Q2-S0.57.json - combined content prepared.
-2024-05-23 22:58:03,309 - INFO - Rewritten file saved to rewritten/20240523_2255-caso_falso_testamento-Q2-S0.57_rewritten.json
-2024-05-23 22:58:03,309 - INFO - Processing file: output/20240523_2255-ilaria_salis_uscita-Q2-S1.00.json
-2024-05-23 22:58:03,309 - INFO - Processing output/20240523_2255-ilaria_salis_uscita-Q2-S1.00.json - combined content prepared.
-2024-05-23 22:59:07,924 - INFO - Rewritten file saved to rewritten/20240523_2255-ilaria_salis_uscita-Q2-S1.00_rewritten.json
-2024-05-23 22:59:07,925 - INFO - Processing file: output/20240523_2255-taiwan__aerei_guerra-Q2-S0.85.json
-2024-05-23 22:59:07,925 - INFO - Processing output/20240523_2255-taiwan__aerei_guerra-Q2-S0.85.json - combined content prepared.
-2024-05-23 22:59:29,428 - INFO - Rewritten file saved to rewritten/20240523_2255-taiwan__aerei_guerra-Q2-S0.85_rewritten.json
-2024-05-23 22:59:29,428 - INFO - Processing file: output/20240523_2255-droga_ordinata_carcere-Q3-S0.59.json
-2024-05-23 22:59:29,429 - INFO - Processing output/20240523_2255-droga_ordinata_carcere-Q3-S0.59.json - combined content prepared.
-2024-05-23 23:00:11,625 - INFO - Rewritten file saved to rewritten/20240523_2255-droga_ordinata_carcere-Q3-S0.59_rewritten.json
-2024-05-23 23:00:11,625 - INFO - Processing file: output/20240523_2255-giovanni_tutte_toti-Q2-S0.35.json
-2024-05-23 23:00:11,626 - INFO - Processing output/20240523_2255-giovanni_tutte_toti-Q2-S0.35.json - combined content prepared.
-2024-05-23 23:00:54,115 - INFO - Rewritten file saved to rewritten/20240523_2255-giovanni_tutte_toti-Q2-S0.35_rewritten.json
+[...]
 RSS feed successfully created at uglyfeeds/uglyfeed.xml
 Serving uglyfeed.xml at: http://192.168.100.6:8000/uglyfeed.xml
 ```
-
-Viewing single item on FluentReader
-
-![demo](https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/docs/demo.png)
-
 
 #### Evaluations
 
@@ -98,11 +79,7 @@ Evaluate metrics of generated files against reference files:
 python evaluate_against_reference.py
 
 Evaluating: 20240523_2255-crosetto_ambulanza_ministro-Q4-S0.48.json
-Evaluating: 20240523_2255-ilaria_salis_uscita-Q2-S1.00.json
-Evaluating: 20240523_2255-caso_falso_testamento-Q2-S0.57.json
-Evaluating: 20240523_2255-giovanni_tutte_toti-Q2-S0.35.json
-Evaluating: 20240523_2255-droga_ordinata_carcere-Q3-S0.59.json
-Evaluating: 20240523_2255-taiwan__aerei_guerra-Q2-S0.85.json
+[...]
 Results saved to reports/evaluation_results.json and reports/evaluation_results.html
 
 cat reports/evaluation_results.json
@@ -137,8 +114,7 @@ cat reports/evaluation_results.json
         "Automated Readability Index": 27.6,
         "Aggregated Score": 67.01110374910445
     },
-
-... 
+[...]
 ```
 
 Evaluate metrics of generated files 
