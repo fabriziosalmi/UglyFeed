@@ -1,4 +1,4 @@
-# Scripts documentation
+# Project documentation
 Welcome to the Scripts Documentation section. This comprehensive guide provides detailed information and instructions for each script in our project. I use to complete the docs also to catch some placeholder functions around the code and replace it with usable stuff :)
 
 **Main scripts**
@@ -8,11 +8,15 @@ Welcome to the Scripts Documentation section. This comprehensive guide provides 
 - [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/serve.py.md)
 
 **Optional scripts**
-
 - [evaluate_against_reference.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/evaluate_against_reference.py.md)
 - [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/process_multiple_metrics.py.md)
 
-#### Each script's documentation includes the following sections:
+**Evaluation metrics**
+- [Metrics documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md)
+
+#### Notes
+
+Each script's documentation includes the following sections:
 
 - **Introduction**
 A brief introduction to the script, explaining its purpose and the specific problem it aims to solve.
@@ -25,3 +29,4 @@ A deep dive into the core functionality of the script, describing key functions 
 
 - **Code Structure**
 An overview of the script's architecture, highlighting major components and their interactions, to give users a clear understanding of how the script is built.
+
