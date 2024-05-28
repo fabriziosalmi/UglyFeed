@@ -1,5 +1,5 @@
 # Project documentation
-Welcome to the Scripts Documentation section. This comprehensive guide provides detailed information and instructions for each script in our project. I use to complete the docs also to catch some placeholder functions around the code and replace it with usable stuff :)
+Welcome to the project documentation section. This comprehensive guide provides detailed information and instructions for each script in our project.
 
 **Main scripts**
 - [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/main.py.md)
@@ -15,7 +15,6 @@ Welcome to the Scripts Documentation section. This comprehensive guide provides 
 - [Metrics documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md)
 
 #### Notes
-
 Each script's documentation includes the following sections:
 
 - **Introduction**
