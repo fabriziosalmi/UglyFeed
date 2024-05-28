@@ -2,7 +2,7 @@
 
 
 
-UglyFeed is a **simple** Python application designed to **retrieve**, **aggregate**, **filter**, **rewrite**, **evaluate** and **serve** content (RSS feeds) written by a large language model. This repository provides the code and necessary files to run the application.
+UglyFeed is a **simple** Python application designed to **retrieve**, **aggregate**, **filter**, **rewrite**, **evaluate** and **serve** content (RSS feeds) written by a large language model. This repository provides the code, the [docs](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md) and the necessary files to run the application.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/docs/UglyFeed.png" alt="UglyFeed">
@@ -40,8 +40,6 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
     ```sh
     pip install -r requirements.txt
     ```
-Optional: 
-Properly setup a custom system prompt on your LLM inference server.
    
 ## Usage
 
@@ -51,17 +49,13 @@ Properly setup a custom system prompt on your LLM inference server.
     ```sh
     python main.py
     ```
-
-   Optional: You can extract RSS urls from local or remote OPML file by running `python opml2feeds.py source OPML_file_or_URL` (check code, barely tested)
-
+    
 3. Rewrite and save aggregated feeds using configured LLM API:
 
     ```sh
     python llm_processor.py
     ```
-   
-    Optional: You can change prompt/role, just look into the **prompts** folder. By using specific prompts You can force specific languages to use for generation.
-   
+    
 4. Convert JSON to RSS feed
     ```sh
     python json2rss.py
@@ -72,13 +66,15 @@ Properly setup a custom system prompt on your LLM inference server.
     python serve.py
     ```
 
-Optional:
+Optional and integrations:
+- 🔁 Create RSS from any content by using [RSSHub](https://github.com/DIYgod/RSSHub) and rewrite its feeds by using [UglyFeed](https://github.com/fabriziosalmi/UglyFeed)
+- 🎛️ Customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
+- 🎛️ Customize user prompt, check the **prompts** folder for inspiration
+- 🎛️ Force specific languages to use for generation just by using specific prompts
 - 📈 Evaluate generated content against several [metrics](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md) (an aggregated score is provided too) by running:  - `python evaluate_against_reference.py`: evaluate comparison metrics of generated files against the reference files
  - `process_multiple_metrics.py`: evaluate only the generated content files against different metrics
-- 🎛️ You can easily customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md).
-- 🕒 You can setup a cronjob to have fresh content automatically updated on your RSS reader by executing all files in the order specified (an [automation script](https://github.com/fabriziosalmi/UglyFeed/blob/main/uglyfeed.sh) is under development)
+- 🕒 Setup a cronjob to have fresh content automatically updated on your RSS reader by executing all files in the order specified
 - 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on.
-- 🎛️ You can create RSS from any content by using [RSSHub](https://github.com/DIYgod/RSSHub) and rewrite its feeds by using UglyFeed.
 
 ## Project Structure
 
@@ -93,7 +89,7 @@ Main components:
 - `llm_processor.py`: Rewrites aggregated feeds using a language model LLM APIs.
 - `json2rss.py`: Convert JSON to RSS feed.
 - `serve.py`: Serve RSS XML via HTTP server.
-  - `uglyfeeds/`: Used by serve.py is the directory where the uglyfeed.xml is served via HTTP
+  - `uglyfeeds`: Used by serve.py is the directory where the uglyfeed.xml is served via HTTP
 
 Optional components:
 
