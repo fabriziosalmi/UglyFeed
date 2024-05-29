@@ -1,5 +1,5 @@
 # Project documentation
-Welcome to the project documentation section. This comprehensive guide provides detailed information and instructions for each script in our project.
+Welcome to the UglyFeed project documentation section. This guide provides detailed information for the scripts used by the project.
 
 **Main scripts**
 - [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/main.py.md)
@@ -7,7 +7,7 @@ Welcome to the project documentation section. This comprehensive guide provides 
 - [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/json2rss.py.md)
 - [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/serve.py.md)
 
-**Optional scripts**
+**Evaluation scripts**
 - [evaluate_against_reference.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/evaluate_against_reference.py.md)
 - [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/process_multiple_metrics.py.md)
 
