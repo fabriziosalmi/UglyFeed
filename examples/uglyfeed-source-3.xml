@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>UglyFeed</title>
+    <link>http://www.uglyfeed.com</link>
+    <description>The ugliest, funniest news you'll ever read!</description>
+    <language>en-us</language>
+    <pubDate>Wed, 29 May 2024 12:00:00 GMT</pubDate>
+
+    <!-- Same Facts with slight differences -->
+
+    <item>
+      <title>Man Wins Lawsuit Against Himself, Receives $1</title>
+      <link>http://www.uglyfeed.com/man-sues-himself</link>
+      <description>A local man sued himself for emotional distress and won a symbolic $1, sparking debates about self-inflicted legal battles.</description>
+      <pubDate>Wed, 29 May 2024 11:00:00 GMT</pubDate>
+      <guid>1</guid>
+    </item>
+
+    <item>
+      <title>Cat Elected Mayor, Declares Fish Day</title>
+      <link>http://www.uglyfeed.com/cat-mayor</link>
+      <description>A cat named Whiskers has been elected mayor, and his first decree is to declare every Friday as Fish Day.</description>
+      <pubDate>Wed, 29 May 2024 10:30:00 GMT</pubDate>
+      <guid>2</guid>
+    </item>
+
+    <item>
+      <title>Invisible Art Exhibit Leaves Critics Speechless</title>
+      <link>http://www.uglyfeed.com/invisible-art</link>
+      <description>An art exhibit featuring invisible paintings has left critics speechless, questioning the very nature of art itself.</description>
+      <pubDate>Wed, 29 May 2024 09:45:00 GMT</pubDate>
+      <guid>3</guid>
+    </item>
+
+    <item>
+      <title>World's Largest Pizza Causes Citywide Feeding Frenzy</title>
+      <link>http://www.uglyfeed.com/helicopter-pizza</link>
+      <description>The world's largest pizza was delivered by helicopter, causing a citywide feeding frenzy and countless selfies.</description>
+      <pubDate>Wed, 29 May 2024 09:00:00 GMT</pubDate>
+      <guid>4</guid>
+    </item>
+
+    <item>
+      <title>Robot Presidential Candidate Vows to End Human Error</title>
+      <link>http://www.uglyfeed.com/robot-president</link>
+      <description>A robot named RoboBob has announced its candidacy for president, promising to eliminate human error and bring order.</description>
+      <pubDate>Wed, 29 May 2024 08:15:00 GMT</pubDate>
+      <guid>5</guid>
+    </item>
+
+    <!-- New Facts -->
+
+    <item>
+      <title>Man Breaks World Record for Most Socks Worn at Once</title>
+      <link>http://www.uglyfeed.com/most-socks</link>
+      <description>A man has broken the world record by wearing 200 pairs of socks at once, waddling his way into the history books.</description>
+      <pubDate>Wed, 29 May 2024 07:30:00 GMT</pubDate>
+      <guid>6</guid>
+    </item>
+
+    <item>
+      <title>Local Library Adds Sleeping Pods for Readers</title>
+      <link>http://www.uglyfeed.com/library-sleeping-pods</link>
+      <description>A local library has added sleeping pods for readers who find the books too relaxing, turning the library into a nap haven.</description>
+      <pubDate>Wed, 29 May 2024 06:45:00 GMT</pubDate>
+      <guid>7</guid>
+    </item>
+
+    <item>
+      <title>Duck Army Takes Over Park, Declares Independence</title>
+      <link>http://www.uglyfeed.com/duck-army</link>
+      <description>A flock of ducks has taken over a local park, declaring it an independent duck nation, complete with pond parades.</description>
+      <pubDate>Wed, 29 May 2024 06:00:00 GMT</pubDate>
+      <guid>8</guid>
+    </item>
+
+    <item>
+      <title>Man Builds Backyard Roller Coaster, Neighbors Demand Rides</title>
+      <link>http://www.uglyfeed.com/backyard-coaster</link>
+      <description>A man has built a roller coaster in his backyard, leading to a surge of neighborly demands for joyrides.</description>
+      <pubDate>Wed, 29 May 2024 05:15:00 GMT</pubDate>
+      <guid>9</guid>
+    </item>
+
+    <item>
+      <title>World's First Flying Bicycle Takes to the Skies</title>
+      <link>http://www.uglyfeed.com/flying-bicycle</link>
+      <description>Inventors have unveiled the world's first flying bicycle, soaring above traffic and stunning onlookers below.</description>
+      <pubDate>Wed, 29 May 2024 04:30:00 GMT</pubDate>
+      <guid>10</guid>
+    </item>
+
+  </channel>
+</rss>
