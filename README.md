@@ -110,7 +110,7 @@ Directories:
 
 Feel free to open issues or submit pull requests. Any contributions are welcome!
 
-**Disclaimer**
+## Disclaimer
 
 > _It is crucial to acknowledge the potential misuse of AI language models by this tool. The use of adversarial prompts and models can easily lead to the creation of misleading content. This application should not be used with the intent to deceive or mislead others. Be a responsible user and prioritize ethical practices when utilizing language models and AI technologies._
 
