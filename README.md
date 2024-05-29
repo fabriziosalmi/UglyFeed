@@ -19,9 +19,11 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - 🌐 Serve XML feed via HTTP server
 
 **Requirements**
+- 🐍 Python
+- 🌎 Internet connection
+- 📰 [an RSS reader](https://github.com/topics/rss-reader)
 
-- You need python and an Internet connection 
-- To retrieve the final RSS XML feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on OSX and [NetNewsWire](https://netnewswire.com/) on mobile but [any RSS reader](https://github.com/topics/rss-reader) will work!
+To retrieve the final feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on laptop and [NetNewsWire](https://netnewswire.com/) on mobile.
 
 **Supported API and models**
 
@@ -66,13 +68,15 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
     python serve.py
     ```
 
-Optional and integrations:
-- 🔁 Create RSS from any content by using [RSSHub](https://github.com/DIYgod/RSSHub) and rewrite its feeds by using [UglyFeed](https://github.com/fabriziosalmi/UglyFeed)
-- 🎛️ Customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
-- 🎛️ Customize user prompt, check the **prompts** folder for inspiration
+**Tweak it for your own needs**
+- 🎛️ Customize user prompt, check the [prompts](https://github.com/fabriziosalmi/UglyFeed/tree/main/prompts) folder for inspiration. You can also check the [Awesome ChatGPT Prompts](https://github.com/f/awesome-chatgpt-prompts)
 - 🎛️ Force specific languages to use for generation just by using specific prompts
 - 📈 Evaluate generated content against several [metrics](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md) (an aggregated score is provided too) by running `python evaluate_against_reference.py` to evaluate comparison metrics of generated files against the reference files or `python process_multiple_metrics.py` to evaluate only the generated content files against different metrics
 - 🕒 Setup a cronjob to have fresh content automatically updated on your RSS reader by executing all files in the order specified
+
+**Tweaks by using 3rd party tools**
+- 🔁 Create RSS from any content by using [RSSHub](https://github.com/DIYgod/RSSHub) and rewrite its feeds by using [UglyFeed](https://github.com/fabriziosalmi/UglyFeed)
+- 🎛️ Customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
 - 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on
 
 ## Project Structure
