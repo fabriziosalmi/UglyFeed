@@ -1,1 +1,10 @@
-https://www.your-awesome-feed.url/rss.xml
+https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml  
+https://www.reutersagency.com/en/rss-feeds/  
+http://feeds.bbci.co.uk/news/rss.xml  
+http://rss.cnn.com/rss/cnn_topstories.rss  
+https://www.aljazeera.com/xml/rss/all.xml  
+https://www.foxnews.com/about/rss  
+https://rssfeeds.usatoday.com/usatoday-NewsTopStories  
+https://www.huffpost.com/section/front-page/feed  
+https://www.politico.com/rss/politics08.xml  
+https://www.latimes.com/rss2.0.xml
