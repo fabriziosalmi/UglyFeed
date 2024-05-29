@@ -7,5 +7,5 @@ COMBINED_CONTENT_PREFIX = (
     "ensuring the final result is clear, complete, coherent, and informative. "
     "Pay particular attention to narrative cohesion and detail accuracy. "
     "Summarize the information if necessary, always maintaining quality and relevance. "
-    "The generated content must be in Italian."
+    "The generated content must be in English."
 )
