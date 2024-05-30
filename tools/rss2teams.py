@@ -1,8 +1,9 @@
+import time
+import os
 import argparse
 import feedparser
 import requests
-import time
-import os
+
 
 # Constants
 LATEST_ENTRY_ID_FILE = 'latest_entry_id.txt'
