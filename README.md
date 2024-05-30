@@ -33,7 +33,7 @@ Please refer to the updated documentation [here](https://github.com/fabriziosalm
 
 ## Use cases
 
-UglyFeed, a good large language model and, maybe, some small modifications can open several use cases:
+The project can be easily customized to fit several use cases:
 
 - **Smart Content Curation**: Create bespoke newsfeeds tailored to niche interests, blending articles from diverse sources into a captivating, engaging narrative.
 - **Dynamic Blog Generation**: Automate blog post creation by rewriting and enhancing existing articles, optimizing them for readability and SEO.
