@@ -29,3 +29,4 @@ textstat
 tqdm
 typing
 uvicorn
+yaml
