@@ -21,21 +21,30 @@ Welcome to the UglyFeed project documentation section. This guide provides detai
 
 1. Setup options by making your changes into the `config.yaml` file
 
-**config.yaml options**
+**Similarity options**
+For a general use the default values seems to be a good fit to aggressively filter out some noise. To increase items count try to reduce min_samples to 2 and play around eps and similarity.
 
 - `similarity_threshold` (range: 0-1)
 - `min_samples` (Minimum number of samples in a cluster for DBSCAN)
 - `eps` (Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN)
-- `openai_api_url` (OpenAI API endpoint)*
-- `openai_api_key` (OpenAI API key)*
-- `openai_model` (OpenAI model)*
-- `ollama_api_url` (Ollama API endpoint)*
-- `ollama_model` (Ollama model)*
+
+**API and LLM options**
+You can use OpenAI API or Ollama API, not togheter at the same time. Please comment or delete the unused API to avoid issues.
+
+- `openai_api_url` (OpenAI API endpoint)
+- `openai_api_key` (OpenAI API key)
+- `openai_model` (OpenAI model)
+- `ollama_api_url` (Ollama API endpoint)
+- `ollama_model` (Ollama model)
+
+**Instructions/role/prompt option**
 - `content_prefix` (prompt to be used as instruction for the rewriting process)
+
+**RSS retention options**
 - `max_items` (Maximum number of items to process for the rewriting process)
 - `max_age_days` (Maximum age of items in days to be considered)
 
-* You can use OpenAI API or Ollama API, not togheter at the same time. Please comment or delete the unused API to avoid issues.
+
 
 2. Modify the `input/feeds.txt` file with your feeds urls
 
