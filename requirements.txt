@@ -1,6 +1,5 @@
 beautifulsoup4
 bs4
-collections
 datetime
 difflib
 ebooklib
