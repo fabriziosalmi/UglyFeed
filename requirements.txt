@@ -2,7 +2,7 @@ beautifulsoup4==4.12.3
 EbookLib==0.18
 feedgen==1.0.0
 feedparser==6.0.11
-gradio==3.29.0  # Using a version compatible with typer<0.10.0
+gradio==3.29.0  # Using a version compatible with typer<0.10.0 (BUT CVE-2023-6572 !!)
 jiwer==3.0.4
 joblib==1.4.0
 langdetect==1.0.9
