@@ -1,38 +1,45 @@
+"""
+Module for evaluating readability and complexity metrics in text using textstat and NLTK.
+"""
+
 import json
-import nltk
 import sys
 from langdetect import detect
+import nltk
 import textstat
 
 # Ensure nltk resources are downloaded
-nltk.download("punkt")
-nltk.download("stopwords")
+nltk.download("punkt", quiet=True)
+nltk.download("stopwords", quiet=True)
 
-# Define function to detect language
 def detect_language(text):
+    """Detect the language of the provided text."""
     try:
         return detect(text)
-    except:
+    except Exception as err:
+        print(f"Error detecting language: {err}")
         return 'it'  # Default to Italian
 
-# Function to calculate Syllable Count
 def calculate_syllable_count(text):
+    """Calculate the syllable count of the text."""
     return textstat.syllable_count(text)
 
-# Function to calculate Flesch-Kincaid Grade Level
 def calculate_flesch_kincaid_grade(text):
+    """Calculate the Flesch-Kincaid Grade Level of the text."""
     return textstat.flesch_kincaid_grade(text)
 
-# Function to calculate SMOG Index
 def calculate_smog_index(text):
+    """Calculate the SMOG Index of the text."""
     return textstat.smog_index(text)
 
-# Function to calculate Readability Ease Score
 def calculate_readability_ease(text):
+    """Calculate the Readability Ease Score of the text."""
     return textstat.flesch_reading_ease(text)
 
-def evaluate_readability_complexity_metrics(text, lang):
-    # Calculate raw metrics
+def evaluate_readability_complexity_metrics(text, _lang):
+    """
+    Evaluate readability and complexity metrics in the provided text.
+    """
     metrics = {
         "Syllable Count": calculate_syllable_count(text),
         "Flesch-Kincaid Grade Level": calculate_flesch_kincaid_grade(text),
@@ -49,7 +56,7 @@ def evaluate_readability_complexity_metrics(text, lang):
     }
 
     normalized_metrics = {
-        key: min(metrics[key] / max_values[key], 1) if key != "Readability Ease Score" else metrics[key] / max_values[key]
+        key: min(metrics[key] / max_values[key], 1)
         for key in metrics
     }
 
@@ -61,14 +68,20 @@ def evaluate_readability_complexity_metrics(text, lang):
         "Readability Ease Score": 0.2
     }
 
-    aggregated_score = sum(normalized_metrics[metric] * weights[metric] for metric in normalized_metrics) * 100
-    
+    aggregated_score = sum(
+        normalized_metrics[metric] * weights[metric]
+        for metric in normalized_metrics
+    ) * 100
+
     return metrics, normalized_metrics, aggregated_score
 
 def main(file_path):
+    """
+    Main function to process the input file and evaluate readability and complexity metrics.
+    """
     try:
-        with open(file_path, 'r') as f:
-            data = json.load(f)
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
             text = data.get("content", "")
 
         if not text:
@@ -93,7 +106,7 @@ def main(file_path):
 
         # Export results to JSON
         output_file_path = file_path.replace(".json", "_metrics_readability_complexity.json")
-        with open(output_file_path, 'w') as out_file:
+        with open(output_file_path, 'w', encoding='utf-8') as out_file:
             json.dump(output, out_file, indent=4)
         print(f"Metrics exported to {output_file_path}")
 
@@ -101,13 +114,12 @@ def main(file_path):
         print(f"Error: The file {file_path} does not exist.")
     except json.JSONDecodeError:
         print("Error: The provided file is not a valid JSON file.")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+    except Exception as err:
+        print(f"An unexpected error occurred: {err}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python evaluate_readability_complexity_metrics.py <file_path>")
         sys.exit(1)
 
-    file_path = sys.argv[1]
-    main(file_path)
+    main(sys.argv[1])
