@@ -1,1 +1,1 @@
-gradio==3.29.0  # Using a version compatible with typer<0.10.0 (BUT CVE-2023-6572 !!)
+gradio==4.19.2  # Using a version compatible with typer<0.10.0 (BUT CVE-2023-6572 !!)
