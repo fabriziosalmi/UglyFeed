@@ -1,9 +1,9 @@
+import sys
 import json
+from collections import Counter
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.util import ngrams
-from collections import Counter
-import sys
 import numpy as np
 import textstat
 

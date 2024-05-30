@@ -1,11 +1,11 @@
+import sys
 import json
+from collections import Counter
+from langdetect import detect
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
-import sys
 import spacy
-from collections import Counter
-from langdetect import detect
 
 # Ensure nltk resources are downloaded
 nltk.download("punkt", quiet=True)

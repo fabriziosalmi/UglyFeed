@@ -1,9 +1,9 @@
-import json
-import nltk
 import sys
-from langdetect import detect
-import spacy
+import json
 from collections import Counter
+import nltk
+import spacy
+from langdetect import detect
 
 # Ensure nltk resources are downloaded
 nltk.download("punkt", quiet=True)

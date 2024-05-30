@@ -1,10 +1,10 @@
+import sys
 import json
 import nltk
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
-import sys
 import numpy as np
 
 # use
