@@ -29,24 +29,6 @@ Directories:
 - `reports`: Directory for metrics export in JSON and HTML
 
 ## Scripts documentation
-
-**Main scripts**
-- [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/main.py.md)
-- [llm_processor.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/llm_processor.py.md)
-- [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/json2rss.py.md)
-- [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/serve.py.md)
-
-**Evaluation scripts**
-- [evaluate_against_reference.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/evaluate_against_reference.py.md)
-- [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/process_multiple_metrics.py.md)
-
-**Evaluation metrics**
-- [Metrics documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md)
-
-**Sources**
-- [Create RSS from any source via RSSHub](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/sources.md)
-
-#### Notes
 Each script's documentation includes the following sections:
 
 - **Introduction**
@@ -60,4 +42,23 @@ A deep dive into the core functionality of the script, describing key functions 
 
 - **Code Structure**
 An overview of the script's architecture, highlighting major components and their interactions, to give users a clear understanding of how the script is built.
+
+#### Main scripts
+- [main.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/main.py.md)
+- [llm_processor.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/llm_processor.py.md)
+- [json2rss.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/json2rss.py.md)
+- [serve.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/serve.py.md)
+
+## Evaluation documentation
+#### Evaluation scripts
+- [evaluate_against_reference.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/evaluate_against_reference.py.md)
+- [process_multiple_metrics.py](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/process_multiple_metrics.py.md)
+#### Evaluation docs
+
+- [Metrics documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md)
+
+## Additional documentation
+#### Sources
+- [Create RSS from any source via RSSHub](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/sources.md)
+
 
