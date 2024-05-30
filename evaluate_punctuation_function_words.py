@@ -1,9 +1,10 @@
-import json
-import nltk
-from nltk.tokenize import word_tokenize, sent_tokenize
 import sys
+import json
 from collections import Counter
 from langdetect import detect
+import nltk
+from nltk.tokenize import word_tokenize, sent_tokenize
+
 
 # Ensure nltk resources are downloaded
 nltk.download("punkt", quiet=True)

@@ -1,8 +1,8 @@
+import sys
 import json
+from collections import Counter
 import nltk
 from nltk.tokenize import word_tokenize, sent_tokenize
-import sys
-from collections import Counter
 from langdetect import detect
 import spacy
 
