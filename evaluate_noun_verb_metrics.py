@@ -1,33 +1,42 @@
+"""
+Module for evaluating noun and verb metrics in text using spaCy and NLTK.
+"""
+
 import json
-import nltk
-from nltk.tokenize import word_tokenize, sent_tokenize
 import sys
-from collections import Counter
 from langdetect import detect
+import nltk
 import spacy
+from spacy.cli import download
 
 # Ensure nltk resources are downloaded
 nltk.download("punkt", quiet=True)
 nltk.download("stopwords", quiet=True)
 nltk.download("averaged_perceptron_tagger", quiet=True)
 
-# Load the spaCy models for both English and Italian
-nlp_en = spacy.load("en_core_web_sm")
-nlp_it = spacy.load("it_core_news_sm")
+# Ensure spaCy models are downloaded
+try:
+    nlp_en = spacy.load("en_core_web_sm")
+except OSError:
+    download("en_core_web_sm")
+    nlp_en = spacy.load("en_core_web_sm")
 
-# Define function to detect language
+try:
+    nlp_it = spacy.load("it_core_news_sm")
+except OSError:
+    download("it_core_news_sm")
+    nlp_it = spacy.load("it_core_news_sm")
+
 def detect_language(text):
+    """Detect the language of the provided text."""
     try:
         return detect(text)
-    except:
+    except Exception:
         return 'it'  # Default to Italian
 
-# Define function to get appropriate spaCy model based on language
 def get_spacy_model(lang):
-    if lang == 'en':
-        return nlp_en
-    else:
-        return nlp_it
+    """Get the appropriate spaCy model based on language."""
+    return nlp_en if lang == 'en' else nlp_it
 
 # Define extended lists of concrete and abstract nouns (examples)
 concrete_nouns_en = [
@@ -41,10 +50,10 @@ concrete_nouns_en = [
 ]
 
 abstract_nouns_en = [
-    "freedom", "happiness", "justice", "thought", "idea", "love", "peace", "knowledge", "wisdom", 
-    "anger", "fear", "joy", "sorrow", "beauty", "truth", "courage", "faith", "honor", "trust", 
-    "patience", "pride", "humility", "envy", "greed", "charity", "gratitude", "sympathy", 
-    "empathy", "friendship", "hope", "compassion", "doubt", "belief", "determination", 
+    "freedom", "happiness", "justice", "thought", "idea", "love", "peace", "knowledge", "wisdom",
+    "anger", "fear", "joy", "sorrow", "beauty", "truth", "courage", "faith", "honor", "trust",
+    "patience", "pride", "humility", "envy", "greed", "charity", "gratitude", "sympathy",
+    "empathy", "friendship", "hope", "compassion", "doubt", "belief", "determination",
     "imagination", "inspiration", "respect", "responsibility", "ambition", "curiosity", "creativity",
     "confidence", "despair", "enthusiasm", "freedom", "integrity", "intelligence", "loyalty", "mercy",
     "optimism", "persistence", "reliability", "sensitivity", "tolerance", "wisdom", "zeal"
@@ -61,36 +70,46 @@ concrete_nouns_it = [
 ]
 
 abstract_nouns_it = [
-    "libertà", "felicità", "giustizia", "pensiero", "idea", "amore", "pace", "conoscenza", "saggezza", 
-    "rabbia", "paura", "gioia", "tristezza", "bellezza", "verità", "coraggio", "fede", "onore", "fiducia", 
-    "pazienza", "orgoglio", "umiltà", "invidia", "avidità", "carità", "gratitudine", "simpatia", 
-    "empatia", "amicizia", "speranza", "compassione", "dubbio", "credenza", "determinazione", 
+    "libertà", "felicità", "giustizia", "pensiero", "idea", "amore", "pace", "conoscenza", "saggezza",
+    "rabbia", "paura", "gioia", "tristezza", "bellezza", "verità", "coraggio", "fede", "onore", "fiducia",
+    "pazienza", "orgoglio", "umiltà", "invidia", "avidità", "carità", "gratitudine", "simpatia",
+    "empatia", "amicizia", "speranza", "compassione", "dubbio", "credenza", "determinazione",
     "immaginazione", "ispirazione", "rispetto", "responsabilità", "ambizione", "curiosità", "creatività",
     "fiducia", "disperazione", "entusiasmo", "libertà", "integrità", "intelligenza", "lealtà", "misericordia",
     "ottimismo", "perseveranza", "affidabilità", "sensibilità", "tolleranza", "saggezza", "zelo"
 ]
 
-
-
-# Function to calculate Concrete Noun Ratio
 def calculate_concrete_noun_ratio(text, nlp, lang):
+    """
+    Calculate the concrete noun ratio in the text.
+    """
     doc = nlp(text)
     concrete_nouns = concrete_nouns_en if lang == 'en' else concrete_nouns_it
-    concrete_noun_tokens = [token for token in doc if token.lemma_ in concrete_nouns and token.pos_ == "NOUN"]
+    concrete_noun_tokens = [
+        token for token in doc
+        if token.lemma_ in concrete_nouns and token.pos_ == "NOUN"
+    ]
     nouns = [token for token in doc if token.pos_ == "NOUN"]
     return len(concrete_noun_tokens) / len(nouns) if nouns else 0
 
-# Function to calculate Abstract Noun Ratio
 def calculate_abstract_noun_ratio(text, nlp, lang):
+    """
+    Calculate the abstract noun ratio in the text.
+    """
     doc = nlp(text)
     abstract_nouns = abstract_nouns_en if lang == 'en' else abstract_nouns_it
-    abstract_noun_tokens = [token for token in doc if token.lemma_ in abstract_nouns and token.pos_ == "NOUN"]
+    abstract_noun_tokens = [
+        token for token in doc
+        if token.lemma_ in abstract_nouns and token.pos_ == "NOUN"
+    ]
     nouns = [token for token in doc if token.pos_ == "NOUN"]
     return len(abstract_noun_tokens) / len(nouns) if nouns else 0
 
 def evaluate_noun_verb_metrics(text, lang):
+    """
+    Evaluate noun and verb metrics in the provided text.
+    """
     nlp = get_spacy_model(lang)
-    
     metrics = {
         "Concrete Noun Ratio": calculate_concrete_noun_ratio(text, nlp, lang),
         "Abstract Noun Ratio": calculate_abstract_noun_ratio(text, nlp, lang)
@@ -102,7 +121,9 @@ def evaluate_noun_verb_metrics(text, lang):
         "Abstract Noun Ratio": 0.5   # Example normalization, adjust as needed
     }
 
-    normalized_metrics = {key: min(metrics[key] / max_values[key], 1) for key in metrics}
+    normalized_metrics = {
+        key: min(metrics[key] / max_values[key], 1) for key in metrics
+    }
 
     # Calculate aggregated score (weights sum up to 1, scaled to 100)
     weights = {
@@ -110,13 +131,19 @@ def evaluate_noun_verb_metrics(text, lang):
         "Abstract Noun Ratio": 0.5
     }
 
-    aggregated_score = sum(normalized_metrics[metric] * weights[metric] for metric in normalized_metrics) * 100
-    
+    aggregated_score = sum(
+        normalized_metrics[metric] * weights[metric]
+        for metric in normalized_metrics
+    ) * 100
+
     return metrics, normalized_metrics, aggregated_score
 
 def main(file_path):
-    with open(file_path, 'r') as f:
-        data = json.load(f)
+    """
+    Main function to process the input file and evaluate metrics.
+    """
+    with open(file_path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
         text = data.get("content", "")
 
     if not text:
@@ -141,7 +168,7 @@ def main(file_path):
 
     # Export results to JSON
     output_file_path = file_path.replace(".json", "_metrics_noun_verb.json")
-    with open(output_file_path, 'w') as out_file:
+    with open(output_file_path, 'w', encoding='utf-8') as out_file:
         json.dump(output, out_file, indent=4)
     print(f"Metrics exported to {output_file_path}")
 
@@ -150,5 +177,4 @@ if __name__ == "__main__":
         print("Usage: python evaluate_noun_verb_metrics.py <file_path>")
         sys.exit(1)
 
-    file_path = sys.argv[1]
-    main(file_path)
+    main(sys.argv[1])
