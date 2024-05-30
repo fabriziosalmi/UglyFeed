@@ -19,6 +19,8 @@ numpy
 openai
 os
 pandas
+pathlib
+pyyaml
 re
 requests
 scikit-learn
