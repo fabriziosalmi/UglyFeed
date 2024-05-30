@@ -52,7 +52,7 @@ To retrieve the final feed I use [FluentReader](https://github.com/yang991178/fl
 
 ## Usage
 
-1. Retrieve and aggregate RSS feeds (you can change feeds in the `input/feeds.txt` file)
+1. Retrieve and aggregate RSS feeds
     ```sh
     python main.py
     ```
