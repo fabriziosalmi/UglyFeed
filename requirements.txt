@@ -15,8 +15,9 @@ pyyaml
 requests
 scikit-learn
 sentence-transformers
-spacy
+spacy==3.7.4
 textblob
 textstat
 tqdm
 uvicorn
+typer<0.10.0
