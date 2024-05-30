@@ -1,23 +1,22 @@
-beautifulsoup4
-ebooklib
-fastapi
-feedgen
-feedparser
-jiwer
-joblib
-langdetect
-lexical-diversity
-nltk
-numpy
-openai
-pandas
-pyyaml
-requests
-scikit-learn
-sentence-transformers
-spacy==3.7.4
-textblob
-textstat
-tqdm
-uvicorn
-typer<0.10.0
+beautifulsoup4==4.12.3
+EbookLib==0.18
+feedgen==1.0.0
+feedparser==6.0.11
+gradio==3.29.0  # Using a version compatible with typer<0.10.0
+jiwer==3.0.4
+joblib==1.4.0
+langdetect==1.0.9
+lexical_diversity==0.1.1
+nltk==3.8.1
+numpy==1.24.4
+openai==1.30.5
+pandas==2.2.2
+PyYAML==6.0.1
+requests==2.32.3
+scikit_learn==1.4.2
+sentence_transformers==2.7.0
+spacy==3.6.0  # Compatible with typer<0.10.0
+textblob==0.18.0.post0
+textstat==0.7.3
+tqdm==4.66.2
+typer==0.9.0  # Ensures compatibility for both gradio and spacy
