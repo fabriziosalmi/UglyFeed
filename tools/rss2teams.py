@@ -1,3 +1,8 @@
+"""
+Module for converting RSS into Teams webhook notification.
+"""
+
+
 import time
 import os
 import argparse

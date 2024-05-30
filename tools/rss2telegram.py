@@ -1,3 +1,7 @@
+"""
+Module for converting RSS into Telegram notification.
+"""
+
 import time
 import os
 import argparse
