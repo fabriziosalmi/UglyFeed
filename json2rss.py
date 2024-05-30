@@ -47,13 +47,13 @@ def create_rss_feed(json_data, output_path):
         link.text = "https://github.com/fabriziosalmi/UglyFeed"
 
         description = SubElement(channel, 'description')
-        description.text = "Feed di notizie aggregato e riscritto da UglyCitizen"
+        description.text = "UglyFeed"
 
         language = SubElement(channel, 'language')
         language.text = "it"
 
         atom_link = SubElement(channel, 'atom:link')
-        atom_link.set('href', 'https://github.com/fabriziosalmi/UglyFeed/uglyfeeds/uglyfeed.xml')
+        atom_link.set('href', 'https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml')
         atom_link.set('rel', 'self')
         atom_link.set('type', 'application/rss+xml')
 
