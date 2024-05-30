@@ -6,11 +6,14 @@ import argparse
 import signal
 from urllib.parse import urljoin
 from pathlib import Path
-from configparser import ConfigParser, NoSectionError, NoOptionError
+from configparser import ConfigParser
+import psutil
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+PID_FILE = 'uglyfeed_server.pid'
 
 class UglyFeedHandler(http.server.SimpleHTTPRequestHandler):
     """Custom handler to serve the specified file."""
@@ -55,9 +58,15 @@ def run_server(directory, file_name, port):
         logger.info("Received signal to shut down the server")
         httpd.server_close()
         logger.info("Server shut down gracefully")
-
+        if Path(PID_FILE).is_file():
+            Path(PID_FILE).unlink()
+    
     signal.signal(signal.SIGINT, graceful_shutdown)
     signal.signal(signal.SIGTERM, graceful_shutdown)
+
+    # Write the PID file
+    with open(PID_FILE, 'w') as f:
+        f.write(str(os.getpid()))
 
     try:
         httpd.serve_forever()
@@ -65,6 +74,8 @@ def run_server(directory, file_name, port):
         logger.error(f"Error occurred: {e}")
     finally:
         httpd.server_close()
+        if Path(PID_FILE).is_file():
+            Path(PID_FILE).unlink()
 
 def load_config(config_file):
     """Load configuration from a file."""
@@ -74,17 +85,28 @@ def load_config(config_file):
     config = ConfigParser()
     if Path(config_file).is_file():
         config.read(config_file)
-        try:
-            directory = config.get('DEFAULT', 'UGLYFEEDS_DIR', fallback=default_dir)
-            file_name = config.get('DEFAULT', 'UGLYFEED_FILE', fallback=default_file)
-        except (NoSectionError, NoOptionError):
-            directory = default_dir
-            file_name = default_file
+        directory = config.get('DEFAULT', 'UGLYFEEDS_DIR', fallback=default_dir)
+        file_name = config.get('DEFAULT', 'UGLYFEED_FILE', fallback=default_file)
     else:
         directory = default_dir
         file_name = default_file
 
     return directory, file_name
+
+def kill_existing_server():
+    """Kill the existing server if it is already running."""
+    if Path(PID_FILE).is_file():
+        try:
+            with open(PID_FILE, 'r') as f:
+                pid = int(f.read().strip())
+                proc = psutil.Process(pid)
+                proc.terminate()
+                proc.wait()
+                logger.info(f"Terminated existing server with PID: {pid}")
+        except Exception as e:
+            logger.error(f"Failed to terminate existing server: {e}")
+        finally:
+            Path(PID_FILE).unlink()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Serve an uglyfeed XML file.")
@@ -101,5 +123,8 @@ if __name__ == '__main__':
     if not Path(UGLYFEEDS_DIR, UGLYFEED_FILE).is_file():
         logger.error(f"The file '{UGLYFEED_FILE}' does not exist in the directory '{UGLYFEEDS_DIR}'.")
         exit(1)
+
+    # Kill any existing server
+    kill_existing_server()
 
     run_server(UGLYFEEDS_DIR, UGLYFEED_FILE, args.port)
