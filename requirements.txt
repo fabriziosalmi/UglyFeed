@@ -2,7 +2,7 @@ beautifulsoup4==4.12.3
 EbookLib==0.18
 feedgen==1.0.0
 feedparser==6.0.11
-gradio==3.29.0  # Using a version compatible with typer<0.10.0
+gradio==4.19.2  # Using a version compatible with typer<0.10.0
 jiwer==3.0.4
 joblib==1.4.0
 langdetect==1.0.9
@@ -18,5 +18,5 @@ sentence_transformers==2.7.0
 spacy==3.6.0  # Compatible with typer<0.10.0
 textblob==0.18.0.post0
 textstat==0.7.3
-tqdm==4.66.2
+tqdm==4.66.3
 typer==0.9.0  # Ensures compatibility for both gradio and spacy
