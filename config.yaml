@@ -1,8 +1,13 @@
+## similarity_checker.py settings
+
 # Similarity configuration settings
 similarity_threshold: 0.5
 similarity_options:
   min_samples: 3  # Minimum number of samples in a cluster for DBSCAN
   eps: 0.5       # Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN
+
+
+## llm_processor.py settings
 
 # API configuration settings
 api_config:
@@ -46,6 +51,8 @@ content_prefix: >
 #  Summarize the information if necessary, always maintaining quality and relevance. 
 #  The generated content must be in English.
     
+
+## json2rss.py settings
 
 # Limit settings for content retrieval and processing
 max_items: 50          # Maximum number of items to process
