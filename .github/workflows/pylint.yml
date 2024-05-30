@@ -21,4 +21,12 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with pylint
       run: |
-        for i in $(ls *.py); do pylint $i; done
+        pylint $(git ls-files '*.py') > pylint_report.txt
+    - name: Upload Pylint report
+      uses: actions/upload-artifact@v2
+      with:
+        name: pylint-report
+        path: pylint_report.txt
+    - name: Display Pylint output
+      run: |
+        cat pylint_report.txt
