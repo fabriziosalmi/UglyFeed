@@ -73,6 +73,8 @@ To retrieve the final feed I use [FluentReader](https://github.com/yang991178/fl
     python serve.py
     ```
 
+## Tuning
+
 **Tune it for your own needs**
 - 🎛️ Customize user prompt, check the [prompts](https://github.com/fabriziosalmi/UglyFeed/tree/main/prompts) folder for inspiration. You can also check the [Awesome ChatGPT Prompts](https://github.com/f/awesome-chatgpt-prompts)
 - 🎛️ Force specific languages to use for generation just by using specific prompts
