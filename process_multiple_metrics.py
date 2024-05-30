@@ -4,6 +4,8 @@ import glob
 import subprocess
 import logging
 import re
+import sys
+from pathlib import Path
 
 # Suppress NLTK log messages
 nltk_logger = logging.getLogger('nltk')
@@ -13,10 +15,12 @@ nltk_logger.setLevel(logging.ERROR)
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Define the directory containing the rewritten JSON files
-REWRITTEN_DIR = 'rewritten'
+# Define directories
+PROJECT_ROOT = Path(__file__).resolve().parent
+REWRITTEN_DIR = PROJECT_ROOT / 'rewritten'
+TOOLS_DIR = PROJECT_ROOT / 'tools'
 
-# Define the evaluation scripts
+# Define the evaluation scripts relative to the tools directory
 EVALUATION_SCRIPTS = [
     'evaluate_cohesion_concreteness.py',
     'evaluate_cohesion_information_density.py',
@@ -34,17 +38,18 @@ def run_evaluation_scripts(input_file, all_aggregated_scores):
     """Run evaluation scripts on the given input file and extract aggregated scores."""
     base_name = os.path.basename(input_file).replace('.json', '')
     for script in EVALUATION_SCRIPTS:
-        logger.info("Running %s on %s", script, input_file)
-        result = subprocess.run(['python', script, input_file], capture_output=True, text=True)
+        script_path = TOOLS_DIR / script
+        logger.info("Running %s on %s", script_path, input_file)
+        result = subprocess.run(['python', str(script_path), input_file], capture_output=True, text=True)
         if result.returncode != 0:
-            logger.error("Error running %s on %s", script, input_file)
+            logger.error("Error running %s on %s", script_path, input_file)
             logger.error(result.stderr)
         else:
             logger.info(result.stdout)
 
         # Extract aggregated scores immediately after the script runs
-        metric_file_pattern = os.path.join(REWRITTEN_DIR, f'{base_name}_metrics_{script.split("_")[1]}*.json')
-        metric_files = glob.glob(metric_file_pattern)
+        metric_file_pattern = REWRITTEN_DIR / f'{base_name}_metrics_{script.split("_")[1]}*.json'
+        metric_files = glob.glob(str(metric_file_pattern))
         logger.debug("Pattern used for glob: %s", metric_file_pattern)
         logger.info("Generated metric files: %s", metric_files)
 
@@ -86,11 +91,11 @@ def calculate_average_aggregated_score(aggregated_scores):
 def merge_metrics_files(input_file, all_aggregated_scores):
     """Merge metrics files for the given input JSON file."""
     base_name = os.path.basename(input_file).replace('.json', '')
-    pattern = os.path.join(REWRITTEN_DIR, f'{base_name}_metrics_*.json')
+    pattern = REWRITTEN_DIR / f'{base_name}_metrics_*.json'
 
     merged_metrics = {}
 
-    for file_path in glob.glob(pattern):
+    for file_path in glob.glob(str(pattern)):
         logger.info("Processing metrics file: %s", file_path)
         with open(file_path, 'r') as file:
             data = json.load(file)
@@ -118,7 +123,7 @@ def merge_metrics_files(input_file, all_aggregated_scores):
     merged_metrics['Overall Average Aggregated Score'] = overall_average_aggregated_score
 
     output_file_name = f"{base_name}_metrics_merged.json"
-    output_file_path = os.path.join(REWRITTEN_DIR, output_file_name)
+    output_file_path = REWRITTEN_DIR / output_file_name
 
     with open(output_file_path, 'w') as output_file:
         json.dump(merged_metrics, output_file, indent=4)
@@ -127,7 +132,7 @@ def merge_metrics_files(input_file, all_aggregated_scores):
 
 def main():
     """Main script execution."""
-    input_files = glob.glob(os.path.join(REWRITTEN_DIR, '*_rewritten.json'))
+    input_files = glob.glob(str(REWRITTEN_DIR / '*_rewritten.json'))
 
     if not input_files:
         logger.warning("No input files found.")
