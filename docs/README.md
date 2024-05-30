@@ -1,6 +1,51 @@
 # Project documentation
 Welcome to the UglyFeed project documentation section. This guide provides detailed information for the scripts used by the project.
 
+## Setup
+
+### Installation
+
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/fabriziosalmi/UglyFeed.git
+    cd UglyFeed
+    ```
+
+2. Install the required dependencies:
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+
+### Configuration
+
+1. Setup options by making your changes into the `config.yaml` file
+
+2. Modify the `input/feeds.txt` file with your feeds urls
+
+### Usage
+
+1. Retrieve and aggregate RSS feeds
+    ```sh
+    python main.py
+    ```
+    
+2. Rewrite and save aggregated feeds using configured LLM API:
+
+    ```sh
+    python llm_processor.py
+    ```
+    
+3. Convert JSON to RSS feed
+    ```sh
+    python json2rss.py
+    ```
+    
+4. Serve RSS XML via HTTP server
+    ```sh
+    python serve.py
+    ```
+
 ## Project Structure
 
 Main components:
