@@ -86,33 +86,6 @@ To retrieve the final feed I use [FluentReader](https://github.com/yang991178/fl
 - 🎛️ Customize system prompt [by using OpenWebUI](https://github.com/open-webui/open-webui) on top of Ollama or [by using Ollama itself](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
 - 🌎 You can reach your local generated feed securely via Internet by using solutions like ngrok, cloudflared, wireguard, tailscale and so on
 
-## Project Structure
-
-Main components:
-
-- `requirements.txt`: List of dependencies.
-- `config.yaml`: Configuration options for the application
-- `main.py`: Retrieves and aggregates RSS feeds.
-  - `json_manager.py`: Used by main.py, manages JSON file operations. 
-  - `rss_reader.py`: Used by main.py, reads RSS feeds.
-  - `similarity_checker.py`: Used by main.py, checks similarity between feeds.
-- `llm_processor.py`: Rewrites aggregated feeds using a language model LLM APIs.
-- `json2rss.py`: Convert JSON to RSS feed.
-- `serve.py`: Serve RSS XML via HTTP server.
-  - `uglyfeeds`: Used by serve.py is the directory where the uglyfeed.xml is served via HTTP
-
-Optional components:
-
-- `process_multiple_metrics.py`: Evaluate metrics of generated content.
-- `evaluate_against_reference.py`: Evaluate metrics of generated content against reference content.
-
-Directories:
-
-- `input`: Directory for feeds list file
-- `output`: Directory for aggregated (for similarity) feeds.
-- `rewritten`: Directory for rewritten content and evaluation metrics.
-- `reports`: Directory for metrics export in JSON and HTML
-  
 ## Contribution
 
 Feel free to open issues or submit pull requests. Any contributions are welcome!
