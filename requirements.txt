@@ -18,5 +18,5 @@ sentence_transformers==2.7.0
 spacy==3.6.0  # Compatible with typer<0.10.0
 textblob==0.18.0.post0
 textstat==0.7.3
-tqdm==4.66.2
+tqdm==4.66.3
 typer==0.9.0  # Ensures compatibility for both gradio and spacy
