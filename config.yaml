@@ -17,6 +17,11 @@ api_config:
   # openai_api_url: "https://api.openai.com/v1/chat/completions"
   # openai_api_key: ""  # Enter your OpenAI API key here
   # openai_model: "gpt-3.5-turbo"  # Model to use from OpenAI
+  
+  # Groq API configuration
+  # groq_api_url: "https://api.groq.com/openai/v1/chat/completions"
+  # groq_api_key: ""  # Enter your Groq API key here
+  # groq_model: "llama3-70b-8192"  # Model to use from Groq
 
   # Ollama API configuration
   ollama_api_url: "http://localhost:11434/api/chat"  # URL for local Ollama API server
