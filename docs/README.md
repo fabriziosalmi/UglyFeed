@@ -32,10 +32,13 @@ For a general use the default values seems to be a good fit to aggressively filt
 You can use OpenAI API or Ollama API, not togheter at the same time. Please comment or delete the unused API to avoid issues.
 
 - `openai_api_url` (OpenAI API endpoint)
-- `openai_api_key` (OpenAI API key)
+- `openai_api_key` (OpenAI API key) [OpenAI models](https://platform.openai.com/docs/models)
 - `openai_model` (OpenAI model)
+- `groq_api_url` (Groq API endpoint)
+- `groq_api_key` (Groq API key)
+- `groq_model` (Groq model) [Groq models](https://console.groq.com/docs/models)
 - `ollama_api_url` (Ollama API endpoint)
-- `ollama_model` (Ollama model)
+- `ollama_model` (Ollama model) [Ollama models](https://platform.openai.com/docs/models)
 
 **Instructions/role/prompt option**
 - `content_prefix` (prompt to be used as instruction for the rewriting process)
