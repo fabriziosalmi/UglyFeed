@@ -29,9 +29,9 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - Groq API (`llama3-8b-8192`, `llama3-70b-8192`, `gemma-7b-it`, `mixtral-8x7b-32768`)
 
 
-## [Documentation](https://github.com/fabriziosalmi/UglyFeed/tree/main/docs)
+## Documentation
 
-Please refer to the updated documentation [here](https://github.com/fabriziosalmi/UglyFeed/tree/main/docs).
+Please refer to the updated [documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md).
 
 ## Use cases
 
