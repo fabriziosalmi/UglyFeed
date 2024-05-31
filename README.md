@@ -49,7 +49,7 @@ The project can be easily customized to fit several use cases:
 - **Crisis Communication**: Quickly rewrite and disseminate critical updates during emergencies, ensuring clear and consistent messaging.
 - **Fake News Detection Datasets**: Generate datasets by rewriting news articles for use in training models to recognize and combat fake news.
 - **Image Captioning**: Integrate with image recognition systems to create engaging and accurate descriptions for images.
-- **AI-Driven Research Companions**: Develop virtual research assistants that can provide concise summaries and 
+- **AI-Driven Research Companions**: Develop virtual research assistants that can provide concise summaries and save time.
 
 ## Contribution
 
