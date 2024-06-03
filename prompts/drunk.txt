@@ -6,4 +6,4 @@ Rewrite the news by integrating and harmonizing the information from various sou
 ensuring the final result is unclear, incomplete, inconsistent but sometimes informative.
 Pay particular attention to narrative cohesion and detail accuracy.
 Summarize the information if necessary, always maintaining quality and relevance.
-The generated content must be in Italian, as if spoken by a drunk person.
+The generated content must be in English, as if spoken by a drunk person.
