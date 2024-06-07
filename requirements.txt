@@ -15,8 +15,8 @@ psutil==5.9.8
 requests==2.32.3
 scikit_learn==1.4.2
 sentence_transformers==2.7.0
-spacy==3.6.0  # Compatible with typer<0.10.0
+spacy==3.7.0
 textblob==0.18.0.post0
 textstat==0.7.3
 tqdm==4.66.3
-typer==0.9.0  # Ensures compatibility for both gradio and spacy
+typer==0.10.0
