@@ -1,11 +1,11 @@
 ## similarity_checker.py settings
 
 # Similarity configuration settings
-similarity_threshold: 0.5
+similarity_threshold: 0.66
 similarity_options:
-  min_samples: 3  # Minimum number of samples in a cluster for DBSCAN
-  eps: 0.5       # Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN
-
+  min_samples: 2    # Minimum number of samples in a cluster for DBSCAN
+  eps: 0.66       # Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN
+  
 
 ## llm_processor.py settings
 
