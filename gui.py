@@ -44,7 +44,7 @@ if 'config_data' not in st.session_state:
     }
 
 # Define the UI
-st.title("Streamlit Configuration and Execution Tool")
+st.title("UglyFeed UI")
 
 # Tab 1: Configuration
 tab1, tab2, tab3 = st.tabs(["Configuration", "Script Execution", "JSON Viewer"])
