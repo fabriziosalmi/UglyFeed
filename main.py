@@ -11,11 +11,21 @@ def load_config(config_path: str) -> dict:
     with open(config_path, 'r') as file:
         return yaml.safe_load(file)
 
+def ensure_directory_exists(directory: str) -> None:
+    """Ensure that a directory exists; if not, create it."""
+    if not os.path.exists(directory):
+        print(f"Creating missing directory: {directory}")
+        os.makedirs(directory)
+
 def main(config: dict) -> None:
     """Main function to process RSS feeds and group similar articles."""
     print("Starting RSS feed processing...")
     input_file_path = 'input/feeds.txt'
+    output_directory = 'output'
     start_time = time.time()
+
+    print("Ensuring output directory exists...")
+    ensure_directory_exists(output_directory)
 
     print("Fetching and parsing RSS feeds...")
     articles = fetch_feeds_from_file(input_file_path)
@@ -29,7 +39,7 @@ def main(config: dict) -> None:
     print(f"Total groups formed: {len(grouped_articles)}")
 
     print("Saving grouped articles to JSON files...")
-    group_sizes = save_grouped_articles(grouped_articles, 'output')
+    group_sizes = save_grouped_articles(grouped_articles, output_directory)
     total_files_saved = len(group_sizes)
 
     elapsed_time = time.time() - start_time
@@ -39,9 +49,9 @@ def main(config: dict) -> None:
 
     # Additional output to summarize file generation
     print("Summarizing output files:")
-    output_files = os.listdir('output')
+    output_files = os.listdir(output_directory)
     for filename in output_files:
-        path = os.path.join('output', filename)
+        path = os.path.join(output_directory, filename)
         with open(path, 'r', encoding='utf-8') as file:
             line_count = sum(1 for _ in file)
         print(f"{filename}: {line_count} lines")
