@@ -19,4 +19,4 @@ spacy==3.7.0
 textblob==0.18.0.post0
 textstat==0.7.3
 tqdm==4.66.3
-typer==0.10.0
+typer==0.11.0
