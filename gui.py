@@ -14,6 +14,11 @@ os.makedirs("input", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 os.makedirs("rewritten", exist_ok=True)
 
+# Default RSS feed URLs
+default_feeds = """https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml
+https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-2.xml
+https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-3.xml"""
+
 # Clone the repository automatically if it does not exist
 repo_url = "https://github.com/fabriziosalmi/UglyFeed"
 repo_path = Path("UglyFeed")
@@ -54,7 +59,7 @@ with tab1:
     
     # Input for RSS feeds
     st.subheader("RSS Feeds")
-    feeds = st.text_area("Enter one RSS feed URL per line:", "")
+    feeds = st.text_area("Enter one RSS feed URL per line:", default_feeds)
     
     if st.button("Save Feeds to feeds.txt"):
         with open(feeds_path, "w") as f:
