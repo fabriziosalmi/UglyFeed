@@ -124,7 +124,6 @@ with tab1:
         st.success("Configuration and feeds saved")
 
 with tab2:
-    st.header("Scripts Execution")
 
     # Execute scripts
     st.subheader("Execute Scripts")
@@ -135,10 +134,9 @@ with tab2:
             result = subprocess.run(["python", script], capture_output=True, text=True)
             st.text_area(f"Output of {script}", result.stdout)
             if result.stderr:
-                st.text_area(f"Errors of {script}", result.stderr)
+                st.text_area(f"Errors or others logs of {script}", result.stderr)
 
 with tab3:
-    st.header("JSON Viewer")
 
     # List JSON files in the rewritten folder
     json_files = list(Path("rewritten").glob("*.json"))
