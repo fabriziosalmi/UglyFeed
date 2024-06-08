@@ -7,6 +7,7 @@ This Docker image contains the UglyFeed application for processing RSS feeds, co
 ### Prerequisites
 
 - **Docker**: Ensure you have Docker installed on your system. You can download and install it from [Docker's official site](https://www.docker.com/get-started).
+- **Ollama** to run local models or an OpenAI/Groq API key
 
 ### Running the Container
 
