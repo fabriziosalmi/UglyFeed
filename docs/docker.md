@@ -1,7 +1,3 @@
-### Docker Hub Image Page Instructions
-
----
-
 # Streamlit UglyFeed Application
 
 This Docker image contains the [UglyFeed](https://github.com/fabriziosalmi/UglyFeed) Streamlit application for processing RSS feeds, configuring similarity and API options, and managing JSON content.
