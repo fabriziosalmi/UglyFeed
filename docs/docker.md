@@ -91,7 +91,8 @@ max_age_days: 10
 
 ### Executing scripts
 
-Goto the 2nd tab to execute application script. Execute one at a time in the given order. Output from scripts is print for troubleshooting and informational purposes.
+Go to the 2nd tab (Script execution) to execute application scripts. Execute one at a time in the given order. Output from scripts is shown for troubleshooting and informational purposes.
+
 ### Viewing Processed JSON Files
 
 Processed JSON files are stored in the `rewritten` directory. You can view and download these files through the UglyFeed application under the "JSON Viewer" tab.
