@@ -33,7 +33,7 @@ docker run -p 8501:8501 \
   -v $(pwd)/input:/app/input \
   -v $(pwd)/output:/app/output \
   -v $(pwd)/rewritten:/app/rewritten \
-  myusername/my-streamlit-app:latest
+  fabriziosalmi/uglyfeed:latest
 ```
 
 Replace `$(pwd)` with the desired path on your host system.
@@ -58,7 +58,7 @@ Mount these files into the container to use your custom configurations:
 docker run -p 8501:8501 \
   -v $(pwd)/input/feeds.txt:/app/input/feeds.txt \
   -v $(pwd)/config.yaml:/app/config.yaml \
-  myusername/my-streamlit-app:latest
+  fabriziosalmi/uglyfeed:latest
 ```
 
 ### Example `config.yaml` Configuration
