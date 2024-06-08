@@ -134,8 +134,7 @@ An overview of the script's architecture, highlighting major components and thei
 - [Metrics documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/metrics.md)
 
 ## Additional documentation
-#### Tuning
-## Tuning
+### Tuning
 
 **Tune it for your own needs**
 - 🎛️ Customize user prompt, check the [prompts](https://github.com/fabriziosalmi/UglyFeed/tree/main/prompts) folder for inspiration. You can also check the [Awesome ChatGPT Prompts](https://github.com/f/awesome-chatgpt-prompts)
