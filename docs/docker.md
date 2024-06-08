@@ -1,6 +1,6 @@
 # UglyFeed Docker
 
-This Docker image contains the [UglyFeed](https://github.com/fabriziosalmi/UglyFeed) UglyFeed application for processing RSS feeds, configuring similarity and API options, and managing JSON content.
+This Docker image contains the UglyFeed application for processing RSS feeds, configuring similarity and API options, and managing JSON content.
 
 ## How to Use This Image
 
