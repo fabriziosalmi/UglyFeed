@@ -1,6 +1,10 @@
 # Project documentation
 Welcome to the UglyFeed project documentation section. This guide provides detailed information for the scripts used by the project.
 
+
+UglyFeed now can be used via Docker, please check the updated [documentation]().
+
+
 ## Setup
 
 ### Installation
