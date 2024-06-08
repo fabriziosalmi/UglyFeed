@@ -1,6 +1,6 @@
-# Streamlit UglyFeed Application
+# UglyFeed Docker
 
-This Docker image contains the [UglyFeed](https://github.com/fabriziosalmi/UglyFeed) Streamlit application for processing RSS feeds, configuring similarity and API options, and managing JSON content.
+This Docker image contains the [UglyFeed](https://github.com/fabriziosalmi/UglyFeed) UglyFeed application for processing RSS feeds, configuring similarity and API options, and managing JSON content.
 
 ## How to Use This Image
 
@@ -10,7 +10,7 @@ This Docker image contains the [UglyFeed](https://github.com/fabriziosalmi/UglyF
 
 ### Running the Container
 
-To start the Streamlit app, use the following `docker run` command:
+To start the UglyFeed app, use the following `docker run` command:
 
 ```bash
 docker run -p 8501:8501 fabriziosalmi/uglyfeed:latest
@@ -18,7 +18,7 @@ docker run -p 8501:8501 fabriziosalmi/uglyfeed:latest
 
 ### Accessing the Application
 
-Once the container is running, open your web browser and navigate to `http://localhost:8501` (or the container ip address) to access the Streamlit application.
+Once the container is running, open your web browser and navigate to `http://localhost:8501` (or the container ip address) to access the UglyFeed application.
 
 ### Volume Mounting for Persistent Storage
 
@@ -36,7 +36,7 @@ Replace `$(pwd)` with the desired path on your host system.
 
 ### Configuration
 
-The application allows you to configure various settings via the Streamlit UI. These configurations are saved in the following files within the container:
+The application allows you to configure various settings via the UglyFeed UI. These configurations are saved in the following files within the container:
 
 - **RSS Feeds**: `input/feeds.txt`
 - **Application Configuration**: `config.yaml`
@@ -93,7 +93,7 @@ max_age_days: 10
 Goto the 2nd tab to execute application script. Execute one at a time in the given order. Output from scripts is print for troubleshooting and informational purposes.
 ### Viewing Processed JSON Files
 
-Processed JSON files are stored in the `rewritten` directory. You can view and download these files through the Streamlit application under the "JSON Viewer" tab.
+Processed JSON files are stored in the `rewritten` directory. You can view and download these files through the UglyFeed application under the "JSON Viewer" tab.
 
 ### Cloning the Repository
 
