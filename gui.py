@@ -55,17 +55,18 @@ st.title("UglyFeed UI")
 tab1, tab2, tab3 = st.tabs(["Configuration", "Script Execution", "JSON Viewer"])
 
 with tab1:
-    st.header("Configuration")
-    
+  
     # Input for RSS feeds
     st.subheader("RSS Feeds")
     feeds = st.text_area("Enter one RSS feed URL per line:", default_feeds)
     
-    if st.button("Save Feeds to feeds.txt"):
+    if st.button("Save Feeds to input/feeds.txt"):
         with open(feeds_path, "w") as f:
             f.write(feeds)
         st.success("Feeds saved to input/feeds.txt")
-
+    
+    st.divider()
+    
     # Similarity options
     st.subheader("Similarity Options")
     st.session_state.config_data['similarity_threshold'] = st.slider("Similarity Threshold", 0.0, 1.0, 0.66)
@@ -108,6 +109,8 @@ with tab1:
             yaml.dump(st.session_state.config_data, f)
         st.success("Configuration saved to config.yaml")
 
+    st.divider()
+    
     st.subheader("Save Configuration and Feeds")
     if st.button("Save All Configuration and Feeds"):
         # Save feeds.txt
