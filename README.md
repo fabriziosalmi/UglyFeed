@@ -37,7 +37,7 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 
 ### Running the Container
 
-To start the Streamlit app, use the following `docker run` command:
+To start the UglyFeed app, use the following `docker run` command:
 
 ```bash
 docker run -p 8501:8501 fabriziosalmi/uglyfeed:latest
