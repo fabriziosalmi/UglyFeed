@@ -29,6 +29,19 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - Ollama API (all models like `llama3` or `phi3`)
 - Groq API (`llama3-8b-8192`, `llama3-70b-8192`, `gemma-7b-it`, `mixtral-8x7b-32768`)
 
+## Quick start
+
+### Prerequisites
+
+- **Docker**: Ensure you have Docker installed on your system. You can download and install it from [Docker's official site](https://www.docker.com/get-started).
+
+### Running the Container
+
+To start the Streamlit app, use the following `docker run` command:
+
+```bash
+docker run -p 8501:8501 fabriziosalmi/uglyfeed:latest
+```
 
 ## Documentation
 
