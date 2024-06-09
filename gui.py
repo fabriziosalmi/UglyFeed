@@ -5,18 +5,23 @@ import yaml
 import json
 from pathlib import Path
 import socket
+import shutil
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+import threading
 
 # Define paths for the feeds.txt and config.yaml files
 feeds_path = Path("input/feeds.txt")
 config_path = Path("config.yaml")
-uglyfeeds_dir = "uglyfeeds"
+uglyfeeds_dir = Path("uglyfeeds")
 uglyfeed_file = "uglyfeed.xml"
+static_dir = Path(".streamlit") / "static" / "uglyfeeds"
 
 # Ensure necessary directories and files exist
 os.makedirs("input", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 os.makedirs("rewritten", exist_ok=True)
 os.makedirs(uglyfeeds_dir, exist_ok=True)
+os.makedirs(static_dir, exist_ok=True)
 
 # Default RSS feed URLs
 default_feeds = """https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml
@@ -92,6 +97,27 @@ def run_script(script_name):
         st.text_area(f"Output of {script_name}", process.stdout or "No output", height=200)
         if process.stderr:
             st.text_area(f"Errors or logs of {script_name}", process.stderr, height=200)
+
+# Custom HTTP handler to serve XML with correct content type
+class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path.endswith(".xml"):
+            self.send_response(200)
+            self.send_header("Content-Type", "application/xml")
+            self.end_headers()
+            with open(static_dir / self.path.lstrip('/'), 'rb') as file:
+                self.wfile.write(file.read())
+        else:
+            super().do_GET()
+
+def start_custom_server():
+    server_address = ('', 8001)  # Using a different port to avoid conflicts with Streamlit
+    httpd = HTTPServer(server_address, XMLHTTPRequestHandler)
+    httpd.serve_forever()
+
+# Start the custom server in a new thread
+server_thread = threading.Thread(target=start_custom_server, daemon=True)
+server_thread.start()
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
@@ -205,19 +231,32 @@ elif selected_option == "View and Serve XML":
     st.header("View and Serve XML")
 
     # Ensure the file exists
-    xml_file_path = Path(uglyfeeds_dir) / uglyfeed_file
+    xml_file_path = uglyfeeds_dir / uglyfeed_file
     if not xml_file_path.exists():
         st.warning(f"The file '{uglyfeed_file}' does not exist in the directory '{uglyfeeds_dir}'.")
     else:
+        # Copy the XML file to the Streamlit static directory
+        destination_path = static_dir / uglyfeed_file
+        shutil.copy(xml_file_path, destination_path)
+        
         # Display the XML file content
         with open(xml_file_path, "r") as f:
             xml_content = f.read()
         st.text_area("XML Content", xml_content, height=300)
 
+        # Provide a direct download link for the XML file
+        with open(destination_path, "rb") as f:
+            st.download_button(
+                label="Download XML File",
+                data=f,
+                file_name=uglyfeed_file,
+                mime="application/xml"
+            )
+
         # Provide a link to serve the XML file
         local_ip = get_local_ip()
-        port = 8501  # Streamlit's default port
-        serve_url = f"http://{local_ip}:{port}/{uglyfeeds_dir}/{uglyfeed_file}"
+        custom_server_port = 8001  # Port for the custom server
+        serve_url = f"http://{local_ip}:{custom_server_port}/{uglyfeed_file}"
         st.markdown(f"**Serve URL:** [Open XML File]({serve_url})")
 
         # Show the local IP and full link for easier access
@@ -247,4 +286,3 @@ elif selected_option == "JSON Viewer":
             )
     else:
         st.info("No JSON files found in the rewritten folder")
-
