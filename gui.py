@@ -4,15 +4,19 @@ import subprocess
 import yaml
 import json
 from pathlib import Path
+import socket
 
 # Define paths for the feeds.txt and config.yaml files
 feeds_path = Path("input/feeds.txt")
 config_path = Path("config.yaml")
+uglyfeeds_dir = "uglyfeeds"
+uglyfeed_file = "uglyfeed.xml"
 
-# Ensure necessary directories exist
+# Ensure necessary directories and files exist
 os.makedirs("input", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 os.makedirs("rewritten", exist_ok=True)
+os.makedirs(uglyfeeds_dir, exist_ok=True)
 
 # Default RSS feed URLs
 default_feeds = """https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml
@@ -68,18 +72,21 @@ if 'config_data' not in st.session_state:
         'max_age_days': 10
     }
 
-# Function to run scripts and display output
-def run_script(script_name):
-    with st.spinner(f"Executing {script_name}..."):
-        result = subprocess.run(["python", script_name], capture_output=True, text=True)
-        if result.stdout:
-            st.text_area(f"Output of {script_name}", result.stdout, height=200)
-        if result.stderr:
-            st.text_area(f"Errors or logs of {script_name}", result.stderr, height=200)
+# Function to get the local IP address
+def get_local_ip():
+    """Get the local IP address."""
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        try:
+            # Doesn't even have to be reachable
+            s.connect(('10.254.254.254', 1))
+            local_ip = s.getsockname()[0]
+        except OSError:
+            local_ip = '127.0.0.1'
+    return local_ip
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
-menu_options = ["Configuration", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "Run serve.py", "JSON Viewer"]
+menu_options = ["Configuration", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "JSON Viewer"]
 selected_option = st.sidebar.selectbox("Select an option", menu_options)
 
 # Configuration Section
@@ -184,11 +191,28 @@ elif selected_option == "Run json2rss.py":
     if st.button("Run json2rss.py"):
         run_script("json2rss.py")
 
-# Run serve.py Section
-elif selected_option == "Run serve.py":
-    st.header("Run serve.py")
-    if st.button("Run serve.py"):
-        run_script("serve.py")
+# View and Serve XML Section
+elif selected_option == "View and Serve XML":
+    st.header("View and Serve XML")
+
+    # Ensure the file exists
+    xml_file_path = Path(uglyfeeds_dir) / uglyfeed_file
+    if not xml_file_path.exists():
+        st.warning(f"The file '{uglyfeed_file}' does not exist in the directory '{uglyfeeds_dir}'.")
+    else:
+        # Display the XML file content
+        with open(xml_file_path, "r") as f:
+            xml_content = f.read()
+        st.text_area("XML Content", xml_content, height=300)
+
+        # Provide a link to serve the XML file
+        local_ip = get_local_ip()
+        port = 8501  # Streamlit's default port
+        serve_url = f"http://{local_ip}:{port}/{uglyfeeds_dir}/{uglyfeed_file}"
+        st.markdown(f"**Serve URL:** [Open XML File]({serve_url})")
+
+        # Show the local IP and full link for easier access
+        st.info(f"Serving `{uglyfeed_file}` at: {serve_url}")
 
 # JSON Viewer Section
 elif selected_option == "JSON Viewer":
@@ -214,4 +238,3 @@ elif selected_option == "JSON Viewer":
             )
     else:
         st.info("No JSON files found in the rewritten folder")
-
