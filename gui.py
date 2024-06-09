@@ -84,6 +84,15 @@ def get_local_ip():
             local_ip = '127.0.0.1'
     return local_ip
 
+# Function to run scripts and display output
+def run_script(script_name):
+    """Execute a script and display its output in Streamlit."""
+    with st.spinner(f"Executing {script_name}..."):
+        process = subprocess.run(["python", script_name], capture_output=True, text=True)
+        st.text_area(f"Output of {script_name}", process.stdout or "No output", height=200)
+        if process.stderr:
+            st.text_area(f"Errors or logs of {script_name}", process.stderr, height=200)
+
 # Sidebar navigation
 st.sidebar.title("Navigation")
 menu_options = ["Configuration", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "JSON Viewer"]
@@ -238,3 +247,4 @@ elif selected_option == "JSON Viewer":
             )
     else:
         st.info("No JSON files found in the rewritten folder")
+
