@@ -43,9 +43,19 @@ To start the UglyFeed app, use the following `docker run` command:
 docker run -p 8001:8001 -p 8501:8501 fabriziosalmi/uglyfeed:latest
 ```
 
+### Configure the application
+In the Configuration page you can change options for aggregation similarity, LLM APIs and model to use and the retention options for the final rewritten XML feed to serve via http.
+
+### Execute the application scripts
+Execute all scripts in the given order (`main.py`, `llm_processor.py`, `json2rss.py`).
+You can check for logs, errors and informational messages after executed each script.
+
+### Get the final rewritten XML feed
+Once all scripts completed you can access to the final rewritten XML url via http at `http://container_ip:8001/uglyfeed.xml`
+
 ## Documentation
 
-Please refer to the updated [documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md).
+Please refer to the extended [documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md) to better understand how to get the best from this application.
 
 ## Use cases
 
@@ -60,7 +70,6 @@ The project can be easily customized to fit several use cases:
 - **Enhanced RSS Feeds**: Offer enriched RSS feeds that summarize, evaluate, and filter content, providing users with high-quality, relevant updates.
 - **Creative Writing Assistance**: Assist writers by generating rewritten drafts of their work, helping overcome writer's block and sparking new ideas.
 - **Content Repurposing**: Transform long-form content into shorter, more digestible formats like infographics, slideshows, and social media snippets.
-- **Crisis Communication**: Quickly rewrite and disseminate critical updates during emergencies, ensuring clear and consistent messaging.
 - **Fake News Detection Datasets**: Generate datasets by rewriting news articles for use in training models to recognize and combat fake news.
 - **Image Captioning**: Integrate with image recognition systems to create engaging and accurate descriptions for images.
 - **AI-Driven Research Companions**: Develop virtual research assistants that can provide concise summaries and save time.
