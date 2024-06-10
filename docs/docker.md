@@ -102,15 +102,16 @@ Processed JSON files are stored in the `rewritten` directory. You can view and d
 ### Get final rewritten XML feed
 
 Once the feeds are downloaded, aggregated for similarity and rewritten by LLM you can convert them into valid RSS XML from JSON.
-Once converted you cam access thr final XML at docker_ip:8001/uglyfeed.xml.
-On the next updates I'll focus on cron schedule (also via UI) and general UI improvements. An additional page will be added for metrics evaluation and visualization soon 😅
+Once converted you can access the final XML at docker_ip:8001/uglyfeed.xml.
+On the next updates I'll focus on the cron schedule (also via UI) and general UI improvements. An additional page will be added for metrics evaluation and visualization soon 😅
+
 ### Cloning the Repository
 
 The `UglyFeed` repository is automatically cloned into the container at `/app/UglyFeed` during the build process, so no additional setup is required to get started with the application.
 
 ## Troubleshooting
 
-- **Port Conflicts**: Ensure the port `8501` is not being used by another application on your host.
+- **Port Conflicts**: Ensure the ports `8001` and `8501` are not being used by another application on your host.
 - **Docker Permissions**: You might need elevated permissions to run Docker commands or mount volumes, depending on your system's configuration.
 - **Updating the Image**: Pull the latest image from Docker Hub to get the newest updates and features:
 
