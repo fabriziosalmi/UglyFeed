@@ -97,6 +97,11 @@ Go to the 2nd tab (Script execution) to execute application scripts. Execute one
 
 Processed JSON files are stored in the `rewritten` directory. You can view and download these files through the UglyFeed application under the "JSON Viewer" tab.
 
+### Get final rewritten XML feed
+
+Once the feeds are downloaded, aggregated for similarity and rewritten by LLM you can convert them into valid RSS XML from JSON.
+Once converted you cam access thr final XML at docker_ip:8001/uglyfeed.xml.
+On the next updates I'll focus on cron schedule (also via UI) and general UI improvements. An additional page will be added for metrics evaluation and visualization soon 😅
 ### Cloning the Repository
 
 The `UglyFeed` repository is automatically cloned into the container at `/app/UglyFeed` during the build process, so no additional setup is required to get started with the application.
