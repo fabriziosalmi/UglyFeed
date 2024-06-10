@@ -52,7 +52,7 @@ To pre-populate or manually edit the configuration files before running the cont
 Mount these files into the container to use your custom configurations:
 
 ```bash
-docker run -p 8501:8501 \
+docker run -p 8001:8001 -p 8501:8501 \
   -v $(pwd)/input/feeds.txt:/app/input/feeds.txt \
   -v $(pwd)/config.yaml:/app/config.yaml \
   fabriziosalmi/uglyfeed:latest
@@ -91,7 +91,9 @@ max_age_days: 10
 
 ### Executing scripts
 
-Go to the 2nd tab (Script execution) to execute application scripts. Execute one at a time in the given order. Output from scripts is shown for troubleshooting and informational purposes.
+Go to the 2nd menu item (Run main.py) to execute retrieval and aggregation of RSS items. Output from script execution is shown for troubleshooting and informational purposes.
+Once the main.py complete the process you can run llm_processor.py to make JSON files in output folder be rewritten by the configured LLM.
+Once the LLM complete the content rewrite you can convert the JSON files in the rewritten folder into valid RSS XML feed.
 
 ### Viewing Processed JSON Files
 
