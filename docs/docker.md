@@ -26,7 +26,7 @@ Once the container is running, open your web browser and navigate to `http://loc
 To persist the data in `input`, `output`, and `rewritten` directories across container runs, you can mount these directories to your local filesystem. This is useful if you want to retain the configuration files and processed data.
 
 ```bash
-docker run -p 8501:8501 \
+docker run -p 8001:8001 -p 8501:8501 \
   -v $(pwd)/input:/app/input \
   -v $(pwd)/output:/app/output \
   -v $(pwd)/rewritten:/app/rewritten \
