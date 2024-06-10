@@ -34,6 +34,7 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 ### Prerequisites
 
 - **Docker**: Ensure you have Docker installed on your system. You can download and install it from [Docker's official site](https://www.docker.com/get-started).
+- **Ollama** to run local models or an **OpenAI** or **Groq** API key.
 
 ### Running the Container
 
