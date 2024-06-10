@@ -14,7 +14,7 @@ This Docker image contains the UglyFeed application for processing RSS feeds, co
 To start the UglyFeed app, use the following `docker run` command:
 
 ```bash
-docker run -p 8501:8501 fabriziosalmi/uglyfeed:latest
+docker run -p 8001:8001 -p 8501:8501 fabriziosalmi/uglyfeed:latest
 ```
 
 ### Accessing the Application
