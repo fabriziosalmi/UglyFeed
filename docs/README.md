@@ -2,26 +2,19 @@
 Welcome to the UglyFeed project documentation section. This guide provides detailed information for the scripts used by the project.
 
 ## Quick start
-**UglyFeed now can be used via Docker, please check the updated [documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/docker.md).**
-
-## Setup
 
 ### Installation
 
-1. Clone the repository:
+1. Clone the repository and run the web applicatio:
     ```sh
     git clone https://github.com/fabriziosalmi/UglyFeed.git
     cd UglyFeed
-    ```
-
-2. Run the web application:
-    ```sh
     streamlit run gui.py --server.address 0.0.0.0
     ```
 
 ### Configuration
 
-1. Setup options by making your changes into the Configuration page
+Once in the web UI just change options to fit your needs:
 
 **Source Feeds**
 - Modify the source feeds list to fit with your preferred RSS feeds (changes will still be saved as `input/feeds.txt` for backward compatibility)
@@ -52,10 +45,12 @@ You can use OpenAI API or Ollama API, not togheter at the same time. Please comm
 - `max_items` (Maximum number of items to process for the rewriting process)
 - `max_age_days` (Maximum age of items in days to be considered)
 
-2. Run `main.py` from its dedicated page, it will retrieve and aggregate feeds items based on similarity
+### Use
 
-3. Run `llm_processor.py` from its dedicated page, it will rewrite feeds based on LLM instruction/prompt and options and it will save a single JSON file for each unique rewritten feeds item.
+1. Run the `main.py` script from its dedicated page, it will retrieve and aggregate feeds items based on similarity. Logs are shown in the page for debugging purposes.
 
-4. Run `json2rss.py` from its dedicated page, it will create a valid RSS XML file with all rewritten feeds items.
+2. Run the `llm_processor.py` script from its dedicated page, it will rewrite feeds based on LLM instruction/prompt and options and it will save a single JSON file for each unique rewritten feeds item. Logs are shown in the page for debugging purposes.
 
-5. Go to the Serve XML feed page to get the generated XML content and a working HTTP URL you can use with any RSS reader as feed source.
+3. Run the `json2rss.py` script from its dedicated page, it will create a valid RSS XML file with all rewritten feeds items. Logs are shown in the page for debugging purposes.
+
+4. Go to the View and Serve XML page to get the generated XML content and a working HTTP URL you can use with any RSS reader as AI-powered feed source.
