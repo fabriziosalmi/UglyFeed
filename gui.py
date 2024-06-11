@@ -8,6 +8,10 @@ import socket
 import shutil
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
+import schedule
+import time
+import xml.etree.ElementTree as ET
+from datetime import datetime
 
 # Define paths
 feeds_path = Path("input/feeds.txt")
@@ -33,6 +37,9 @@ https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-
 # Repository URL and path
 repo_url = "https://github.com/fabriziosalmi/UglyFeed"
 repo_path = Path("UglyFeed")
+
+# Global variable to hold the last run output
+last_run_output = []
 
 def get_local_version():
     """Get the local version from version.txt."""
@@ -84,18 +91,10 @@ def load_config():
     else:
         return None
 
-# Save configuration and feeds
-def save_configuration(overwrite):
-    if overwrite:
-        with open(config_path, "w") as f:
-            yaml.dump(st.session_state.config_data, f)
-        st.success("Configuration saved to config.yaml")
-    else:
-        st.info("Configuration changes not saved to avoid overwriting.")
-
-# Initialize session state for config data
-if 'config_data' not in st.session_state:
-    st.session_state.config_data = load_config() or {
+# Ensure all required keys are in the config_data with default values
+def ensure_default_config(config_data):
+    """Ensure the configuration dictionary contains default values for missing keys."""
+    defaults = {
         'similarity_threshold': 0.66,
         'similarity_options': {
             'min_samples': 2,
@@ -111,8 +110,36 @@ if 'config_data' not in st.session_state:
         },
         'content_prefix': "In qualità di giornalista esperto, utilizza un tono professionale, preciso e dettagliato...",
         'max_items': 50,
-        'max_age_days': 10
+        'max_age_days': 10,
+        'scheduling_enabled': False,
+        'scheduling_interval': 1,
+        'scheduling_period': 'hours'
     }
+
+    # Recursively update the config_data with any missing default keys
+    def recursive_update(d, u):
+        for k, v in u.items():
+            if isinstance(v, dict):
+                d[k] = recursive_update(d.get(k, {}), v)
+            else:
+                d.setdefault(k, v)
+        return d
+
+    return recursive_update(config_data, defaults)
+
+# Initialize session state for config data
+if 'config_data' not in st.session_state:
+    st.session_state.config_data = ensure_default_config(load_config() or {})
+
+# Save configuration and feeds
+def save_configuration(overwrite):
+    """Save the current configuration to config.yaml and feeds.txt."""
+    if overwrite:
+        with open(config_path, "w") as f:
+            yaml.dump(st.session_state.config_data, f)
+        st.success("Configuration saved to config.yaml")
+    else:
+        st.info("Configuration changes not saved to avoid overwriting.")
 
 # Function to get the local IP address
 def get_local_ip():
@@ -136,7 +163,7 @@ def find_available_port(base_port):
             except OSError:
                 base_port += 1
 
-# Function to run scripts and display output
+# Function to run a script and display its output
 def run_script(script_name):
     """Execute a script and display its output in Streamlit."""
     with st.spinner(f"Executing {script_name}..."):
@@ -144,6 +171,22 @@ def run_script(script_name):
         st.text_area(f"Output of {script_name}", process.stdout or "No output", height=200)
         if process.stderr:
             st.text_area(f"Errors or logs of {script_name}", process.stderr, height=200)
+
+# Function to run scripts sequentially and display output
+def run_scripts_sequentially():
+    """Run main.py, llm_processor.py, and json2rss.py sequentially."""
+    global last_run_output
+    last_run_output = []
+    scripts = ["main.py", "llm_processor.py", "json2rss.py"]
+    for script in scripts:
+        with st.spinner(f"Executing {script}..."):
+            process = subprocess.run(["python", script], capture_output=True, text=True)
+            output = process.stdout or "No output"
+            errors = process.stderr or ""
+            st.text_area(f"Output of {script}", output, height=200)
+            if errors:
+                st.text_area(f"Errors or logs of {script}", errors, height=200)
+            last_run_output.append((script, output, errors))
 
 # Custom HTTP handler to serve XML with correct content type
 class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
@@ -179,9 +222,41 @@ def copy_xml_to_static():
 def list_markdown_files(docs_dir):
     return [file for file in docs_dir.glob("*.md")]
 
+# Function to get quick stats from the XML file
+def get_xml_stats():
+    if not (uglyfeeds_dir / uglyfeed_file).exists():
+        return None, None, None
+    tree = ET.parse(uglyfeeds_dir / uglyfeed_file)
+    root = tree.getroot()
+    items = root.findall(".//item")
+    item_count = len(items)
+    last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return item_count, last_updated, uglyfeeds_dir / uglyfeed_file
+
+# Function to schedule jobs
+def schedule_jobs(interval, period):
+    def job():
+        run_scripts_sequentially()
+
+    if period == 'minutes':
+        schedule.every(interval).minutes.do(job)
+    elif period == 'hours':
+        schedule.every(interval).hours.do(job)
+    elif period == 'days':
+        schedule.every(interval).days.do(job)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+# Start scheduling if enabled in the config
+if st.session_state.config_data.get('scheduling_enabled', False):
+    scheduling_thread = threading.Thread(target=schedule_jobs, args=(st.session_state.config_data['scheduling_interval'], st.session_state.config_data['scheduling_period']), daemon=True)
+    scheduling_thread.start()
+
 # Sidebar navigation
 st.sidebar.title("Navigation")
-menu_options = ["Introduction", "Configuration", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "JSON Viewer", "Documentation"]
+menu_options = ["Introduction", "Configuration", "Run Scripts", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "Scheduled Jobs", "Documentation"]
 selected_option = st.sidebar.selectbox("Select an option", menu_options)
 
 # Introduction Page
@@ -195,7 +270,7 @@ if selected_option == "Introduction":
         - **Configuration**: Set up and save your RSS feeds and processing options.
         - **Run Scripts**: Execute various processing scripts like `main.py`, `llm_processor.py`, and `json2rss.py`.
         - **View and Serve XML**: View the content of the XML feed and serve it via a custom HTTP server.
-        - **JSON Viewer**: Browse and download the generated JSON files from the `rewritten` folder.
+        - **Scheduled Jobs**: Configure and view the output of scheduled jobs.
         - **Documentation**: View the Markdown documentation files related to the project.
 
         Make sure your local environment is configured correctly and that the necessary directories and files are in place. For any bug just [open an issue](https://github.com/fabriziosalmi/UglyFeed/issues/new/choose) on GitHub, hopefully I'll be able to fix it ^_^. Enjoy!
@@ -272,21 +347,31 @@ elif selected_option == "Configuration":
     if st.button("Save Configuration and Feeds"):
         save_configuration(overwrite_config)
 
+# Run Scripts Section
+elif selected_option == "Run Scripts":
+    st.header("Run Scripts")
+
+    if st.button("Run main.py, llm_processor.py, and json2rss.py sequentially"):
+        run_scripts_sequentially()
+
 # Run main.py Section
 elif selected_option == "Run main.py":
     st.header("Run main.py")
+
     if st.button("Run main.py"):
         run_script("main.py")
 
 # Run llm_processor.py Section
 elif selected_option == "Run llm_processor.py":
     st.header("Run llm_processor.py")
+
     if st.button("Run llm_processor.py"):
         run_script("llm_processor.py")
 
 # Run json2rss.py Section
 elif selected_option == "Run json2rss.py":
     st.header("Run json2rss.py")
+
     if st.button("Run json2rss.py"):
         run_script("json2rss.py")
 
@@ -320,34 +405,67 @@ elif selected_option == "View and Serve XML":
         # Display the serve URL in a clean format
         st.markdown(f"**Serving `{uglyfeed_file}` at:**\n\n[{serve_url}]({serve_url})")
 
-# JSON Viewer Section
-elif selected_option == "JSON Viewer":
-    st.header("JSON Viewer")
+# Scheduled Jobs Section
+elif selected_option == "Scheduled Jobs":
+    st.header("Scheduled Jobs")
 
-    json_files = list(Path("rewritten").glob("*.json"))
+    # Display the scheduling configuration and status
+    st.subheader("Scheduling Configuration")
+    scheduling_enabled = st.session_state.config_data.get('scheduling_enabled', False)
 
-    if json_files:
-        selected_file = st.selectbox("Select a JSON file to view", json_files)
+    # Predefined scheduling intervals
+    interval_options = {
+        "1 hour": (1, 'hours'),
+        "4 hours": (4, 'hours'),
+        "12 hours": (12, 'hours'),
+        "24 hours": (24, 'hours')
+    }
 
-        if selected_file:
-            with open(selected_file, "r") as f:
-                json_data = json.load(f)
+    # Default to "1 hour" if not set
+    current_interval = st.session_state.config_data.get('scheduling_interval', 1)
+    current_period = st.session_state.config_data.get('scheduling_period', 'hours')
+    default_option = next((k for k, v in interval_options.items() if v == (current_interval, current_period)), "1 hour")
 
-            st.json(json_data)
+    st.session_state.config_data['scheduling_enabled'] = st.checkbox("Enable Scheduled Execution", value=scheduling_enabled)
+    selected_interval = st.selectbox("Select Scheduling Interval", list(interval_options.keys()), index=list(interval_options.keys()).index(default_option))
 
-            json_str = json.dumps(json_data, indent=2)
-            st.download_button(
-                label="Download JSON",
-                data=json_str,
-                file_name=selected_file.name,
-                mime="application/json"
-            )
+    # Update session state based on selection
+    interval, period = interval_options[selected_interval]
+    st.session_state.config_data['scheduling_interval'] = interval
+    st.session_state.config_data['scheduling_period'] = period
+
+    # Save the scheduling configuration
+    if st.button("Save Scheduling Configuration"):
+        save_configuration(True)
+        st.success("Scheduling configuration saved.")
+
+    st.write(f"Scheduling Enabled: **{st.session_state.config_data['scheduling_enabled']}**")
+    st.write(f"Selected Interval: **{selected_interval}**")
+
+    # Show the last run output
+    st.subheader("Last Run Output")
+    if last_run_output:
+        for script, output, errors in last_run_output:
+            st.markdown(f"**Output of `{script}`:**")
+            st.text_area(f"Output of {script}", output, height=200)
+            if errors:
+                st.text_area(f"Errors or logs of {script}", errors, height=200)
     else:
-        st.info("No JSON files found in the rewritten folder")
+        st.info("No scheduled runs have occurred yet.")
+
+    # Display quick stats for the XML file
+    st.subheader("XML File Stats")
+    item_count, last_updated, xml_path = get_xml_stats()
+    if item_count is not None:
+        st.write(f"**Item Count:** {item_count}")
+        st.write(f"**Last Updated:** {last_updated}")
+        st.write(f"**File Path:** {xml_path}")
+    else:
+        st.info("No XML file found or file is empty.")
 
 # Documentation Section
 elif selected_option == "Documentation":
-    # st.header("Documentation")
+    st.header("Documentation")
 
     # Display README.md by default
     readme_path = docs_dir / "README.md"
