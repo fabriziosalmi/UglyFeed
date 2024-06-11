@@ -15,6 +15,7 @@ config_path = Path("config.yaml")
 uglyfeeds_dir = Path("uglyfeeds")
 uglyfeed_file = "uglyfeed.xml"
 static_dir = Path(".streamlit") / "static" / "uglyfeeds"
+version_file = Path("version.txt")
 
 # Ensure necessary directories and files exist
 os.makedirs("input", exist_ok=True)
@@ -28,17 +29,56 @@ default_feeds = """https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main
 https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-2.xml
 https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-3.xml"""
 
-# Clone the repository automatically if it does not exist
+# Repository URL and path
 repo_url = "https://github.com/fabriziosalmi/UglyFeed"
 repo_path = Path("UglyFeed")
 
-def clone_repo():
-    if not repo_path.exists():
-        with st.spinner("Cloning the UglyFeed repository..."):
-            subprocess.run(["git", "clone", repo_url], check=True)
-            st.success("Repository cloned into UglyFeed folder")
+def get_local_version():
+    """Get the local version from version.txt."""
+    if version_file.exists():
+        with open(version_file, "r") as f:
+            return f.read().strip()
+    return None
 
-clone_repo()
+def get_remote_version(repo_url):
+    """Get the remote version by fetching version.txt from the remote repository."""
+    try:
+        # Use curl to fetch the raw version.txt from the remote repo directly
+        remote_version_url = f"https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/version.txt"
+        
+        # Fetch the content using subprocess
+        result = subprocess.run(["curl", "-s", remote_version_url], capture_output=True, text=True, check=True)
+        
+        if result.stdout:
+            return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        st.error(f"An error occurred while fetching the remote version: {e}")
+    return None
+
+def check_and_update_repo(repo_path, repo_url):
+    """Check if the remote repo has updates and pull them if available."""
+    try:
+        local_version = get_local_version()
+        remote_version = get_remote_version(repo_url)
+        
+        if local_version and remote_version:
+            if remote_version > local_version:
+                st.write(f"Remote version ({remote_version}) is newer than local version ({local_version}). Updating repository...")
+                if repo_path.exists():
+                    os.chdir(repo_path)
+                    with st.spinner("Pulling updates from the remote repository..."):
+                        subprocess.run(["git", "pull"], check=True)
+                        st.success(f"Repository updated to version {remote_version}.")
+                else:
+                    with st.spinner("Cloning the UglyFeed repository..."):
+                        subprocess.run(["git", "clone", repo_url], check=True)
+                        st.success(f"Repository cloned with version {remote_version}.")
+            else:
+                st.info(f"The local repository is already up-to-date. (version: {local_version})")
+        else:
+            st.error("Unable to determine versions for comparison.")
+    except subprocess.CalledProcessError as e:
+        st.error(f"An error occurred while checking the repository: {e}")
 
 # Load existing configuration if available
 def load_config():
@@ -49,12 +89,13 @@ def load_config():
         return None
 
 # Save configuration and feeds
-def save_configuration():
-    with open(config_path, "w") as f:
-        yaml.dump(st.session_state.config_data, f)
-    with open(feeds_path, "w") as f:
-        f.write(st.session_state.feeds)
-    st.success("Configuration and feeds saved")
+def save_configuration(overwrite):
+    if overwrite:
+        with open(config_path, "w") as f:
+            yaml.dump(st.session_state.config_data, f)
+        st.success("Configuration saved to config.yaml")
+    else:
+        st.info("Configuration changes not saved to avoid overwriting.")
 
 # Initialize session state for config data
 if 'config_data' not in st.session_state:
@@ -128,6 +169,11 @@ selected_option = st.sidebar.selectbox("Select an option", menu_options)
 if selected_option == "Configuration":
     st.header("Configuration")
 
+    st.subheader("Version and Repository Management")
+    check_and_update_repo(repo_path, repo_url)
+
+    st.divider()
+
     st.subheader("RSS Feeds")
     if not feeds_path.exists():
         st.session_state.feeds = default_feeds
@@ -148,6 +194,8 @@ if selected_option == "Configuration":
     st.session_state.config_data['similarity_threshold'] = st.slider("Similarity Threshold", 0.0, 1.0, st.session_state.config_data['similarity_threshold'])
     st.session_state.config_data['similarity_options']['min_samples'] = st.number_input("Minimum Samples", min_value=1, value=st.session_state.config_data['similarity_options']['min_samples'])
     st.session_state.config_data['similarity_options']['eps'] = st.number_input("Epsilon (eps)", min_value=0.0, value=st.session_state.config_data['similarity_options']['eps'], step=0.01)
+
+    st.divider()
 
     st.subheader("API and LLM Options")
     api_options = ["OpenAI", "Groq", "Ollama"]
@@ -170,43 +218,24 @@ if selected_option == "Configuration":
             'ollama_model': st.text_input("Ollama Model", "phi3")
         }
 
+    st.divider()
+
     st.subheader("Content Prefix")
     st.session_state.config_data['content_prefix'] = st.text_area("Content Prefix", st.session_state.config_data['content_prefix'])
+
+    st.divider()
 
     st.subheader("RSS Retention Options")
     st.session_state.config_data['max_items'] = st.number_input("Maximum Items", min_value=1, value=st.session_state.config_data['max_items'])
     st.session_state.config_data['max_age_days'] = st.number_input("Maximum Age (days)", min_value=1, value=st.session_state.config_data['max_age_days'])
 
     st.divider()
-    if st.button("Load Configuration"):
-        st.session_state.config_data = load_config() or st.session_state.config_data
-        st.experimental_rerun()
 
-    if st.button("Reset to Default"):
-        st.session_state.config_data = {
-            'similarity_threshold': 0.66,
-            'similarity_options': {
-                'min_samples': 2,
-                'eps': 0.66
-            },
-            'api_config': {
-                'ollama_api_url': "http://localhost:11434/api/chat",
-                'ollama_model': "phi3"
-            },
-            'folders': {
-                'output_folder': "output",
-                'rewritten_folder': "rewritten"
-            },
-            'content_prefix': "In qualità di giornalista esperto, utilizza un tono professionale, preciso e dettagliato...",
-            'max_items': 50,
-            'max_age_days': 10
-        }
-        st.session_state.feeds = default_feeds
-        st.experimental_rerun()
+    # Add a checkbox to control the overwriting of config.yaml
+    overwrite_config = st.checkbox("Force overwrite config.yaml", value=False)
 
-    st.divider()
     if st.button("Save Configuration and Feeds"):
-        save_configuration()
+        save_configuration(overwrite_config)
 
 # Run main.py Section
 elif selected_option == "Run main.py":
