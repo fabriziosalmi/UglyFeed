@@ -1,20 +1,19 @@
-# Project documentation
-Welcome to the UglyFeed project documentation section. This guide provides detailed information for the scripts used by the project.
+# Documentation
+Welcome to the UglyFeed documentation. This guide provides detailed information to run UglyFeed.
 
-## Quick start
+## Installation and run
 
-### Installation
+Clone the repository and run the web application:
 
-1. Clone the repository and run the web applicatio:
-    ```sh
-    git clone https://github.com/fabriziosalmi/UglyFeed.git
-    cd UglyFeed
-    streamlit run gui.py --server.address 0.0.0.0
-    ```
+```sh
+git clone https://github.com/fabriziosalmi/UglyFeed.git
+cd UglyFeed
+streamlit run gui.py --server.address 0.0.0.0
+```
 
-### Configuration
+## Configuration
 
-Once in the web UI just change options to fit your needs:
+Once in the web UI at http://yourownip:8501 just check options and made changes to fit your needs.
 
 **Source Feeds**
 - Modify the source feeds list to fit with your preferred RSS feeds (changes will still be saved as `input/feeds.txt` for backward compatibility)
