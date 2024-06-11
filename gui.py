@@ -9,13 +9,14 @@ import shutil
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
 
-# Define paths for the feeds.txt and config.yaml files
+# Define paths
 feeds_path = Path("input/feeds.txt")
 config_path = Path("config.yaml")
 uglyfeeds_dir = Path("uglyfeeds")
 uglyfeed_file = "uglyfeed.xml"
 static_dir = Path(".streamlit") / "static" / "uglyfeeds"
 version_file = Path("version.txt")
+docs_dir = Path("docs")  # Path to the documentation directory
 
 # Ensure necessary directories and files exist
 os.makedirs("input", exist_ok=True)
@@ -43,12 +44,8 @@ def get_local_version():
 def get_remote_version(repo_url):
     """Get the remote version by fetching version.txt from the remote repository."""
     try:
-        # Use curl to fetch the raw version.txt from the remote repo directly
         remote_version_url = f"https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/version.txt"
-        
-        # Fetch the content using subprocess
         result = subprocess.run(["curl", "-s", remote_version_url], capture_output=True, text=True, check=True)
-        
         if result.stdout:
             return result.stdout.strip()
     except subprocess.CalledProcessError as e:
@@ -60,7 +57,6 @@ def check_and_update_repo(repo_path, repo_url):
     try:
         local_version = get_local_version()
         remote_version = get_remote_version(repo_url)
-        
         if local_version and remote_version:
             if remote_version > local_version:
                 st.write(f"Remote version ({remote_version}) is newer than local version ({local_version}). Updating repository...")
@@ -123,7 +119,6 @@ def get_local_ip():
     """Get the local IP address."""
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         try:
-            # Doesn't even have to be reachable
             s.connect(('10.254.254.254', 1))
             local_ip = s.getsockname()[0]
         except OSError:
@@ -180,9 +175,13 @@ def copy_xml_to_static():
         return destination_path
     return None
 
+# Function to list all Markdown files in the docs directory
+def list_markdown_files(docs_dir):
+    return [file for file in docs_dir.glob("*.md")]
+
 # Sidebar navigation
 st.sidebar.title("Navigation")
-menu_options = ["Introduction", "Configuration", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "JSON Viewer"]
+menu_options = ["Introduction", "Configuration", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "JSON Viewer", "Documentation"]
 selected_option = st.sidebar.selectbox("Select an option", menu_options)
 
 # Introduction Page
@@ -197,6 +196,7 @@ if selected_option == "Introduction":
         - **Run Scripts**: Execute various processing scripts like `main.py`, `llm_processor.py`, and `json2rss.py`.
         - **View and Serve XML**: View the content of the XML feed and serve it via a custom HTTP server.
         - **JSON Viewer**: Browse and download the generated JSON files from the `rewritten` folder.
+        - **Documentation**: View the Markdown documentation files related to the project.
         
         Make sure your local environment is configured correctly and that the necessary directories and files are in place. Enjoy!
     """)
@@ -344,3 +344,28 @@ elif selected_option == "JSON Viewer":
             )
     else:
         st.info("No JSON files found in the rewritten folder")
+
+# Documentation Section
+elif selected_option == "Documentation":
+    st.header("Documentation")
+
+    # Display README.md by default
+    readme_path = docs_dir / "README.md"
+    if readme_path.exists():
+        with open(readme_path, "r") as f:
+            readme_content = f.read()
+        st.markdown(readme_content)
+    else:
+        st.info("No README.md found in the docs folder.")
+
+    st.subheader("Additional Documentation Files")
+    markdown_files = list_markdown_files(docs_dir)
+    if markdown_files:
+        selected_file = st.selectbox("Select a documentation file to view", markdown_files)
+
+        if selected_file:
+            with open(selected_file, "r") as f:
+                content = f.read()
+            st.markdown(content)
+    else:
+        st.info("No additional documentation files found in the docs folder.")
