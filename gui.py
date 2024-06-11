@@ -192,11 +192,30 @@ def run_scripts_sequentially():
 class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.endswith(".xml"):
-            self.send_response(200)
-            self.send_header("Content-Type", "application/xml")
-            self.end_headers()
-            with open(static_dir / self.path.lstrip('/'), 'rb') as file:
-                self.wfile.write(file.read())
+            try:
+                # Define the only allowed file to serve
+                allowed_files = {"uglyfeed.xml"}
+                
+                # Sanitize and resolve the path
+                requested_file = os.path.basename(self.path)
+                
+                if requested_file not in allowed_files:
+                    self.send_error(403, "Forbidden: Access is denied.")
+                    return
+                
+                file_path = static_dir / requested_file
+                
+                # Ensure the file exists within the static directory
+                if file_path.exists() and file_path.is_file():
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/xml")
+                    self.end_headers()
+                    with open(file_path, 'rb') as file:
+                        self.wfile.write(file.read())
+                else:
+                    self.send_error(404, "File not found")
+            except Exception as e:
+                self.send_error(500, f"Internal Server Error: {e}")
         else:
             super().do_GET()
 
