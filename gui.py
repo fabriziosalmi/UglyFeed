@@ -130,6 +130,17 @@ def get_local_ip():
             local_ip = '127.0.0.1'
     return local_ip
 
+# Function to find an available port starting from a base port
+def find_available_port(base_port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        while True:
+            try:
+                s.bind(("", base_port))
+                s.close()
+                return base_port
+            except OSError:
+                base_port += 1
+
 # Function to run scripts and display output
 def run_script(script_name):
     """Execute a script and display its output in Streamlit."""
@@ -151,27 +162,51 @@ class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
-def start_custom_server():
-    server_address = ('', 8001)  # Using a different port to avoid conflicts with Streamlit
+def start_custom_server(port):
+    server_address = ('', port)
     httpd = HTTPServer(server_address, XMLHTTPRequestHandler)
     httpd.serve_forever()
 
-# Start the custom server in a new thread
-server_thread = threading.Thread(target=start_custom_server, daemon=True)
+# Start the custom server in a new thread on an available port
+custom_server_port = find_available_port(8001)
+server_thread = threading.Thread(target=start_custom_server, args=(custom_server_port,), daemon=True)
 server_thread.start()
+
+# Ensure XML is copied to Streamlit static directory
+def copy_xml_to_static():
+    if uglyfeeds_dir.exists() and (uglyfeeds_dir / uglyfeed_file).exists():
+        destination_path = static_dir / uglyfeed_file
+        shutil.copy(uglyfeeds_dir / uglyfeed_file, destination_path)
+        return destination_path
+    return None
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
-menu_options = ["Configuration", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "JSON Viewer"]
+menu_options = ["Introduction", "Configuration", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "JSON Viewer"]
 selected_option = st.sidebar.selectbox("Select an option", menu_options)
 
+# Introduction Page
+if selected_option == "Introduction":
+    st.title("Welcome to the UglyFeed GUI")
+    st.image("docs/UglyFeed.png", width=300, use_column_width='auto')
+    st.write("""
+        This application provides a graphical user interface to manage and process RSS feeds using the UglyFeed project. 
+        Use the sidebar to navigate through different functionalities of the application:
+        
+        - **Configuration**: Set up and save your RSS feeds and processing options.
+        - **Run Scripts**: Execute various processing scripts like `main.py`, `llm_processor.py`, and `json2rss.py`.
+        - **View and Serve XML**: View the content of the XML feed and serve it via a custom HTTP server.
+        - **JSON Viewer**: Browse and download the generated JSON files from the `rewritten` folder.
+        
+        Make sure your local environment is configured correctly and that the necessary directories and files are in place. Enjoy!
+    """)
+
 # Configuration Section
-if selected_option == "Configuration":
+elif selected_option == "Configuration":
     st.header("Configuration")
 
     st.subheader("Version and Repository Management")
     check_and_update_repo(repo_path, repo_url)
-
     st.divider()
 
     st.subheader("RSS Feeds")
@@ -259,22 +294,18 @@ elif selected_option == "Run json2rss.py":
 elif selected_option == "View and Serve XML":
     st.header("View and Serve XML")
 
-    # Ensure the file exists
-    xml_file_path = uglyfeeds_dir / uglyfeed_file
-    if not xml_file_path.exists():
+    # Ensure the file exists and copy it to the static directory
+    xml_file_path = copy_xml_to_static()
+    if not xml_file_path:
         st.warning(f"The file '{uglyfeed_file}' does not exist in the directory '{uglyfeeds_dir}'.")
     else:
-        # Copy the XML file to the Streamlit static directory
-        destination_path = static_dir / uglyfeed_file
-        shutil.copy(xml_file_path, destination_path)
-        
         # Display the XML file content
         with open(xml_file_path, "r") as f:
             xml_content = f.read()
         st.text_area("XML Content", xml_content, height=300)
 
         # Provide a direct download link for the XML file
-        with open(destination_path, "rb") as f:
+        with open(xml_file_path, "rb") as f:
             st.download_button(
                 label="Download XML File",
                 data=f,
@@ -282,14 +313,12 @@ elif selected_option == "View and Serve XML":
                 mime="application/xml"
             )
 
-        # Provide a link to serve the XML file
+        # Provide a link to serve the XML file through the custom server
         local_ip = get_local_ip()
-        custom_server_port = 8001  # Port for the custom server
         serve_url = f"http://{local_ip}:{custom_server_port}/{uglyfeed_file}"
-        st.markdown(f"**Serve URL:** [Open XML File]({serve_url})")
-
-        # Show the local IP and full link for easier access
-        st.info(f"Serving `{uglyfeed_file}` at: {serve_url}")
+        
+        # Display the serve URL in a clean format
+        st.markdown(f"**Serving `{uglyfeed_file}` at:**\n\n[{serve_url}]({serve_url})")
 
 # JSON Viewer Section
 elif selected_option == "JSON Viewer":
