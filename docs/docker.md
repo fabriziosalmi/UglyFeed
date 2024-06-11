@@ -1,4 +1,4 @@
-# UglyFeed Docker
+# UglyFeed (Docker)
 
 This Docker image contains the UglyFeed application for processing RSS feeds, configuring similarity and API options, and managing JSON content.
 
@@ -58,56 +58,9 @@ docker run -p 8001:8001 -p 8501:8501 \
   fabriziosalmi/uglyfeed:latest
 ```
 
-### Example `config.yaml` Configuration
-
-Below is an example configuration for `config.yaml`:
-
-```yaml
-# Similarity configuration settings
-similarity_threshold: 0.66
-similarity_options:
-  min_samples: 2
-  eps: 0.66
-
-# API configuration settings
-api_config:
-  # Example for Ollama API
-  ollama_api_url: "http://localhost:11434/api/chat"
-  ollama_model: "phi3"
-
-# Folder configuration settings
-folders:
-  output_folder: "output"
-  rewritten_folder: "rewritten"
-
-# Content generation settings
-content_prefix: >
-  As an expert journalist, use a professional, precise, and detailed tone. Do not include titles, personal information, or details about the sources. Rewrite the news by integrating information from various sources, ensuring clarity and coherence.
-
-# Limit settings for content retrieval and processing
-max_items: 50
-max_age_days: 10
-```
-
 ### Executing scripts
 
-Go to the 2nd menu item (Run main.py) to execute retrieval and aggregation of RSS items. Output from script execution is shown for troubleshooting and informational purposes.
-Once the main.py complete the process you can run llm_processor.py to make JSON files in output folder be rewritten by the configured LLM.
-Once the LLM complete the content rewrite you can convert the JSON files in the rewritten folder into valid RSS XML feed.
-
-### Viewing Processed JSON Files
-
-Processed JSON files are stored in the `rewritten` directory. You can view and download these files through the UglyFeed application under the "JSON Viewer" tab.
-
-### Get final rewritten XML feed
-
-Once the feeds are downloaded, aggregated for similarity and rewritten by LLM you can convert them into valid RSS XML from JSON.
-Once converted you can access the final XML at docker_ip:8001/uglyfeed.xml.
-On the next updates I'll focus on the cron schedule (also via UI) and general UI improvements. An additional page will be added for metrics evaluation and visualization soon 😅
-
-### Cloning the Repository
-
-The `UglyFeed` repository is automatically cloned into the container at `/app/UglyFeed` during the build process, so no additional setup is required to get started with the application.
+Refer to the main documentation for the script execution process, basically just run the main, the llm_processor and the json2rss python scripts from their own dedicated pages just by clicking on the run buttons.
 
 ## Troubleshooting
 
