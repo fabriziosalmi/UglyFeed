@@ -186,19 +186,19 @@ selected_option = st.sidebar.selectbox("Select an option", menu_options)
 
 # Introduction Page
 if selected_option == "Introduction":
-    st.title("Welcome to the UglyFeed GUI")
+    st.title("UglyFeed")
     st.image("docs/UglyFeed.png", width=300, use_column_width='auto')
     st.write("""
-        This application provides a graphical user interface to manage and process RSS feeds using the UglyFeed project. 
+        This application provides a graphical user interface to manage and process RSS feeds using the UglyFeed project.
         Use the sidebar to navigate through different functionalities of the application:
-        
+
         - **Configuration**: Set up and save your RSS feeds and processing options.
         - **Run Scripts**: Execute various processing scripts like `main.py`, `llm_processor.py`, and `json2rss.py`.
         - **View and Serve XML**: View the content of the XML feed and serve it via a custom HTTP server.
         - **JSON Viewer**: Browse and download the generated JSON files from the `rewritten` folder.
         - **Documentation**: View the Markdown documentation files related to the project.
-        
-        Make sure your local environment is configured correctly and that the necessary directories and files are in place. Enjoy!
+
+        Make sure your local environment is configured correctly and that the necessary directories and files are in place. For any bug just [open an issue](https://github.com/fabriziosalmi/UglyFeed/issues/new/choose) on GitHub, hopefully I'll be able to fix it ^_^. Enjoy!
     """)
 
 # Configuration Section
@@ -316,7 +316,7 @@ elif selected_option == "View and Serve XML":
         # Provide a link to serve the XML file through the custom server
         local_ip = get_local_ip()
         serve_url = f"http://{local_ip}:{custom_server_port}/{uglyfeed_file}"
-        
+
         # Display the serve URL in a clean format
         st.markdown(f"**Serving `{uglyfeed_file}` at:**\n\n[{serve_url}]({serve_url})")
 
@@ -347,7 +347,7 @@ elif selected_option == "JSON Viewer":
 
 # Documentation Section
 elif selected_option == "Documentation":
-    st.header("Documentation")
+    # st.header("Documentation")
 
     # Display README.md by default
     readme_path = docs_dir / "README.md"
