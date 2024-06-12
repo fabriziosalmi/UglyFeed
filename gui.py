@@ -28,11 +28,6 @@ os.makedirs("rewritten", exist_ok=True)
 os.makedirs(uglyfeeds_dir, exist_ok=True)
 os.makedirs(static_dir, exist_ok=True)
 
-# Default RSS feed URLs
-default_feeds = """https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml
-https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-2.xml
-https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-3.xml"""
-
 # Global variable to hold job execution stats
 job_stats_global = []
 
@@ -52,6 +47,13 @@ def ensure_default_config(config_data):
             'eps': 0.66
         },
         'api_config': {
+            'selected_api': "OpenAI",
+            'openai_api_url': "https://api.openai.com/v1/chat/completions",
+            'openai_api_key': "",
+            'openai_model': "gpt-3.5-turbo",
+            'groq_api_url': "https://api.groq.com/openai/v1/chat/completions",
+            'groq_api_key': "",
+            'groq_model': "llama3-70b-8192",
             'ollama_api_url': "http://localhost:11434/api/chat",
             'ollama_model': "phi3"
         },
@@ -77,14 +79,13 @@ def ensure_default_config(config_data):
 
     return recursive_update(config_data, defaults)
 
-def save_configuration(overwrite):
+def save_configuration():
     """Save configuration and feeds to file."""
-    if overwrite:
-        with open(config_path, "w") as f:
-            yaml.dump(st.session_state.config_data, f)
-        st.success("Configuration saved to config.yaml")
-    else:
-        st.info("Configuration changes not saved to avoid overwriting.")
+    with open(config_path, "w") as f:
+        yaml.dump(st.session_state.config_data, f)
+    with open(feeds_path, "w") as f:
+        f.write(st.session_state.feeds)
+    st.success("Configuration and feeds saved.")
 
 def get_local_ip():
     """Get the local IP address."""
@@ -237,6 +238,14 @@ if 'config_data' not in st.session_state:
 if 'server_thread' not in st.session_state:
     st.session_state.server_thread = None
 
+# Load RSS feeds
+if 'feeds' not in st.session_state:
+    if feeds_path.exists():
+        with open(feeds_path, "r") as f:
+            st.session_state.feeds = f.read()
+    else:
+        st.session_state.feeds = ""
+
 # Start scheduling if enabled in the config
 if st.session_state.config_data.get('scheduling_enabled', False):
     scheduling_thread = threading.Thread(target=schedule_jobs, args=(st.session_state.config_data['scheduling_interval'], st.session_state.config_data['scheduling_period']), daemon=True)
@@ -248,12 +257,8 @@ menu_options = [
     "Introduction",
     "Configuration",
     "Run Scripts",
-    "Run main.py",
-    "Run llm_processor.py",
-    "Run json2rss.py",
     "View and Serve XML",
-    "Scheduled Jobs",
-    "Documentation"
+    "Debug"
 ]
 selected_option = st.sidebar.selectbox("Select an option", menu_options)
 
@@ -264,13 +269,12 @@ if selected_option == "Introduction":
     st.write("""
         This application provides a graphical user interface to manage and process RSS feeds using the UglyFeed project.
         Use the sidebar to navigate through different functionalities of the application:
-        
+
         - **Configuration**: Set up and save your RSS feeds and processing options.
         - **Run Scripts**: Execute various processing scripts like `main.py`, `llm_processor.py`, and `json2rss.py`.
         - **View and Serve XML**: View the content of the XML feed and serve it via a custom HTTP server.
-        - **Scheduled Jobs**: Configure and view the output of scheduled jobs.
-        - **Documentation**: View the Markdown documentation files related to the project.
-        
+        - **Debug**: View detailed debug information for troubleshooting.
+
         Ensure your local environment is correctly set up and necessary directories and files are in place.
         For any issues, [open an issue on GitHub](https://github.com/fabriziosalmi/UglyFeed/issues/new/choose). Enjoy!
     """)
@@ -282,18 +286,7 @@ elif selected_option == "Configuration":
     st.divider()
 
     st.subheader("RSS Feeds")
-    if not feeds_path.exists():
-        st.session_state.feeds = default_feeds
-    else:
-        with open(feeds_path, "r") as f:
-            st.session_state.feeds = f.read()
-
     st.session_state.feeds = st.text_area("Enter one RSS feed URL per line:", st.session_state.feeds)
-
-    if st.button("Save Feeds to input/feeds.txt"):
-        with open(feeds_path, "w") as f:
-            f.write(st.session_state.feeds)
-        st.success("Feeds saved to input/feeds.txt")
 
     st.divider()
 
@@ -306,24 +299,20 @@ elif selected_option == "Configuration":
 
     st.subheader("API and LLM Options")
     api_options = ["OpenAI", "Groq", "Ollama"]
-    selected_api = st.selectbox("Select API", api_options)
+    selected_api = st.selectbox("Select API", api_options, index=api_options.index(st.session_state.config_data['api_config']['selected_api']))
+    st.session_state.config_data['api_config']['selected_api'] = selected_api
+
     if selected_api == "OpenAI":
-        st.session_state.config_data['api_config'] = {
-            'openai_api_url': st.text_input("OpenAI API URL", "https://api.openai.com/v1/chat/completions"),
-            'openai_api_key': st.text_input("OpenAI API Key", type="password"),
-            'openai_model': st.text_input("OpenAI Model", "gpt-3.5-turbo")
-        }
+        st.session_state.config_data['api_config']['openai_api_url'] = st.text_input("OpenAI API URL", st.session_state.config_data['api_config']['openai_api_url'])
+        st.session_state.config_data['api_config']['openai_api_key'] = st.text_input("OpenAI API Key", st.session_state.config_data['api_config']['openai_api_key'], type="password")
+        st.session_state.config_data['api_config']['openai_model'] = st.text_input("OpenAI Model", st.session_state.config_data['api_config']['openai_model'])
     elif selected_api == "Groq":
-        st.session_state.config_data['api_config'] = {
-            'groq_api_url': st.text_input("Groq API URL", "https://api.groq.com/openai/v1/chat/completions"),
-            'groq_api_key': st.text_input("Groq API Key", type="password"),
-            'groq_model': st.text_input("Groq Model", "llama3-70b-8192")
-        }
+        st.session_state.config_data['api_config']['groq_api_url'] = st.text_input("Groq API URL", st.session_state.config_data['api_config']['groq_api_url'])
+        st.session_state.config_data['api_config']['groq_api_key'] = st.text_input("Groq API Key", st.session_state.config_data['api_config']['groq_api_key'], type="password")
+        st.session_state.config_data['api_config']['groq_model'] = st.text_input("Groq Model", st.session_state.config_data['api_config']['groq_model'])
     else:
-        st.session_state.config_data['api_config'] = {
-            'ollama_api_url': st.text_input("Ollama API URL", "http://localhost:11434/api/chat"),
-            'ollama_model': st.text_input("Ollama Model", "phi3")
-        }
+        st.session_state.config_data['api_config']['ollama_api_url'] = st.text_input("Ollama API URL", st.session_state.config_data['api_config']['ollama_api_url'])
+        st.session_state.config_data['api_config']['ollama_model'] = st.text_input("Ollama Model", st.session_state.config_data['api_config']['ollama_model'])
 
     st.divider()
 
@@ -358,10 +347,8 @@ elif selected_option == "Configuration":
     st.session_state.config_data['scheduling_interval'] = interval
     st.session_state.config_data['scheduling_period'] = period
 
-    overwrite_config = st.checkbox("Force overwrite config.yaml", value=False)
-
     if st.button("Save Configuration and Feeds"):
-        save_configuration(overwrite_config)
+        save_configuration()
 
 # Run Scripts Section
 elif selected_option == "Run Scripts":
@@ -369,36 +356,6 @@ elif selected_option == "Run Scripts":
 
     if st.button("Run main.py, llm_processor.py, and json2rss.py sequentially"):
         run_scripts_sequentially()
-
-# Run main.py Section
-elif selected_option == "Run main.py":
-    st.header("Run main.py")
-
-    if st.button("Run main.py"):
-        output, errors = run_script("main.py")
-        st.text_area(f"Output of main.py", output, height=200)
-        if errors:
-            st.text_area(f"Errors or logs of main.py", errors, height=200)
-
-# Run llm_processor.py Section
-elif selected_option == "Run llm_processor.py":
-    st.header("Run llm_processor.py")
-
-    if st.button("Run llm_processor.py"):
-        output, errors = run_script("llm_processor.py")
-        st.text_area(f"Output of llm_processor.py", output, height=200)
-        if errors:
-            st.text_area(f"Errors or logs of llm_processor.py", errors, height=200)
-
-# Run json2rss.py Section
-elif selected_option == "Run json2rss.py":
-    st.header("Run json2rss.py")
-
-    if st.button("Run json2rss.py"):
-        output, errors = run_script("json2rss.py")
-        st.text_area(f"Output of json2rss.py", output, height=200)
-        if errors:
-            st.text_area(f"Errors or logs of json2rss.py", errors, height=200)
 
 # View and Serve XML Section
 elif selected_option == "View and Serve XML":
@@ -433,21 +390,17 @@ elif selected_option == "View and Serve XML":
         else:
             st.info("Server is not running.")
 
-# Scheduled Jobs Section
-elif selected_option == "Scheduled Jobs":
-    st.header("Scheduled Jobs")
+# Debug Section
+elif selected_option == "Debug":
+    st.header("Debug")
 
-    st.subheader("Scheduling Configuration")
-    st.write(f"Scheduling Enabled: **{st.session_state.config_data['scheduling_enabled']}**")
-    st.write(f"Scheduling Interval: **{st.session_state.config_data['scheduling_interval']} {st.session_state.config_data['scheduling_period']}**")
-
-    st.subheader("Job Execution Stats")
+    st.subheader("Job Execution Logs")
     if job_stats_global:
         for stat in job_stats_global:
-            st.markdown(f"**Script:** {stat['script']}")
-            st.markdown(f"**Time:** {stat['time']}")
-            st.markdown(f"**Status:** {stat['status']}")
-            st.markdown(f"**New Items:** {stat.get('new_items', 0)}")
+            st.markdown(f"**Script:** `{stat['script']}`")
+            st.markdown(f"**Time:** `{stat['time']}`")
+            st.markdown(f"**Status:** `{stat['status']}`")
+            st.markdown(f"**New Items:** `{stat.get('new_items', 0)}`")
             st.divider()
     else:
         st.info("No job executions have been recorded yet.")
@@ -455,32 +408,14 @@ elif selected_option == "Scheduled Jobs":
     st.subheader("XML File Stats")
     item_count, last_updated, xml_path = get_xml_stats()
     if item_count is not None:
-        st.write(f"**Item Count:** {item_count}")
-        st.write(f"**Last Updated:** {last_updated}")
-        st.write(f"**File Path:** {xml_path}")
+        st.write(f"**Item Count:** `{item_count}`")
+        st.write(f"**Last Updated:** `{last_updated}`")
+        st.write(f"**File Path:** `{xml_path}`")
     else:
         st.info("No XML file found or file is empty.")
 
-# Documentation Section
-elif selected_option == "Documentation":
-    st.header("Documentation")
+    st.subheader("Current Configuration")
+    st.text_area("Config.yaml Content", yaml.dump(st.session_state.config_data), height=300)
 
-    readme_path = docs_dir / "README.md"
-    if readme_path.exists():
-        with open(readme_path, "r") as f:
-            readme_content = f.read()
-        st.markdown(readme_content)
-    else:
-        st.info("No README.md found in the docs folder.")
-
-    st.subheader("Additional Documentation Files")
-    markdown_files = list_markdown_files(docs_dir)
-    if markdown_files:
-        selected_file = st.selectbox("Select a documentation file to view", markdown_files)
-
-        if selected_file:
-            with open(selected_file, "r") as f:
-                content = f.read()
-            st.markdown(content)
-    else:
-        st.info("No additional documentation files found in the docs folder.")
+    st.subheader("Loaded Feeds")
+    st.text_area("Feeds Content", st.session_state.feeds, height=200)
