@@ -46,13 +46,13 @@ def truncate_content(content, max_tokens):
     tokens = content.split()
     truncated_content = []
     current_tokens = 0
-    
+
     for token in tokens:
         current_tokens += len(token) / 4
         if current_tokens > max_tokens:
             break
         truncated_content.append(token)
-    
+
     return ' '.join(truncated_content)
 
 def call_openai_api(api_url, combined_content, model, api_key):
@@ -204,22 +204,24 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
         logging.error("Failed to get rewritten content from LLM API.")
         logging.debug(f"Rewritten content: {rewritten_content}")
 
+
 def validate_config(api_config):
-    api_keys = ['openai_api_url', 'groq_api_url', 'ollama_api_url']
-    active_apis = [key for key in api_keys if key in api_config]
-    
-    if len(active_apis) != 1:
-        raise ValueError("Exactly one API configuration must be set in the config file.")
-    
-    if 'openai_api_url' in api_config:
-        if 'openai_api_key' not in api_config or 'openai_model' not in api_config:
-            raise ValueError("OpenAI API configuration is incomplete. Please set the API URL, API key, and model.")
-    elif 'groq_api_url' in api_config:
-        if 'groq_api_key' not in api_config or 'groq_model' not in api_config:
-            raise ValueError("Groq API configuration is incomplete. Please set the API URL, API key, and model.")
-    elif 'ollama_api_url' in api_config:
-        if 'ollama_model' not in api_config:
-            raise ValueError("Ollama API configuration is incomplete. Please set the API URL and model.")
+    selected_api = api_config.get('selected_api')
+
+    if selected_api == "OpenAI":
+        required_keys = ['openai_api_url', 'openai_api_key', 'openai_model']
+    elif selected_api == "Groq":
+        required_keys = ['groq_api_url', 'groq_api_key', 'groq_model']
+    elif selected_api == "Ollama":
+        required_keys = ['ollama_api_url', 'ollama_model']
+    else:
+        raise ValueError("Invalid API selection. Please choose OpenAI, Groq, or Ollama.")
+
+    missing_keys = [key for key in required_keys if not api_config.get(key)]
+    if missing_keys:
+        raise ValueError(f"The selected API configuration is incomplete. Missing keys: {', '.join(missing_keys)}")
+
+
 
 def main(config_path):
     try:
@@ -235,17 +237,19 @@ def main(config_path):
 
     validate_config(api_config)
 
-    if 'openai_api_url' in api_config:
+    selected_api = api_config['selected_api']
+
+    if selected_api == 'OpenAI':
         api_url = api_config['openai_api_url']
         model = api_config['openai_model']
         api_key = api_config['openai_api_key']
         api_type = 'openai'
-    elif 'groq_api_url' in api_config:
+    elif selected_api == 'Groq':
         api_url = api_config['groq_api_url']
         model = api_config['groq_model']
         api_key = api_config['groq_api_key']
         api_type = 'groq'
-    else:
+    else:  # Ollama
         api_url = api_config['ollama_api_url']
         model = api_config['ollama_model']
         api_key = None  # Ollama does not need an API key
