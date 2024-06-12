@@ -14,13 +14,6 @@ from openai import OpenAI
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Ensure output and rewritten folders exist
-output_folder = Path('output')
-rewritten_folder = Path('rewritten')
-
-output_folder.mkdir(parents=True, exist_ok=True)
-rewritten_folder.mkdir(parents=True, exist_ok=True)
-
 # Maximum context length for Groq API (this may need adjustment based on the actual limit)
 MAX_TOKENS = 32768
 
@@ -103,14 +96,6 @@ def call_groq_api(api_url, combined_content, model, api_key):
                 return call_groq_api(api_url, combined_content, model, api_key)
         return None
 
-def parse_retry_after(response_json):
-    try:
-        message = response_json['error']['message']
-        retry_after = float(re.search(r"try again in (\d+\.?\d*)s", message).group(1))
-        return retry_after
-    except (KeyError, AttributeError):
-        return 60  # Default retry after 60 seconds if parsing fails
-
 def call_ollama_api(api_url, combined_content, model):
     data = json.dumps({
         "model": model,
@@ -134,6 +119,14 @@ def call_ollama_api(api_url, combined_content, model):
         if response is not None:
             logging.error(f"Ollama API response content: {response.text}")
         return None
+
+def parse_retry_after(response_json):
+    try:
+        message = response_json['error']['message']
+        retry_after = float(re.search(r"try again in (\d+\.?\d*)s", message).group(1))
+        return retry_after
+    except (KeyError, AttributeError):
+        return 60  # Default retry after 60 seconds if parsing fails
 
 def ensure_proper_punctuation(text):
     sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
@@ -204,7 +197,6 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
         logging.error("Failed to get rewritten content from LLM API.")
         logging.debug(f"Rewritten content: {rewritten_content}")
 
-
 def validate_config(api_config):
     selected_api = api_config.get('selected_api')
 
@@ -220,8 +212,6 @@ def validate_config(api_config):
     missing_keys = [key for key in required_keys if not api_config.get(key)]
     if missing_keys:
         raise ValueError(f"The selected API configuration is incomplete. Missing keys: {', '.join(missing_keys)}")
-
-
 
 def main(config_path):
     try:
