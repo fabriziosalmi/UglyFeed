@@ -62,3 +62,8 @@ content_prefix: >
 # Limit settings for content retrieval and processing
 max_items: 50          # Maximum number of items to process
 max_age_days: 10       # Maximum age of items in days to be considered
+
+## scheduler
+scheduling_enabled: true
+scheduling_interval: 4
+scheduling_period: hours
