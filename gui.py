@@ -41,48 +41,6 @@ repo_path = Path("UglyFeed")
 # Global variable to hold the last run output
 last_run_output = []
 
-def get_local_version():
-    """Get the local version from version.txt."""
-    if version_file.exists():
-        with open(version_file, "r") as f:
-            return f.read().strip()
-    return None
-
-def get_remote_version(repo_url):
-    """Get the remote version by fetching version.txt from the remote repository."""
-    try:
-        remote_version_url = f"https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/version.txt"
-        result = subprocess.run(["curl", "-s", remote_version_url], capture_output=True, text=True, check=True)
-        if result.stdout:
-            return result.stdout.strip()
-    except subprocess.CalledProcessError as e:
-        st.error(f"An error occurred while fetching the remote version: {e}")
-    return None
-
-def check_and_update_repo(repo_path, repo_url):
-    """Check if the remote repo has updates and pull them if available."""
-    try:
-        local_version = get_local_version()
-        remote_version = get_remote_version(repo_url)
-        if local_version and remote_version:
-            if remote_version > local_version:
-                st.write(f"Remote version ({remote_version}) is newer than local version ({local_version}). Updating repository...")
-                if repo_path.exists():
-                    os.chdir(repo_path)
-                    with st.spinner("Pulling updates from the remote repository..."):
-                        subprocess.run(["git", "pull"], check=True)
-                        st.success(f"Repository updated to version {remote_version}.")
-                else:
-                    with st.spinner("Cloning the UglyFeed repository..."):
-                        subprocess.run(["git", "clone", repo_url], check=True)
-                        st.success(f"Repository cloned with version {remote_version}.")
-            else:
-                st.info(f"The local repository is already up-to-date. (version: {local_version})")
-        else:
-            st.error("Unable to determine versions for comparison.")
-    except subprocess.CalledProcessError as e:
-        st.error(f"An error occurred while checking the repository: {e}")
-
 # Load existing configuration if available
 def load_config():
     if config_path.exists():
@@ -188,53 +146,19 @@ def run_scripts_sequentially():
                 st.text_area(f"Errors or logs of {script}", errors, height=200)
             last_run_output.append((script, output, errors))
 
-
-from urllib.parse import unquote
-import os
-
 # Custom HTTP handler to serve XML with correct content type
 class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.endswith(".xml"):
-            try:
-                # Define the only allowed file to serve
-                allowed_files = {"uglyfeed.xml"}
-
-                # Decode the URL and get the basename
-                requested_file = unquote(os.path.basename(self.path))
-
-                # Check if the requested file is in the allowlist
-                if requested_file not in allowed_files:
-                    self.send_error(403, "Forbidden: Access is denied.")
-                    return
-
-                # Construct the file path safely
-                file_path = static_dir / requested_file
-
-                # Validate the file path to ensure it is within the expected directory
-                file_path = file_path.resolve()
-
-                # Check if the resolved path is under the static_dir
-                if not str(file_path).startswith(str(static_dir)):
-                    self.send_error(403, "Forbidden: Access is denied.")
-                    return
-
-                # Check if the file exists and is a file
-                if file_path.exists() and file_path.is_file():
-                    self.send_response(200)
-                    self.send_header("Content-Type", "application/xml")
-                    self.end_headers()
-                    with open(file_path, 'rb') as file:
-                        self.wfile.write(file.read())
-                else:
-                    self.send_error(404, "File not found")
-            except Exception as e:
-                self.send_error(500, f"Internal Server Error: {e}")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/xml")
+            self.end_headers()
+            with open(static_dir / self.path.lstrip('/'), 'rb') as file:
+                self.wfile.write(file.read())
         else:
             super().do_GET()
 
 def start_custom_server(port):
-    os.chdir(static_dir)  # Change working directory to the static directory
     server_address = ('', port)
     httpd = HTTPServer(server_address, XMLHTTPRequestHandler)
     httpd.serve_forever()
@@ -314,8 +238,6 @@ if selected_option == "Introduction":
 elif selected_option == "Configuration":
     st.header("Configuration")
 
-    st.subheader("Version and Repository Management")
-    check_and_update_repo(repo_path, repo_url)
     st.divider()
 
     st.subheader("RSS Feeds")
