@@ -188,6 +188,10 @@ def run_scripts_sequentially():
                 st.text_area(f"Errors or logs of {script}", errors, height=200)
             last_run_output.append((script, output, errors))
 
+
+from urllib.parse import unquote
+import os
+
 # Custom HTTP handler to serve XML with correct content type
 class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -195,17 +199,27 @@ class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
             try:
                 # Define the only allowed file to serve
                 allowed_files = {"uglyfeed.xml"}
-                
-                # Sanitize and resolve the path
-                requested_file = os.path.basename(self.path)
-                
+
+                # Decode the URL and get the basename
+                requested_file = unquote(os.path.basename(self.path))
+
+                # Check if the requested file is in the allowlist
                 if requested_file not in allowed_files:
                     self.send_error(403, "Forbidden: Access is denied.")
                     return
-                
+
+                # Construct the file path safely
                 file_path = static_dir / requested_file
-                
-                # Ensure the file exists within the static directory
+
+                # Validate the file path to ensure it is within the expected directory
+                file_path = file_path.resolve()
+
+                # Check if the resolved path is under the static_dir
+                if not str(file_path).startswith(str(static_dir)):
+                    self.send_error(403, "Forbidden: Access is denied.")
+                    return
+
+                # Check if the file exists and is a file
                 if file_path.exists() and file_path.is_file():
                     self.send_response(200)
                     self.send_header("Content-Type", "application/xml")
