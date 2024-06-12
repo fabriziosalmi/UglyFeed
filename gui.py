@@ -11,7 +11,6 @@ import time
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
-import hashlib
 
 # Define paths
 feeds_path = Path("input/feeds.txt")
@@ -135,25 +134,21 @@ def run_scripts_sequentially():
             st.text_area(f"Output of {script}", output, height=200)
             if errors:
                 st.text_area(f"Errors or logs of {script}", errors, height=200)
-            job_stats_global.append({
-                'script': script,
-                'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'status': 'Success' if not errors.strip() else 'Failed',
-                'output': output,
-                'errors': errors,
-                'new_items': get_new_item_count(item_count_before)
-            })
-            item_count_before = get_xml_item_count()
+    new_items = get_new_item_count(item_count_before)
+    job_stats_global.append({
+        'script': ', '.join(scripts),
+        'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'status': 'Success',
+        'new_items': new_items
+    })
 
-# Custom HTTP handler to serve XML with correct content type and cache control headers
+# Custom HTTP handler to serve XML with correct content type and cache headers
 class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.endswith(".xml"):
             self.send_response(200)
             self.send_header("Content-Type", "application/xml")
-            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
-            self.send_header("Expires", "0")
-            self.send_header("Pragma", "no-cache")
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0")
             self.end_headers()
             with open(static_dir / self.path.lstrip('/'), 'rb') as file:
                 self.wfile.write(file.read())
@@ -164,8 +159,13 @@ class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
 def start_custom_server(port):
     server_address = ('', port)
     httpd = HTTPServer(server_address, XMLHTTPRequestHandler)
-    st.session_state.server_instance = httpd
     httpd.serve_forever()
+
+# Function to stop the HTTP server
+def stop_server():
+    if st.session_state.server_thread and st.session_state.server_thread.is_alive():
+        st.session_state.server_thread = None
+        st.warning("Server stopped. Please restart the application to stop the server completely.")
 
 # Function to toggle the HTTP server
 def toggle_server(start):
@@ -178,16 +178,9 @@ def toggle_server(start):
         else:
             st.warning("Server is already running.")
     else:
-        if st.session_state.server_thread and st.session_state.server_thread.is_alive():
-            # Note: Stopping the server thread gracefully in this context is complex and typically requires signaling the server to shutdown.
-            st.session_state.server_instance.shutdown()
-            st.session_state.server_thread.join()
-            st.session_state.server_thread = None
-            st.success("Server stopped.")
-        else:
-            st.info("Server is not running.")
+        stop_server()
 
-# Ensure XML is copied to Streamlit static directory with a cache-busting query parameter
+# Ensure XML is copied to Streamlit static directory
 def copy_xml_to_static():
     if uglyfeeds_dir.exists() and (uglyfeeds_dir / uglyfeed_file).exists():
         destination_path = static_dir / uglyfeed_file
@@ -210,7 +203,7 @@ def get_xml_stats():
     last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return item_count, last_updated, uglyfeeds_dir / uglyfeed_file
 
-# Function to get the item count from the XML file
+# Function to get the current count of items in the XML
 def get_xml_item_count():
     if not (uglyfeeds_dir / uglyfeed_file).exists():
         return 0
@@ -219,20 +212,21 @@ def get_xml_item_count():
     items = root.findall(".//item")
     return len(items)
 
-# Function to calculate new item count
-def get_new_item_count(previous_count):
-    current_count = get_xml_item_count()
-    return max(current_count - previous_count, 0)
+# Function to calculate the new items count
+def get_new_item_count(old_count):
+    new_count = get_xml_item_count()
+    if old_count is None or new_count is None:
+        return 0
+    return new_count - old_count
 
 # Function to schedule jobs
 def schedule_jobs(interval, period):
     def job():
-        run_scripts_sequentially()
+        run_scripts_sequentially()  # Log the execution in the global context
         job_stats_global.append({
             'script': 'Scheduled Job',
             'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'status': 'Success',
-            'new_items': get_new_item_count(get_xml_item_count())
+            'status': 'Success'
         })
 
     if period == 'minutes':
@@ -304,7 +298,7 @@ elif selected_option == "Configuration":
 
     st.subheader("API and LLM Options")
     api_options = ["OpenAI", "Groq", "Ollama"]
-    selected_api = st.selectbox("Select API", api_options, index=api_options.index("Ollama"))
+    selected_api = st.selectbox("Select API", api_options)
     if selected_api == "OpenAI":
         st.session_state.config_data['api_config'] = {
             'openai_api_url': st.text_input("OpenAI API URL", "https://api.openai.com/v1/chat/completions"),
@@ -341,7 +335,7 @@ elif selected_option == "Configuration":
     st.session_state.config_data['scheduling_enabled'] = st.checkbox("Enable Scheduled Execution", value=scheduling_enabled)
 
     interval_options = {
-        "2 minutes": (2, 'minutes'),
+        "2 minutes": (2, 'minutes'),  # Default to 2 minutes
         "10 minutes": (10, 'minutes'),
         "30 minutes": (30, 'minutes'),
         "1 hour": (1, 'hours'),
@@ -427,8 +421,7 @@ elif selected_option == "View and Serve XML":
 
         if st.session_state.server_thread and st.session_state.server_thread.is_alive():
             local_ip = get_local_ip()
-            # Adding a query parameter to avoid caching
-            serve_url = f"http://{local_ip}:{st.session_state.custom_server_port}/{uglyfeed_file}?{datetime.now().timestamp()}"
+            serve_url = f"http://{local_ip}:{st.session_state.custom_server_port}/{uglyfeed_file}"
             st.markdown(f"**Serving `{uglyfeed_file}` at:**\n\n[{serve_url}]({serve_url})")
         else:
             st.info("Server is not running.")
@@ -447,7 +440,7 @@ elif selected_option == "Scheduled Jobs":
             st.markdown(f"**Script:** {stat['script']}")
             st.markdown(f"**Time:** {stat['time']}")
             st.markdown(f"**Status:** {stat['status']}")
-            st.write(f"**New Items:** {stat['new_items']}")
+            st.markdown(f"**New Items:** {stat.get('new_items', 0)}")
             st.divider()
     else:
         st.info("No job executions have been recorded yet.")
