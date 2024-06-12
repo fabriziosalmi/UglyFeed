@@ -9,6 +9,8 @@ Clone the repository and run the web application:
 git clone https://github.com/fabriziosalmi/UglyFeed.git
 cd UglyFeed
 streamlit run gui.py --server.address 0.0.0.0
+# if you want to disable streamlit telemetry just add browser.gatherUsageStats flag:
+# streamlit run gui.py --server.address 0.0.0.0 --browser.gatherUsageStats false 
 ```
 
 ## Configuration
