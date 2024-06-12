@@ -234,6 +234,7 @@ class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
             super().do_GET()
 
 def start_custom_server(port):
+    os.chdir(static_dir)  # Change working directory to the static directory
     server_address = ('', port)
     httpd = HTTPServer(server_address, XMLHTTPRequestHandler)
     httpd.serve_forever()
