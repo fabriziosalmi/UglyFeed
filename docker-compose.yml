@@ -1,0 +1,14 @@
+name: uglyfeed
+services:
+    uglyfeed:
+        ports:
+            - 8001:8001
+            - 8501:8501
+        container_name: uglyfeed
+        networks:
+            - uglyfeed
+        image: fabriziosalmi/uglyfeed:latest
+networks:
+    uglyfeed:
+        external: true
+        name: uglyfeed
