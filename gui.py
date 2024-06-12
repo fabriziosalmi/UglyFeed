@@ -4,13 +4,13 @@ import subprocess
 import yaml
 import socket
 import shutil
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
 import schedule
 import time
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 # Define paths
 feeds_path = Path("input/feeds.txt")
@@ -33,19 +33,18 @@ default_feeds = """https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main
 https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-2.xml
 https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-3.xml"""
 
-# Global variable to hold job execution stats outside the Streamlit context
+# Global variable to hold job execution stats
 job_stats_global = []
 
-# Load existing configuration if available
 def load_config():
+    """Load existing configuration if available."""
     if config_path.exists():
         with open(config_path, "r") as f:
             return yaml.safe_load(f)
-    else:
-        return {}
+    return {}
 
-# Ensure all required keys are in the config_data with default values
 def ensure_default_config(config_data):
+    """Ensure all required keys are in the config_data with default values."""
     defaults = {
         'similarity_threshold': 0.66,
         'similarity_options': {
@@ -64,7 +63,7 @@ def ensure_default_config(config_data):
         'max_items': 50,
         'max_age_days': 10,
         'scheduling_enabled': False,
-        'scheduling_interval': 2,  # Default to 2 minutes
+        'scheduling_interval': 2,
         'scheduling_period': 'minutes'
     }
 
@@ -78,14 +77,8 @@ def ensure_default_config(config_data):
 
     return recursive_update(config_data, defaults)
 
-# Initialize session state for config data and server status
-if 'config_data' not in st.session_state:
-    st.session_state.config_data = ensure_default_config(load_config())
-if 'server_thread' not in st.session_state:
-    st.session_state.server_thread = None
-
-# Save configuration and feeds
 def save_configuration(overwrite):
+    """Save configuration and feeds to file."""
     if overwrite:
         with open(config_path, "w") as f:
             yaml.dump(st.session_state.config_data, f)
@@ -93,8 +86,8 @@ def save_configuration(overwrite):
     else:
         st.info("Configuration changes not saved to avoid overwriting.")
 
-# Function to get the local IP address
 def get_local_ip():
+    """Get the local IP address."""
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         try:
             s.connect(('10.254.254.254', 1))
@@ -103,8 +96,8 @@ def get_local_ip():
             local_ip = '127.0.0.1'
     return local_ip
 
-# Function to find an available port starting from a base port
 def find_available_port(base_port):
+    """Find an available port starting from a base port."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         while True:
             try:
@@ -114,7 +107,6 @@ def find_available_port(base_port):
             except OSError:
                 base_port += 1
 
-# Function to run a script and capture its output
 def run_script(script_name):
     """Execute a script and capture its output and errors."""
     process = subprocess.run(["python", script_name], capture_output=True, text=True)
@@ -122,7 +114,6 @@ def run_script(script_name):
     errors = process.stderr or "No errors"
     return output, errors
 
-# Function to run scripts sequentially and log the output
 def run_scripts_sequentially():
     """Run main.py, llm_processor.py, and json2rss.py sequentially and log their outputs."""
     global job_stats_global
@@ -142,8 +133,8 @@ def run_scripts_sequentially():
         'new_items': new_items
     })
 
-# Custom HTTP handler to serve XML with correct content type and cache headers
 class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
+    """Custom HTTP handler to serve XML with correct content type and cache headers."""
     def do_GET(self):
         if self.path.endswith(".xml"):
             self.send_response(200)
@@ -155,20 +146,20 @@ class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
-# Function to start the HTTP server
 def start_custom_server(port):
+    """Start the HTTP server to serve XML."""
     server_address = ('', port)
     httpd = HTTPServer(server_address, XMLHTTPRequestHandler)
     httpd.serve_forever()
 
-# Function to stop the HTTP server
 def stop_server():
+    """Stop the HTTP server."""
     if st.session_state.server_thread and st.session_state.server_thread.is_alive():
         st.session_state.server_thread = None
         st.warning("Server stopped. Please restart the application to stop the server completely.")
 
-# Function to toggle the HTTP server
 def toggle_server(start):
+    """Toggle the HTTP server on or off."""
     if start:
         if st.session_state.server_thread is None or not st.session_state.server_thread.is_alive():
             st.session_state.custom_server_port = 8001  # Fixed port
@@ -180,20 +171,20 @@ def toggle_server(start):
     else:
         stop_server()
 
-# Ensure XML is copied to Streamlit static directory
 def copy_xml_to_static():
+    """Ensure XML is copied to Streamlit static directory."""
     if uglyfeeds_dir.exists() and (uglyfeeds_dir / uglyfeed_file).exists():
         destination_path = static_dir / uglyfeed_file
         shutil.copy(uglyfeeds_dir / uglyfeed_file, destination_path)
         return destination_path
     return None
 
-# Function to list all Markdown files in the docs directory
 def list_markdown_files(docs_dir):
+    """List all Markdown files in the docs directory."""
     return [file for file in docs_dir.glob("*.md")]
 
-# Function to get quick stats from the XML file
 def get_xml_stats():
+    """Get quick stats from the XML file."""
     if not (uglyfeeds_dir / uglyfeed_file).exists():
         return None, None, None
     tree = ET.parse(uglyfeeds_dir / uglyfeed_file)
@@ -203,8 +194,8 @@ def get_xml_stats():
     last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return item_count, last_updated, uglyfeeds_dir / uglyfeed_file
 
-# Function to get the current count of items in the XML
 def get_xml_item_count():
+    """Get the current count of items in the XML."""
     if not (uglyfeeds_dir / uglyfeed_file).exists():
         return 0
     tree = ET.parse(uglyfeeds_dir / uglyfeed_file)
@@ -212,17 +203,17 @@ def get_xml_item_count():
     items = root.findall(".//item")
     return len(items)
 
-# Function to calculate the new items count
 def get_new_item_count(old_count):
+    """Calculate the new items count based on the old count."""
     new_count = get_xml_item_count()
     if old_count is None or new_count is None:
         return 0
     return new_count - old_count
 
-# Function to schedule jobs
 def schedule_jobs(interval, period):
+    """Schedule jobs to run periodically."""
     def job():
-        run_scripts_sequentially()  # Log the execution in the global context
+        run_scripts_sequentially()
         job_stats_global.append({
             'script': 'Scheduled Job',
             'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -240,6 +231,12 @@ def schedule_jobs(interval, period):
         schedule.run_pending()
         time.sleep(1)
 
+# Initialize session state
+if 'config_data' not in st.session_state:
+    st.session_state.config_data = ensure_default_config(load_config())
+if 'server_thread' not in st.session_state:
+    st.session_state.server_thread = None
+
 # Start scheduling if enabled in the config
 if st.session_state.config_data.get('scheduling_enabled', False):
     scheduling_thread = threading.Thread(target=schedule_jobs, args=(st.session_state.config_data['scheduling_interval'], st.session_state.config_data['scheduling_period']), daemon=True)
@@ -247,7 +244,17 @@ if st.session_state.config_data.get('scheduling_enabled', False):
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
-menu_options = ["Introduction", "Configuration", "Run Scripts", "Run main.py", "Run llm_processor.py", "Run json2rss.py", "View and Serve XML", "Scheduled Jobs", "Documentation"]
+menu_options = [
+    "Introduction",
+    "Configuration",
+    "Run Scripts",
+    "Run main.py",
+    "Run llm_processor.py",
+    "Run json2rss.py",
+    "View and Serve XML",
+    "Scheduled Jobs",
+    "Documentation"
+]
 selected_option = st.sidebar.selectbox("Select an option", menu_options)
 
 # Introduction Page
@@ -257,14 +264,15 @@ if selected_option == "Introduction":
     st.write("""
         This application provides a graphical user interface to manage and process RSS feeds using the UglyFeed project.
         Use the sidebar to navigate through different functionalities of the application:
-
+        
         - **Configuration**: Set up and save your RSS feeds and processing options.
         - **Run Scripts**: Execute various processing scripts like `main.py`, `llm_processor.py`, and `json2rss.py`.
         - **View and Serve XML**: View the content of the XML feed and serve it via a custom HTTP server.
         - **Scheduled Jobs**: Configure and view the output of scheduled jobs.
         - **Documentation**: View the Markdown documentation files related to the project.
-
-        Make sure your local environment is configured correctly and that the necessary directories and files are in place. For any bug just [open an issue](https://github.com/fabriziosalmi/UglyFeed/issues/new/choose) on GitHub, hopefully I'll be able to fix it ^_^. Enjoy!
+        
+        Ensure your local environment is correctly set up and necessary directories and files are in place.
+        For any issues, [open an issue on GitHub](https://github.com/fabriziosalmi/UglyFeed/issues/new/choose). Enjoy!
     """)
 
 # Configuration Section
@@ -335,7 +343,7 @@ elif selected_option == "Configuration":
     st.session_state.config_data['scheduling_enabled'] = st.checkbox("Enable Scheduled Execution", value=scheduling_enabled)
 
     interval_options = {
-        "2 minutes": (2, 'minutes'),  # Default to 2 minutes
+        "2 minutes": (2, 'minutes'),
         "10 minutes": (10, 'minutes'),
         "30 minutes": (30, 'minutes'),
         "1 hour": (1, 'hours'),
@@ -350,7 +358,6 @@ elif selected_option == "Configuration":
     st.session_state.config_data['scheduling_interval'] = interval
     st.session_state.config_data['scheduling_period'] = period
 
-    # Add a checkbox to control the overwriting of config.yaml
     overwrite_config = st.checkbox("Force overwrite config.yaml", value=False)
 
     if st.button("Save Configuration and Feeds"):
