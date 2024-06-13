@@ -1,5 +1,7 @@
 import streamlit as st
 import os
+import requests
+import psutil
 import subprocess
 import yaml
 import socket
@@ -449,32 +451,95 @@ elif selected_option == "View and Serve XML":
         else:
             st.info("Server is not running.")
 
+
+
 # Debug Section
 elif selected_option == "Debug":
     st.header("Debug")
 
+    # Job Execution Logs
     st.subheader("Job Execution Logs")
     if job_stats_global:
-        for stat in job_stats_global:
-            st.markdown(f"**Script:** `{stat['script']}`")
-            st.markdown(f"**Time:** `{stat['time']}`")
-            st.markdown(f"**Status:** `{stat['status']}`")
-            st.markdown(f"**New Items:** `{stat.get('new_items', 0)}`")
-            st.divider()
+        with st.expander("View Detailed Logs"):
+            for stat in job_stats_global:
+                status_color = "green" if stat['status'].lower() == 'success' else "red"
+                st.markdown(f"<div style='background-color: {status_color}; padding: 10px; border-radius: 5px;'>"
+                            f"<strong>Script:</strong> `{stat['script']}`<br>"
+                            f"<strong>Time:</strong> `{stat['time']}`<br>"
+                            f"<strong>Status:</strong> `{stat['status']}`<br>"
+                            f"<strong>New Items:</strong> `{stat.get('new_items', 0)}`"
+                            f"</div>", unsafe_allow_html=True)
+                st.divider()
     else:
         st.info("No job executions have been recorded yet.")
 
+    # XML File Stats
     st.subheader("XML File Stats")
     item_count, last_updated, xml_path = get_xml_stats()
     if item_count is not None:
-        st.write(f"**Item Count:** `{item_count}`")
-        st.write(f"**Last Updated:** `{last_updated}`")
-        st.write(f"**File Path:** `{xml_path}`")
+        with st.expander("View XML File Details"):
+            st.write(f"**Item Count:** `{item_count}`")
+            st.write(f"**Last Updated:** `{last_updated}`")
+            st.write(f"**File Path:** `{xml_path}`")
     else:
-        st.info("No XML file found or file is empty.")
+        st.warning("No XML file found or file is empty. Please ensure the XML file is generated properly.")
 
+    # Check if HTTP server on port 8001 is running
+    st.subheader("HTTP Server Status (Port 8001)")
+    try:
+        response = requests.get('http://localhost:8001', timeout=5)
+        if response.status_code == 200:
+            st.success("HTTP server on port 8001 is running.")
+        else:
+            st.warning("HTTP server on port 8001 is not responding as expected.")
+    except requests.ConnectionError:
+        st.error("HTTP server on port 8001 is not running.")
+
+    # System Information
+    st.subheader("System Information")
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    cpu_usage = psutil.cpu_percent(interval=1)
+    memory_info = psutil.virtual_memory()
+
+    st.write(f"**Hostname:** `{hostname}`")
+    st.write(f"**IP Address:** `{ip_address}`")
+    st.write(f"**CPU Usage:** `{cpu_usage}%`")
+    st.write(f"**Memory Usage:** `{memory_info.percent}%` (Available: `{memory_info.available // (1024 ** 2)} MB`)")
+
+    # Current Configuration
     st.subheader("Current Configuration")
-    st.text_area("Config.yaml Content", yaml.dump(st.session_state.config_data), height=300)
+    with st.expander("View Config.yaml Content"):
+        st.text_area("Config.yaml Content", yaml.dump(st.session_state.config_data), height=300)
+        if st.button("Refresh Configuration"):
+            # Code to refresh configuration can be placed here
+            st.experimental_rerun()  # This will refresh the Streamlit app
 
+    # Loaded Feeds
     st.subheader("Loaded Feeds")
-    st.text_area("Feeds Content", st.session_state.feeds, height=200)
+    with st.expander("View Feeds Content"):
+        st.text_area("Feeds Content", st.session_state.feeds, height=200)
+        if st.button("Refresh Feeds"):
+            # Code to refresh feeds can be placed here
+            st.experimental_rerun()  # This will refresh the Streamlit app
+
+    # Download Logs
+    st.subheader("Download Logs")
+    logs_path = Path('logs.txt')
+    if logs_path.exists():
+        with logs_path.open('r') as log_file:
+            logs = log_file.read()
+        st.download_button('Download Log File', logs, file_name='logs.txt')
+        st.text_area("Log File Content", logs, height=300)
+    else:
+        st.warning("No log file found. Please ensure logs are being recorded properly.")
+
+    # Log Level Slider
+    st.subheader("Adjust Log Level")
+    log_level = st.select_slider(
+        "Select log level",
+        options=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        value="INFO"
+    )
+    logger.setLevel(log_level)
+    st.info(f"Current log level set to: {log_level}")
