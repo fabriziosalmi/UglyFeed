@@ -49,12 +49,18 @@ You can use OpenAI API or Ollama API, not togheter at the same time. Please comm
 - `max_items` (Maximum number of items to process for the rewriting process)
 - `max_age_days` (Maximum age of items in days to be considered)
 
+**Scheduler options**
+- `scheduling_enabled`: `true` (Enable the scheduler)
+- `scheduling_interval`: `4` 
+- `scheduling_period`: `hours`
+
 ### Use
 
 1. Run the `main.py` script from its dedicated page, it will retrieve and aggregate feeds items based on similarity. Logs are shown in the page for debugging purposes.
 
-2. Run the `llm_processor.py` script from its dedicated page, it will rewrite feeds based on LLM instruction/prompt and options and it will save a single JSON file for each unique rewritten feeds item. Logs are shown in the page for debugging purposes.
+2. Run all main scripts from its the `Run scripts` page, it will rewrite feeds based on LLM instruction/prompt and options and it will save a single JSON file for each unique rewritten feeds item. Logs are shown in the page for debugging purposes.
 
-3. Run the `json2rss.py` script from its dedicated page, it will create a valid RSS XML file with all rewritten feeds items. Logs are shown in the page for debugging purposes.
+Optional
 
-4. Go to the View and Serve XML page to get the generated XML content and a working HTTP URL you can use with any RSS reader as AI-powered feed source.
+3. Go to the View and Serve XML page to enable HTTP server and get the generated XML content URL you can use with any RSS reader.
+4. Go to the Deploy page to publish the XML to GitHub or GitLab.
