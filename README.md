@@ -10,7 +10,7 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 
 - 📡 Retrieve RSS feeds
 - 🧮 Aggregate feeds items by similarity
-- 🤖 Rewrite aggregated feeds using a language model
+- 🤖 Rewrite content using a large language model
 - 💾 Save rewritten feeds to JSON files
 - 🔁 Convert JSON to valid RSS feed
 - 🌐 Serve XML feed via HTTP server
