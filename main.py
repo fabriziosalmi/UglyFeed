@@ -82,7 +82,7 @@ def main(config: dict) -> None:
     logger.info("Saving grouped articles to JSON files...")
     progress_bar = st.progress(0)  # Initialize the progress bar
     try:
-        group_sizes = save_grouped_articles(grouped_articles, output_directory, progress_bar)
+        group_sizes = save_grouped_articles(grouped_articles, output_directory)
         total_files_saved = len(group_sizes)
         logger.info(f"RSS feed processing complete. {total_files_saved} different articles are now grouped.")
         logger.info(f"Details of groups saved: {group_sizes}")
@@ -104,8 +104,6 @@ def main(config: dict) -> None:
         logger.info(f"Total output files: {len(output_files)}")
     except Exception as e:
         logger.error(f"Error summarizing output files: {e}")
-
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
