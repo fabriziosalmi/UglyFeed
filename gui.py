@@ -186,11 +186,13 @@ def run_scripts_sequentially():
         'new_items': new_items
     })
 
-    # Display consolidated logs
-    if info_log_content:
-        st.text_area("Consolidated Output Log", "\n".join(info_log_content), height=200)
-    if error_log_content:
-        st.text_area("Consolidated Error Log", "\n".join(error_log_content), height=200)
+
+
+#    # Display consolidated logs
+#    if info_log_content:
+#        st.text_area("Consolidated Output Log", "\n".join(info_log_content), height=200)
+#    if error_log_content:
+#        st.text_area("Consolidated Error Log", "\n".join(error_log_content), height=200)
 
 
 
