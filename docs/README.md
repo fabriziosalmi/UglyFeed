@@ -24,6 +24,7 @@ Once in the web UI at http://yourownip:8501 just check options and made changes 
 - Modify the source feeds list to fit with your preferred RSS feeds (changes will still be saved as `input/feeds.txt` for backward compatibility)
 
 **Similarity options**
+
 For a general use the default values seems to be a good fit to aggressively filter out some noise. To increase items count try to reduce min_samples to 2 and play around eps and similarity.
 
 - `similarity_threshold` (range: 0-1)
@@ -31,6 +32,7 @@ For a general use the default values seems to be a good fit to aggressively filt
 - `eps` (Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN)
 
 **API and LLM options**
+
 You can use OpenAI API or Ollama API, not togheter at the same time. Please comment or delete the unused API to avoid issues.
 
 - `openai_api_url` (OpenAI API endpoint)
