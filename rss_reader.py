@@ -4,18 +4,19 @@ import re
 import datetime
 import logging
 import hashlib
-from typing import List, Dict
+from typing import List, Dict, Set
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import DBSCAN
 import numpy as np
-from tqdm import tqdm
 import feedparser
 from joblib import Parallel, delayed
+import streamlit as st
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 TAG_RE = re.compile(r"<[^<]+?>")
 
@@ -26,7 +27,10 @@ def fetch_feeds_from_file(file_path: str) -> List[Dict]:
     with open(file_path, 'r', encoding='utf-8') as file:
         urls = file.readlines()
 
-    for url in tqdm(urls, desc="Fetching and parsing RSS feeds"):
+    # Streamlit progress bar
+    progress_bar = st.progress(0)
+
+    for i, url in enumerate(urls):
         feed = feedparser.parse(url.strip())
         for entry in feed.entries:
             articles.append({
@@ -34,6 +38,10 @@ def fetch_feeds_from_file(file_path: str) -> List[Dict]:
                 'content': entry.description if hasattr(entry, 'description') else '',
                 'link': entry.link
             })
+        # Update progress
+        progress_bar.progress((i + 1) / len(urls))
+
+    logger.info(f"Total articles fetched and parsed: {len(articles)}")
     return articles
 
 
@@ -137,7 +145,7 @@ def calculate_similarity(articles: List[Dict[str, str]]) -> float:
 
         return average_similarity
     except Exception as e:
-        logging.error("An error occurred while calculating similarity: %s", e)
+        logger.error("An error occurred while calculating similarity: %s", e)
         return 0.0
 
 
@@ -150,7 +158,7 @@ def process_article(article: Dict) -> Dict:
     return article_copy
 
 
-def save_articles_to_json(articles: List[Dict], directory: str, seen_articles: set) -> None:
+def save_articles_to_json(articles: List[Dict], directory: str, seen_articles: Set[str]) -> None:
     """Save unique articles to a JSON file."""
     os.makedirs(directory, exist_ok=True)
     unique_articles = [
@@ -171,17 +179,26 @@ def save_articles_to_json(articles: List[Dict], directory: str, seen_articles: s
         try:
             with open(file_path, 'w', encoding='utf-8') as file:
                 json.dump(unique_articles, file, ensure_ascii=False, indent=4)
-            logging.info("Saved %s with %d items.", file_path, len(unique_articles))
+            logger.info("Saved %s with %d items.", file_path, len(unique_articles))
         except IOError as e:
-            logging.error("Failed to save %s: %s", file_path, e)
+            logger.error("Failed to save %s: %s", file_path, e)
 
 
 def save_grouped_articles(articles_groups: List[List[Dict]], directory: str) -> List[int]:
     """Save groups of articles to JSON files."""
     seen_articles = set()
     group_sizes = []
-    for group in tqdm(articles_groups, desc="Saving groups"):
+
+    # Streamlit progress bar
+    progress_bar = st.progress(0)
+
+    for i, group in enumerate(articles_groups):
         if len(group) > 2:
             save_articles_to_json(group, directory, seen_articles)
             group_sizes.append(len(group))
+
+        # Update progress
+        progress_bar.progress((i + 1) / len(articles_groups))
+
+    logger.info(f"Total groups saved: {len(group_sizes)}")
     return group_sizes
