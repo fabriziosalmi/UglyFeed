@@ -321,6 +321,7 @@ menu_options = [
     "Configuration",
     "Run Scripts",
     "View and Serve XML",
+    "Deploy",
     "Debug"
 ]
 selected_option = st.sidebar.selectbox("Select an option", menu_options)
@@ -477,6 +478,50 @@ elif selected_option == "View and Serve XML":
             st.markdown(f"**Serving `{uglyfeed_file}` at:**\n\n[{serve_url}]({serve_url})")
         else:
             st.info("Server is not running.")
+
+
+# Import the deploy function from deploy_xml.py
+from deploy_xml import deploy_xml, load_config
+
+# Deploy Section
+if selected_option == "Deploy":
+    st.header("Deploy XML File")
+
+    # Load configuration
+    config = load_config()
+
+    st.write("This section allows you to deploy the `uglyfeed.xml` file to GitHub and GitLab.")
+    st.write("Current configuration:")
+    st.json(config)
+
+    # Button to start deployment
+    if st.button("Deploy to GitHub and GitLab"):
+        try:
+            with st.spinner("Deploying..."):
+                # Deploy the XML file
+                urls = deploy_xml('uglyfeeds/uglyfeed.xml', config)
+
+                if urls:
+                    st.success("Deployment successful!")
+                    st.write("File deployed to the following URLs:")
+                    for platform, url in urls.items():
+                        st.markdown(f"**{platform.capitalize()}**: [View]({url})")
+
+                    # Store the deployment URLs in session state
+                    st.session_state['urls'] = urls
+                else:
+                    st.warning("No deployments were made. Check if the configuration is correct.")
+        except Exception as e:
+            st.error(f"An error occurred during deployment: {e}")
+
+    # Display previous deployment status if available
+    st.subheader("Previous Deployment Status")
+    if 'urls' in st.session_state:
+        st.write("Last deployed to the following URLs:")
+        for platform, url in st.session_state['urls'].items():
+            st.markdown(f"**{platform.capitalize()}**: [View]({url})")
+    else:
+        st.info("No previous deployments found.")
 
 
 
