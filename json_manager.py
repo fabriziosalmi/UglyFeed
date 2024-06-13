@@ -8,17 +8,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import hashlib
-from tqdm import tqdm
 import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
 def sanitize_filename(filename: str) -> str:
     """Sanitize the filename to remove invalid characters."""
     return re.sub(r'[<>:"/\\|?*\n\r\']+', '', filename).replace(',', '_').replace(' ', '_')
-
 
 def generate_title(articles: List[Dict]) -> str:
     """Generate a title based on the most common words in article titles."""
@@ -26,7 +23,6 @@ def generate_title(articles: List[Dict]) -> str:
     word_counts = Counter(title_words)
     common_words = [word for word, count in word_counts.most_common(10) if len(word) > 3][:3]
     return ' '.join(common_words)
-
 
 def calculate_similarity(articles: List[Dict]) -> float:
     """Calculate the average pairwise cosine similarity of articles."""
@@ -39,7 +35,6 @@ def calculate_similarity(articles: List[Dict]) -> float:
     num_comparisons = len(articles) * (len(articles) - 1) / 2
     return np.tril(cosine_sim_matrix, -1).sum() / num_comparisons if num_comparisons > 0 else 0.0
 
-
 def process_article(article: Dict) -> Dict:
     """Process an article by removing HTML tags and unwanted fields."""
     article_copy = article.copy()
@@ -47,7 +42,6 @@ def process_article(article: Dict) -> Dict:
     article_copy['content'] = re.sub(r"<[^<]+?>", "", article['content'])
     article_copy.pop('time', None)  # Use pop to safely remove the key
     return article_copy
-
 
 def save_articles_to_json(articles: List[Dict], directory: str = "output", seen_articles: set = None) -> None:
     """Save unique articles to a JSON file with sanitized filenames."""
@@ -90,12 +84,11 @@ def save_articles_to_json(articles: List[Dict], directory: str = "output", seen_
         except IOError as e:
             logging.error("Failed to save %s: %s", file_path, e)
 
-
 def save_grouped_articles(articles_groups: List[List[Dict]], directory: str = "output") -> List[int]:
     """Save groups of articles to JSON files."""
     seen_articles = set()
     group_sizes = []
-    for group in tqdm(articles_groups, desc="Saving groups"):
+    for group in articles_groups:
         if len(group) > 2:
             save_articles_to_json(group, directory, seen_articles)
             group_sizes.append(len(group))
