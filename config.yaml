@@ -71,3 +71,11 @@ max_age_days: 10       # Maximum age of items in days to be considered
 scheduling_enabled: true
 scheduling_interval: 4
 scheduling_period: hours
+
+## deploy
+github_token: "your_github_token"
+gitlab_token: "your_gitlab_token"
+github_repo: "your_github_username/uglufeed-cdn"
+gitlab_repo: "your_gitlab_username/uglufeed-cdn"
+enable_github: false
+enable_gitlab: false
