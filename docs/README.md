@@ -57,7 +57,12 @@ You can use OpenAI API or Ollama API, not togheter at the same time. Please comm
 
 **Deploy options**
 
-
+- `github_token`: your_github_token
+- `gitlab_token`: your_gitlab_token
+- `github_repo`: your_github_username/uglyfeed-cdn
+- `gitlab_repo`: your_gitlab_username/uglyfeed-cdn
+- `enable_github`: `false` or `true`
+- `enable_gitlab`: `false` or `true`
 
 
 
