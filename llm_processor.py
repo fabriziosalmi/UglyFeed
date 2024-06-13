@@ -11,8 +11,9 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from openai import OpenAI
 
-# Set up logging
+# Configure logging using the new method
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Maximum context length for Groq API (this may need adjustment based on the actual limit)
 MAX_TOKENS = 32768
@@ -60,7 +61,7 @@ def call_openai_api(api_url, combined_content, model, api_key):
         )
         return response.choices[0].message.content
     except Exception as e:
-        logging.error(f"OpenAI API request failed: {e}")
+        logger.error(f"OpenAI API request failed: {e}")
         return None
 
 def call_groq_api(api_url, combined_content, model, api_key):
@@ -73,25 +74,25 @@ def call_groq_api(api_url, combined_content, model, api_key):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {api_key}'
     }
-    logging.debug(f"Groq API request data: {data}")
+    logger.debug(f"Groq API request data: {data}")
     try:
         response = requests_retry_session().post(api_url, data=data, headers=headers)
         response.raise_for_status()
         try:
             response_json = response.json()
-            logging.debug(f"Groq API response: {response_json}")
+            logger.debug(f"Groq API response: {response_json}")
             return response_json['choices'][0]['message']['content']
         except json.JSONDecodeError as e:
-            logging.error(f"Failed to parse JSON response from Groq API: {e}")
-            logging.error(f"Response content: {response.text}")
+            logger.error(f"Failed to parse JSON response from Groq API: {e}")
+            logger.error(f"Response content: {response.text}")
             return None
     except requests.RequestException as e:
-        logging.error(f"Groq API request failed: {e}")
+        logger.error(f"Groq API request failed: {e}")
         if response is not None:
-            logging.error(f"Groq API response content: {response.text}")
+            logger.error(f"Groq API response content: {response.text}")
             if 'rate_limit_exceeded' in response.text:
                 retry_after = parse_retry_after(response.json())
-                logging.info(f"Rate limit exceeded. Retrying after {retry_after} seconds.")
+                logger.info(f"Rate limit exceeded. Retrying after {retry_after} seconds.")
                 time.sleep(retry_after)
                 return call_groq_api(api_url, combined_content, model, api_key)
         return None
@@ -102,22 +103,22 @@ def call_ollama_api(api_url, combined_content, model):
         "messages": [{"role": "user", "content": combined_content}],
         "stream": False
     })
-    logging.debug(f"Ollama API request data: {data}")
+    logger.debug(f"Ollama API request data: {data}")
     try:
         response = requests_retry_session().post(api_url, data=data, headers={'Content-Type': 'application/json'})
         response.raise_for_status()
         try:
             response_json = response.json()
-            logging.debug(f"Ollama API response: {response_json}")
+            logger.debug(f"Ollama API response: {response_json}")
             return response_json['message']['content']
         except json.JSONDecodeError as e:
-            logging.error(f"Failed to parse JSON response from Ollama API: {e}")
-            logging.error(f"Response content: {response.text}")
+            logger.error(f"Failed to parse JSON response from Ollama API: {e}")
+            logger.error(f"Response content: {response.text}")
             return None
     except requests.RequestException as e:
-        logging.error(f"Ollama API request failed: {e}")
+        logger.error(f"Ollama API request failed: {e}")
         if response is not None:
-            logging.error(f"Ollama API response content: {response.text}")
+            logger.error(f"Ollama API response content: {response.text}")
         return None
 
 def parse_retry_after(response_json):
@@ -145,17 +146,17 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
         with open(filepath, 'r', encoding='utf-8') as file:
             json_data = json.load(file)
     except (json.JSONDecodeError, IOError) as e:
-        logging.error(f"Error reading JSON from {filepath}: {e}")
+        logger.error(f"Error reading JSON from {filepath}: {e}")
         return
 
     combined_content = content_prefix + "\n".join(
         f"[source {idx + 1}] {item['content']}" for idx, item in enumerate(json_data))
 
-    logging.info(f"Processing {filepath} - combined content prepared.")
-    logging.debug(f"Combined content: {combined_content}")
+    logger.info(f"Processing {filepath} - combined content prepared.")
+    logger.debug(f"Combined content: {combined_content}")
 
     if estimate_token_count(combined_content) > MAX_TOKENS:
-        logging.info(f"Truncating content to fit within {MAX_TOKENS} tokens.")
+        logger.info(f"Truncating content to fit within {MAX_TOKENS} tokens.")
         combined_content = truncate_content(combined_content, MAX_TOKENS)
 
     if api_type == "openai":
@@ -190,12 +191,12 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
         try:
             with open(new_filename, 'w', encoding='utf-8') as outfile:
                 json.dump(new_data, outfile, ensure_ascii=False, indent=4)
-            logging.info(f"Rewritten file saved to {new_filename}")
+            logger.info(f"Rewritten file saved to {new_filename}")
         except IOError as e:
-            logging.error(f"Error writing to {new_filename}: {e}")
+            logger.error(f"Error writing to {new_filename}: {e}")
     else:
-        logging.error("Failed to get rewritten content from LLM API.")
-        logging.debug(f"Rewritten content: {rewritten_content}")
+        logger.error("Failed to get rewritten content from LLM API.")
+        logger.debug(f"Rewritten content: {rewritten_content}")
 
 def validate_config(api_config):
     selected_api = api_config.get('selected_api')
@@ -218,7 +219,7 @@ def main(config_path):
         with open(config_path, 'r', encoding='utf-8') as file:
             config = yaml.safe_load(file)
     except (yaml.YAMLError, IOError) as e:
-        logging.error(f"Error reading config file {config_path}: {e}")
+        logger.error(f"Error reading config file {config_path}: {e}")
         return
 
     api_config = config.get('api_config', {})
