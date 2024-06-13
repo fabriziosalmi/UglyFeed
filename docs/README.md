@@ -18,10 +18,9 @@ If you want to disable streamlit telemetry just add browser.gatherUsageStats fla
 
 ## Configuration
 
-Once in the web UI at http://yourownip:8501 just check options and made changes to fit your needs.
+You can change source feeds by modifying the `input/feeds.txt` file or in the **Configuration** page of the web application.
 
-**Source Feeds**
-- Modify the source feeds list to fit with your preferred RSS feeds (changes will still be saved as `input/feeds.txt` for backward compatibility)
+You can change options by modifying the `config.yaml` file or in the **Configuration** page of the web application.
 
 **Similarity options**
 
@@ -55,6 +54,12 @@ You can use OpenAI API or Ollama API, not togheter at the same time. Please comm
 - `scheduling_enabled`: `true` (Enable the scheduler)
 - `scheduling_interval`: `4` 
 - `scheduling_period`: `hours`
+
+**Deploy options**
+
+
+
+
 
 ### Use
 
