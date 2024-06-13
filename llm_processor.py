@@ -153,6 +153,14 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
         f"[source {idx + 1}] {item['content']}" for idx, item in enumerate(json_data))
 
     logger.info(f"Processing {filepath} - combined content prepared.")
+
+    # testing
+    log_message = f"Processing {filepath} - combined content prepared."
+    logger.info(log_message)
+    print(log_message)
+
+    # end test
+
     logger.debug(f"Combined content: {combined_content}")
 
     if estimate_token_count(combined_content) > MAX_TOKENS:
@@ -192,6 +200,11 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
             with open(new_filename, 'w', encoding='utf-8') as outfile:
                 json.dump(new_data, outfile, ensure_ascii=False, indent=4)
             logger.info(f"Rewritten file saved to {new_filename}")
+
+            log_message2 = f"Rewritten file saved to {new_filename}"
+            logger.info(log_message2)
+            print(log_message2)
+
         except IOError as e:
             logger.error(f"Error writing to {new_filename}: {e}")
     else:
