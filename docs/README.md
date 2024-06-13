@@ -68,11 +68,10 @@ You can use OpenAI API or Ollama API, not togheter at the same time. Please comm
 
 ### Use
 
-1. Run the `main.py` script from its dedicated page, it will retrieve and aggregate feeds items based on similarity. Logs are shown in the page for debugging purposes.
-
-2. Run all main scripts from its the `Run scripts` page, it will rewrite feeds based on LLM instruction/prompt and options and it will save a single JSON file for each unique rewritten feeds item. Logs are shown in the page for debugging purposes.
+Run all main scripts from the `Run scripts` page, feeds items will be aggregated by similarity and rewritten following the LLM instruction/prompt and options. 
+Logs are shown in the page for debugging purposes.
 
 Optional
 
-3. Go to the View and Serve XML page to enable HTTP server and get the generated XML content URL you can use with any RSS reader.
+3. Go to the View and Serve XML page where you can view and download the generated XML. You can also enable the HTTP server to have a valid XML URL to use with any RSS reader.
 4. Go to the Deploy page to publish the XML to GitHub or GitLab, a public URL you can use with any RSS reader will be returned.
