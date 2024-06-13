@@ -45,14 +45,17 @@ docker run -p 8001:8001 -p 8501:8501 fabriziosalmi/uglyfeed:latest
 ```
 
 ### Configure the application
-In the Configuration page you can change options for aggregation similarity, LLM APIs and model to use and the retention options for the final rewritten XML feed to serve via http.
+In the Configuration page you can change options for aggregation similarity, LLM API and model, retention options and the scheduler.
 
 ### Execute the application scripts
-Execute all scripts in the given order (`main.py`, `llm_processor.py`, `json2rss.py`).
-You can check for logs, errors and informational messages after executed each script.
+Execute all scripts in the **Run scripts** page easily by clicking on the button **Run `main.py`, `llm_processor.py`, `json2rss.py` sequentially**.
+You can check for logs, errors and informational messages.
 
 ### Get the final rewritten XML feed
 Once all scripts completed you can access to the final rewritten XML url via http at `http://container_ip:8001/uglyfeed.xml`
+
+### Deploy the final rewritten XML feed
+Once all scripts completed you can deploy the final rewritten XML file to GitHub/GitLab, the public XML URL is returned for each enabled platform to use by RSS readers.
 
 ## Documentation
 
