@@ -12,6 +12,38 @@ from datetime import datetime
 from pathlib import Path
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
+import logging
+import streamlit as st
+
+# Define a custom logging filter
+class LevelFilter(logging.Filter):
+    def __init__(self, level):
+        self.level = level
+    def filter(self, record):
+        return record.levelno >= self.level
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Create a stream handler for capturing logs
+info_handler = logging.StreamHandler()
+info_handler.setLevel(logging.INFO)
+info_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
+# Create another stream handler for error logs
+error_handler = logging.StreamHandler()
+error_handler.setLevel(logging.WARNING)  # Capturing WARNING and above
+error_handler.addFilter(LevelFilter(logging.WARNING))
+error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
+# Add handlers to the logger
+logger.addHandler(info_handler)
+logger.addHandler(error_handler)
+
+
+
+
 # Define paths
 feeds_path = Path("input/feeds.txt")
 config_path = Path("config.yaml")
@@ -111,8 +143,8 @@ def find_available_port(base_port):
 def run_script(script_name):
     """Execute a script and capture its output and errors."""
     process = subprocess.run(["python", script_name], capture_output=True, text=True)
-    output = process.stdout or "No output"
-    errors = process.stderr or "No errors"
+    output = process.stdout.strip() if process.stdout else "No output"
+    errors = process.stderr.strip() if process.stderr else "No errors"
     return output, errors
 
 def run_scripts_sequentially():
@@ -120,12 +152,30 @@ def run_scripts_sequentially():
     global job_stats_global
     scripts = ["main.py", "llm_processor.py", "json2rss.py"]
     item_count_before = get_xml_item_count()
+
+    # Prepare containers for output and error logs
+    info_log_content = []
+    error_log_content = []
+
     for script in scripts:
         with st.spinner(f"Executing {script}..."):
             output, errors = run_script(script)
+
+            # Collect logs for Streamlit display
+            info_log_content.append(f"Output of {script}:\n{output}")
+            if errors.strip() and errors != "No errors":
+                error_log_content.append(f"Errors or logs of {script}:\n{errors}")
+
+            # Log output and errors
+            logger.info(f"Output of {script}:\n{output}")
+            if errors.strip() and errors != "No errors":
+                logger.error(f"Errors or logs of {script}:\n{errors}")
+
+            # Display output and errors in Streamlit text areas
             st.text_area(f"Output of {script}", output, height=200)
-            if errors:
-                st.text_area(f"Errors or logs of {script}", errors, height=200)
+            #  if errors.strip() and errors != "No errors":
+            #    st.text_area(f"Errors or logs of {script}", errors, height=200)
+
     new_items = get_new_item_count(item_count_before)
     job_stats_global.append({
         'script': ', '.join(scripts),
@@ -133,6 +183,15 @@ def run_scripts_sequentially():
         'status': 'Success',
         'new_items': new_items
     })
+
+    # Display consolidated logs
+    if info_log_content:
+        st.text_area("Consolidated Output Log", "\n".join(info_log_content), height=200)
+    if error_log_content:
+        st.text_area("Consolidated Error Log", "\n".join(error_log_content), height=200)
+
+
+
 
 class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
     """Custom HTTP handler to serve XML with correct content type and cache headers."""
