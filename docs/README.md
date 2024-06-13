@@ -65,4 +65,4 @@ You can use OpenAI API or Ollama API, not togheter at the same time. Please comm
 Optional
 
 3. Go to the View and Serve XML page to enable HTTP server and get the generated XML content URL you can use with any RSS reader.
-4. Go to the Deploy page to publish the XML to GitHub or GitLab.
+4. Go to the Deploy page to publish the XML to GitHub or GitLab, a public URL you can use with any RSS reader will be returned.
