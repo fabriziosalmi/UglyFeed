@@ -53,10 +53,10 @@ Execute all scripts in the **Run scripts** page easily by clicking on the button
 You can check for logs, errors and informational messages.
 
 ### Get the final rewritten XML feed
-Once all scripts completed you can access to the final rewritten XML url via http at `http://container_ip:8001/uglyfeed.xml`
+Once all scripts completed go to the View and Serve XML page and start the HTTP server, you can access to the final rewritten XML url at `http://container_ip:8001/uglyfeed.xml`
 
 ### Deploy the final rewritten XML feed
-Once all scripts completed you can deploy the final rewritten XML file to GitHub/GitLab, the public XML URL is returned for each enabled platform to use by RSS readers.
+Once all scripts completed go to the Deploy page where you can push the final rewritten XML file to the configured GitHub/GitLab repository, the public XML URL to use by RSS readers is returned for each enabled platform.
 
 ## Documentation
 
