@@ -14,6 +14,7 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - 💾 Save rewritten feeds to JSON files
 - 🔁 Convert JSON to valid RSS feed
 - 🌐 Serve XML feed via HTTP server
+- 🌎 Deploy XML feed to GitHub or GitLab
 - 📈 Evaluate generated content
 - 🖥️ Web UI based on Streamlit
 
