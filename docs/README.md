@@ -68,10 +68,6 @@ You can use OpenAI API or Ollama API, not togheter at the same time. Please comm
 
 ### Use
 
-Run all main scripts from the `Run scripts` page, feeds items will be aggregated by similarity and rewritten following the LLM instruction/prompt and options. 
-Logs are shown in the page for debugging purposes.
-
-Optional
-
-3. Go to the View and Serve XML page where you can view and download the generated XML. You can also enable the HTTP server to have a valid XML URL to use with any RSS reader.
-4. Go to the Deploy page to publish the XML to GitHub or GitLab, a public URL you can use with any RSS reader will be returned.
+- Run all main scripts from the `Run scripts` page, feeds items will be aggregated by similarity and rewritten following the LLM instruction/prompt and options. Logs are shown in the page for debugging purposes.
+- Go to the View and Serve XML page where you can view and download the generated XML. You can also enable the HTTP server to have a valid XML URL to use with any RSS reader.
+- Go to the Deploy page to publish the XML to GitHub or GitLab, a public URL you can use with any RSS reader will be returned.
