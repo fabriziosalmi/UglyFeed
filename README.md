@@ -46,7 +46,7 @@ docker run -p 8001:8001 -p 8501:8501 fabriziosalmi/uglyfeed:latest
 ```
 
 ### Configure the application
-In the Configuration page (or by manually editing the `config.yaml` file) you will find aggregation similarity, LLM API, LLM model, retention, scheduler and deploy options.
+In the **Configuration** page (or by manually editing the `config.yaml` file) you will find aggregation similarity, LLM API, LLM model, retention, scheduler and deploy options.
 
 ### Execute the application scripts
 Execute all scripts in the **Run scripts** page easily by clicking on the button **Run `main.py`, `llm_processor.py`, `json2rss.py` sequentially**.
