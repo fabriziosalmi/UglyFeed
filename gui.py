@@ -323,22 +323,47 @@ menu_options = [
 ]
 selected_option = st.sidebar.selectbox("Select an option", menu_options)
 
+# Ensure Font Awesome is included
+st.sidebar.markdown("""
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <hr>
+    <a href="https://github.com/fabriziosalmi/UglyFeed" target="_blank">
+        <i class="fab fa-github" style="font-size: 32px;"></i>
+    </a>
+    """, unsafe_allow_html=True)
+
+
 # Introduction Page
 if selected_option == "Introduction":
-    st.title("UglyFeed")
-    st.image("docs/UglyFeed.png", width=300, use_column_width='auto')
-    st.write("""
+    # Add title with GitHub icon on the left
+    st.markdown("""
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <img src="https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed.png?raw=true"
+             alt="GitHub" style="width: 48px; height: 48px; margin-right: 10px;">
+        <h1 style="margin: 0; display: inline; font-size: 2em;">UglyFeed</h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Description with styled markdown
+    st.markdown("""
+    <p style="font-size: 16px; line-height: 1.6; text-align: justify;">
         This application provides a graphical user interface to manage and process RSS feeds using the UglyFeed project.
         Use the sidebar to navigate through different functionalities of the application:
-
-        - **Configuration**: Set up and save your RSS feeds and processing options.
-        - **Run Scripts**: Execute various processing scripts like `main.py`, `llm_processor.py`, and `json2rss.py`.
-        - **View and Serve XML**: View the content of the XML feed and serve it via a custom HTTP server.
-        - **Debug**: View detailed debug information for troubleshooting.
-
+    </p>
+    <ul style="font-size: 16px; line-height: 1.6; margin-left: 20px;">
+        <li><b>Configuration</b>: Set up and save your RSS feeds and processing options.</li>
+        <li><b>Run Scripts</b>: Execute various processing scripts like <code>main.py</code>, <code>llm_processor.py</code>, and <code>json2rss.py</code> with just one click.</li>
+        <li><b>View and Serve XML</b>: View the content of the XML feed and serve it via a custom HTTP server.</li>
+        <li><b>Debug</b>: View detailed debug information for troubleshooting.</li>
+    </ul>
+    <p style="font-size: 16px; line-height: 1.6;">
         Ensure your local environment is correctly set up and necessary directories and files are in place.
-        For any issues, [open an issue on GitHub](https://github.com/fabriziosalmi/UglyFeed/issues/new/choose). Enjoy!
-    """)
+        For any issues, <a href="https://github.com/fabriziosalmi/UglyFeed/issues/new/choose" target="_blank">open an issue on GitHub</a>. Enjoy!
+    </p>
+    """, unsafe_allow_html=True)
+
+
+
 
 # Configuration Section
 elif selected_option == "Configuration":
