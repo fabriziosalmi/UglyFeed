@@ -1,7 +1,8 @@
 # Documentation
 Welcome to the UglyFeed documentation. This guide provides detailed information to run UglyFeed.
 
-## Installation and run
+
+## Installation and run (without Docker)
 
 Clone the repository and run the web application:
 
@@ -11,51 +12,77 @@ cd UglyFeed
 streamlit run gui.py --server.address 0.0.0.0
 ```
 
-If you want to disable streamlit telemetry just add browser.gatherUsageStats flag:
+If you want to disable streamlit telemetry just run this command: 
 
 `streamlit run gui.py --server.address 0.0.0.0 --browser.gatherUsageStats false`
 
+## Installation and run (with Docker)
+
+To start the UglyFeed app, use the following `docker run` command:
+
+```bash
+docker run -p 8001:8001 -p 8501:8501 fabriziosalmi/uglyfeed:latest
+```
+
+## Installation and run (Docker Compose)
+
+To start the UglyFeed app, use the following `docker run` command:
+
+```bash
+git clone https://github.com/fabriziosalmi/UglyFeed.git
+cd UglyFeed
+docker compose up -d
+```
+
+The stack defined in the `docker-compose.yaml` file has been succesfully tested on Portainer 🎉
 
 ## Configuration
+- You can change source feeds by modifying the `input/feeds.txt` file or in the **Configuration** page of the web application.
+- You can change options by modifying the `config.yaml` file or in the **Configuration** page of the web application.
 
-You can change source feeds by modifying the `input/feeds.txt` file or in the **Configuration** page of the web application.
+### Options
 
-You can change options by modifying the `config.yaml` file or in the **Configuration** page of the web application.
-
-**Similarity options**
-
-For a general use the default values seems to be a good fit to aggressively filter out some noise. To increase items count try to reduce min_samples to 2 and play around eps and similarity.
+**Similarity**
+> For a general use the default values seems to be a good fit to aggressively filter out some noise. To increase items count try to reduce min_samples to 2 and play around eps and similarity.
 
 - `similarity_threshold` (range: 0-1)
 - `min_samples` (Minimum number of samples in a cluster for DBSCAN)
 - `eps` (Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN)
 
-**API and LLM options**
+**LLM API and model**
+> You can use OpenAI API, Groq API or Ollama API, not multiple at the same time.
 
-You can use OpenAI API or Ollama API, not togheter at the same time. Please comment or delete the unused API to avoid issues.
 
+- `selected_api` (Active API can be `OpenAI`, `Groq`, or `Ollama`)
 - `openai_api_url` (OpenAI API endpoint)
-- `openai_api_key` (OpenAI API key) [OpenAI models](https://platform.openai.com/docs/models)
-- `openai_model` (OpenAI model)
+- `openai_api_key` (OpenAI API key) 
+- `openai_model` (OpenAI [models](https://platform.openai.com/docs/models))
 - `groq_api_url` (Groq API endpoint)
 - `groq_api_key` (Groq API key)
-- `groq_model` (Groq model) [Groq models](https://console.groq.com/docs/models)
+- `groq_model` (Groq [models](https://console.groq.com/docs/models)) 
 - `ollama_api_url` (Ollama API endpoint)
-- `ollama_model` (Ollama model) [Ollama models](https://platform.openai.com/docs/models)
+- `ollama_model` (Ollama [models](https://platform.openai.com/docs/models)) 
 
-**Instructions/role/prompt option**
+**Instructions/role/prompt**
+> You can force the LLM to translate, aggregate, summarize, extend, say the oppposite or any creative mix you can imagine, just test it to fit to your own needs. If you need some ideas check the [prompts folder](https://github.com/fabriziosalmi/UglyFeed/tree/main/prompts)
+
 - `content_prefix` (prompt to be used as instruction for the rewriting process)
 
-**RSS retention options**
+**RSS retention**
+> You can set limits for content retention.
+
 - `max_items` (Maximum number of items to process for the rewriting process)
 - `max_age_days` (Maximum age of items in days to be considered)
 
-**Scheduler options**
+**Scheduler**
+> You can set automated jobs for retrieval, aggregation, rewriting and XML generation (deployment job will be soon added to the same pipeline)
+
 - `scheduling_enabled`: `true` (Enable the scheduler)
 - `scheduling_interval`: `4` 
 - `scheduling_period`: `hours`
 
-**Deploy options**
+**Deploy**
+> You can publish the final generated XML feed to your own GitHub or GitLab repository.
 
 - `github_token`: your_github_token
 - `gitlab_token`: your_gitlab_token
@@ -63,7 +90,6 @@ You can use OpenAI API or Ollama API, not togheter at the same time. Please comm
 - `gitlab_repo`: your_gitlab_username/uglyfeed-cdn
 - `enable_github`: `false` or `true`
 - `enable_gitlab`: `false` or `true`
-
 
 
 ### Use
