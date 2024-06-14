@@ -100,7 +100,15 @@ def ensure_default_config(config_data):
         'max_age_days': 10,
         'scheduling_enabled': False,
         'scheduling_interval': 2,
-        'scheduling_period': 'minutes'
+        'scheduling_period': 'minutes',
+        'feed_title': "UglyFeed RSS",
+        'feed_link': "https://github.com/fabriziosalmi/UglyFeed",
+        'feed_description': "This is a default description for the feed.",
+        'feed_language': "it",
+        'feed_self_link': "https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml",
+        'author': "UglyFeed",
+        'category': "Fun",
+        'copyright': "None"
     }
 
     def recursive_update(d, u):
@@ -112,6 +120,9 @@ def ensure_default_config(config_data):
         return d
 
     return recursive_update(config_data, defaults)
+
+
+
 
 def save_configuration():
     """Save configuration and feeds to file."""
@@ -367,7 +378,6 @@ if selected_option == "Introduction":
 
 
 
-
 # Configuration Section
 elif selected_option == "Configuration":
     st.header("Configuration")
@@ -376,6 +386,18 @@ elif selected_option == "Configuration":
 
     st.subheader("RSS Feeds")
     st.session_state.feeds = st.text_area("Enter one RSS feed URL per line:", st.session_state.feeds)
+
+    st.divider()
+
+    st.subheader("RSS Feed Details")
+    st.session_state.config_data['feed_title'] = st.text_input("Feed Title", st.session_state.config_data['feed_title'])
+    st.session_state.config_data['feed_link'] = st.text_input("Feed Link", st.session_state.config_data['feed_link'])
+    st.session_state.config_data['feed_description'] = st.text_input("Feed Description", st.session_state.config_data['feed_description'])
+    st.session_state.config_data['feed_language'] = st.text_input("Feed Language", st.session_state.config_data['feed_language'])
+    st.session_state.config_data['feed_self_link'] = st.text_input("Feed Self-Link", st.session_state.config_data['feed_self_link'])
+    st.session_state.config_data['author'] = st.text_input("Author", st.session_state.config_data['author'])
+    st.session_state.config_data['category'] = st.text_input("Category", st.session_state.config_data['category'])
+    st.session_state.config_data['copyright'] = st.text_input("Copyright", st.session_state.config_data['copyright'])
 
     st.divider()
 
@@ -438,6 +460,9 @@ elif selected_option == "Configuration":
 
     if st.button("Save Configuration and Feeds"):
         save_configuration()
+
+
+
 
 # Run Scripts Section
 elif selected_option == "Run Scripts":
