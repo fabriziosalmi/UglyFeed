@@ -68,28 +68,38 @@ The stack defined in the `docker-compose.yaml` file has been succesfully tested 
 
 - `content_prefix` (prompt to be used as instruction for the rewriting process)
 
-**RSS retention**
+**XML feed**
 > You can set limits for content retention.
 
-- `max_items` (Maximum number of items to process for the rewriting process)
-- `max_age_days` (Maximum age of items in days to be considered)
-
+- `max_items`: `250` (Maximum number of items to process for the rewriting process)
+- `max_age_days`: `7` (Maximum age of items in days to be considered)
+- `feed_title`: `Default Feed Title`
+- `feed_link`: `https://example.com`
+- `feed_description`: `This is a default description for the feed.`
+- `feed_language`: `en`
+- `feed_self_link`: `https://example.com/feed.xml`
+- `author`: `Default Author`
+- `category`: `Default Category`
+- `copyright`: `Copyright info`
+  
 **Scheduler**
 > You can set automated jobs for retrieval, aggregation, rewriting and XML generation (deployment job will be soon added to the same pipeline)
 
-- `scheduling_enabled`: `true` (Enable the scheduler)
-- `scheduling_interval`: `4` 
-- `scheduling_period`: `hours`
+- `scheduling_enabled`: `false` or `true` (Enable the scheduler)
+- `scheduling_interval`: `4`
+- `scheduling_period`: `hours` or `minutes`
+
 
 **Deploy**
 > You can publish the final generated XML feed to your own GitHub or GitLab repository.
 
-- `github_token`: your_github_token
-- `gitlab_token`: your_gitlab_token
-- `github_repo`: your_github_username/uglyfeed-cdn
-- `gitlab_repo`: your_gitlab_username/uglyfeed-cdn
 - `enable_github`: `false` or `true`
+- `github_repo`: `your_github_username/uglyfeed-cdn`
+- `github_token`: `your_github_token`
+
 - `enable_gitlab`: `false` or `true`
+- `gitlab_repo`: `your_gitlab_username/uglyfeed-cdn`
+- `gitlab_token`: `your_gitlab_token`
 
 
 ### Use
