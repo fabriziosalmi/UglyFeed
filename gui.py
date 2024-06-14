@@ -184,10 +184,8 @@ def run_scripts_sequentially():
             if errors.strip() and errors != "No errors":
                 logger.error(f"Errors or logs of {script}:\n{errors}")
 
-            # Display output and errors in Streamlit text areas
-            st.text_area(f"Output of {script}", output, height=200)
-            #  if errors.strip() and errors != "No errors":
-            #    st.text_area(f"Errors or logs of {script}", errors, height=200)
+            # Display real useful informations in Streamlit text areas
+            st.text_area(f"Output of {script}", errors, height=200)
 
     new_items = get_new_item_count(item_count_before)
     job_stats_global.append({
@@ -196,15 +194,6 @@ def run_scripts_sequentially():
         'status': 'Success',
         'new_items': new_items
     })
-
-
-
-#    # Display consolidated logs
-#    if info_log_content:
-#        st.text_area("Consolidated Output Log", "\n".join(info_log_content), height=200)
-#    if error_log_content:
-#        st.text_area("Consolidated Error Log", "\n".join(error_log_content), height=200)
-
 
 
 
@@ -463,13 +452,26 @@ elif selected_option == "Configuration":
 
 
 
-
 # Run Scripts Section
 elif selected_option == "Run Scripts":
     st.header("Run Scripts")
 
+    # Add example text or instructions
+    st.markdown("""
+    This section allows you to run the necessary scripts to process and generate the RSS feed.
+
+    - **main.py** retrieves the RSS feeds and prepares the data for further processing.
+    - **llm_processor.py** uses the Large Language Model to rewrite and enhance the feed content.
+    - **json2rss.py** converts the processed and rewritten JSON data into a valid RSS feed.
+
+    Output and errors are shown for each scripts for debugging purpose.
+
+    """)
+
+    # Run the scripts sequentially
     if st.button("Run main.py, llm_processor.py, and json2rss.py sequentially"):
         run_scripts_sequentially()
+
 
 # View and Serve XML Section
 elif selected_option == "View and Serve XML":
