@@ -1,6 +1,6 @@
 # Prompt Directory
 
-This repository contains a variety of prompts categorized by different roles, tones, precision levels, and approaches. The prompts are available in both Italian and English. Use the categories below to find the appropriate prompts for your needs.
+This repository contains a variety of prompts categorized by different roles, tones, precision levels, and approaches. The prompts are available in both Italian and English. Use the categories below to find the appropriate prompt for your needs.
 
 ## Italian Prompts
 
