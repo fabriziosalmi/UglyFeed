@@ -108,7 +108,8 @@ def ensure_default_config(config_data):
         'feed_self_link': "https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml",
         'author': "UglyFeed",
         'category': "Fun",
-        'copyright': "None"
+        'copyright': "None",
+        'http_server_port': 8001  # Default server port
     }
 
     def recursive_update(d, u):
@@ -210,6 +211,10 @@ class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
+def get_config_value(config, key, default_value):
+    """Get the configuration value from environment variables, config file, or default."""
+    return os.getenv(key.upper(), config.get(key, default_value))
+
 def start_custom_server(port):
     """Start the HTTP server to serve XML."""
     server_address = ('', port)
@@ -219,14 +224,19 @@ def start_custom_server(port):
 def stop_server():
     """Stop the HTTP server."""
     if st.session_state.server_thread and st.session_state.server_thread.is_alive():
+        # Set the server thread to None to signal it should stop
         st.session_state.server_thread = None
         st.warning("Server stopped. Please restart the application to stop the server completely.")
+    else:
+        st.info("Server is not running.")
 
 def toggle_server(start):
     """Toggle the HTTP server on or off."""
     if start:
         if st.session_state.server_thread is None or not st.session_state.server_thread.is_alive():
-            st.session_state.custom_server_port = 8001  # Fixed port
+            # Get the port from the session state, environment variable, or config file
+            port = int(get_config_value(st.session_state.config_data, 'http_server_port', 8001))
+            st.session_state.custom_server_port = port
             st.session_state.server_thread = threading.Thread(target=start_custom_server, args=(st.session_state.custom_server_port,), daemon=True)
             st.session_state.server_thread.start()
             st.success(f"Server started on port {st.session_state.custom_server_port}")
@@ -234,6 +244,7 @@ def toggle_server(start):
             st.warning("Server is already running.")
     else:
         stop_server()
+
 
 def copy_xml_to_static():
     """Ensure XML is copied to Streamlit static directory."""
@@ -366,8 +377,6 @@ if selected_option == "Introduction":
     """, unsafe_allow_html=True)
 
 
-
-# Configuration Section
 elif selected_option == "Configuration":
     st.header("Configuration")
 
@@ -447,9 +456,13 @@ elif selected_option == "Configuration":
     st.session_state.config_data['scheduling_interval'] = interval
     st.session_state.config_data['scheduling_period'] = period
 
+    st.subheader("HTTP Server Configuration")
+    st.session_state.config_data['http_server_port'] = st.number_input("HTTP Server Port", min_value=1, max_value=65535, value=st.session_state.config_data['http_server_port'])
+
+    st.divider()
+
     if st.button("Save Configuration and Feeds"):
         save_configuration()
-
 
 
 # Run Scripts Section
