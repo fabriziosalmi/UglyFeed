@@ -38,7 +38,7 @@ The stack defined in the `docker-compose.yaml` file has been succesfully tested 
 
 ## Configuration
 - You can change source feeds by modifying the `input/feeds.txt` file or in the **Configuration** page of the web application.
-- You can change options by modifying the `config.yaml` file or in the **Configuration** page of the web application.
+- All others options can be changed via environment variables, by updating the `config.yaml` file or in the **Configuration** page of the web application.
 
 ### Options
 
@@ -89,6 +89,10 @@ The stack defined in the `docker-compose.yaml` file has been succesfully tested 
 - `scheduling_interval`: `4`
 - `scheduling_period`: `hours` or `minutes`
 
+**HTTP server port**
+> You can change the port used by the custom HTTP server used to serve the final valid XML rewritten feed
+
+- `http_server_port`: `8001`
 
 **Deploy**
 > You can publish the final generated XML feed to your own GitHub or GitLab repository.
