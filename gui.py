@@ -368,6 +368,7 @@ if selected_option == "Introduction":
         <li><b>Configuration</b>: Set up and save your RSS feeds and processing options.</li>
         <li><b>Run Scripts</b>: Execute various processing scripts like <code>main.py</code>, <code>llm_processor.py</code>, and <code>json2rss.py</code> with just one click.</li>
         <li><b>View and Serve XML</b>: View the content of the XML feed and serve it via a custom HTTP server.</li>
+        <li><b>Deploy</b>: Deploy the generated uglyfeed.xml file to GitHub and GitLab.</li>
         <li><b>Debug</b>: View detailed debug information for troubleshooting.</li>
     </ul>
     <p style="font-size: 16px; line-height: 1.6;">
