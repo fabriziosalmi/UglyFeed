@@ -80,6 +80,9 @@ scheduling_enabled: true
 scheduling_interval: 4
 scheduling_period: hours
 
+## Custom HTTP server port
+http_server_port: 8001
+
 ## deploy
 github_token: "your_github_token"
 gitlab_token: "your_gitlab_token"
