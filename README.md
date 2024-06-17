@@ -85,6 +85,24 @@ Feel free to open issues or submit pull requests. Any contributions are welcome!
 
 [![Pylint](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml)
 
+## Roadmap
+
+> I started this project a month ago to experiment, get fun, learn and contribute to the open source community. Never planned to extend with UI nor to deliver a python package which is close to be released. I am so grateful to those who already made me empowering this pathway in a so short timeframe 🙏
+
+Here some improvements I am still working on:
+
+- make UglyFeed a python package too for easier automation and integration on existing pipelines and applications
+- modularize, simplify and improve content filters (not just to moderate incoming content but also to get additional fun)
+- improve/fix similarity logic
+- extend to more LLM apis
+- extend to get not only RSS easy way (minimal and basic. I use RSSHub, which is a super software, then no wheel invention recursion needed but something out of the box is needed for those who prefer less stuff to configure/manage)
+- complete the configuration logic with env vars for easier docker run
+- extend to generate rewritten HTML from JSON with theme support
+- extend to generate media from processed content
+- deploy to telegram, gotify, ntfy
+- improve/fix debug page
+- here something i forgot 😅
+
 ## Disclaimer
 
 > _It is crucial to acknowledge the potential misuse of AI language models by this tool. The use of adversarial prompts and models can easily lead to the creation of misleading content. This application should not be used with the intent to deceive or mislead others. Be a responsible user and prioritize ethical practices when utilizing language models and AI technologies._
