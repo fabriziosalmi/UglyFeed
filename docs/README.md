@@ -12,7 +12,7 @@ cd UglyFeed
 streamlit run gui.py --server.address 0.0.0.0
 ```
 
-If you want to disable streamlit telemetry just run this command: 
+If you want to disable Streamlit telemetry just run this command: 
 
 `streamlit run gui.py --server.address 0.0.0.0 --browser.gatherUsageStats false`
 
@@ -45,26 +45,28 @@ The stack defined in the `docker-compose.yaml` file has been succesfully tested 
 **Similarity**
 > For a general use the default values seems to be a good fit to aggressively filter out some noise. To increase items count try to reduce min_samples to 2 and play around eps and similarity.
 
-- `similarity_threshold` (range: 0-1)
-- `min_samples` (Minimum number of samples in a cluster for DBSCAN)
-- `eps` (Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN)
+- `similarity_threshold` (range: 0-1, example: `0.5`)
+- `min_samples` (Minimum number of samples in a cluster for DBSCAN, example: `3`)
+- `eps` (Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN, example: `0.65`)
 
 **LLM API and model**
-> You can use OpenAI API, Groq API or Ollama API, not multiple at the same time.
-
+> You can use OpenAI API, Groq API or Ollama API:
 
 - `selected_api` (Active API can be `OpenAI`, `Groq`, or `Ollama`)
-- `openai_api_url` (OpenAI API endpoint)
+
+- `openai_api_url` (OpenAI API chat completions endpoint)
 - `openai_api_key` (OpenAI API key) 
 - `openai_model` (OpenAI [models](https://platform.openai.com/docs/models))
-- `groq_api_url` (Groq API endpoint)
+
+- `groq_api_url` (Groq API OpenAI compatible chat completion endpoint)
 - `groq_api_key` (Groq API key)
 - `groq_model` (Groq [models](https://console.groq.com/docs/models)) 
+
 - `ollama_api_url` (Ollama API endpoint)
 - `ollama_model` (Ollama [models](https://platform.openai.com/docs/models)) 
 
 **Instructions/role/prompt**
-> You can force the LLM to translate, aggregate, summarize, extend, say the oppposite or any creative mix you can imagine, just test it to fit to your own needs. If you need some ideas check the [prompts folder](https://github.com/fabriziosalmi/UglyFeed/tree/main/prompts)
+> You can force the LLM to translate, aggregate, summarize, extend, say the opposite or any other creative mix you can imagine, just test it against a bunch of source feeds to fit to your own needs. If you need some ideas check the [prompts folder](https://github.com/fabriziosalmi/UglyFeed/tree/main/prompts)
 
 - `content_prefix` (prompt to be used as instruction for the rewriting process)
 
@@ -109,5 +111,5 @@ The stack defined in the `docker-compose.yaml` file has been succesfully tested 
 ### Use
 
 - Run all main scripts from the `Run scripts` page, feeds items will be aggregated by similarity and rewritten following the LLM instruction/prompt and options. Logs are shown in the page for debugging purposes.
-- Go to the View and Serve XML page where you can view and download the generated XML. You can also enable the HTTP server to have a valid XML URL to use with any RSS reader.
-- Go to the Deploy page to publish the XML to GitHub or GitLab, a public URL you can use with any RSS reader will be returned.
+- You can go to the View and Serve XML page where you can view and download the generated XML. You can also enable the HTTP server to have a valid XML URL to use with any RSS reader.
+- You can go to the Deploy page to publish the XML to GitHub or GitLab, a public URL you can use with any RSS reader will be returned.
