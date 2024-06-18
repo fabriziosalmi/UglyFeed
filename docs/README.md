@@ -1,6 +1,13 @@
 # Documentation
 Welcome to the UglyFeed documentation. This guide provides detailed information to run UglyFeed.
 
+## Installation and run (pip)
+
+You can use UglyFeed also via `pip install uglypy`. 
+
+Users with already in place pipelines can now easily adopt the UglyFeed features. Here the [pypi.org uglypy page](https://pypi.org/project/uglypy/0.0.1/). 
+
+Note that the early version is missing some features.. this will be sorted out very soon :) 
 
 ## Installation and run (without Docker)
 
