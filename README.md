@@ -94,12 +94,12 @@ Here some improvements I am still working on:
 - modularize, simplify and improve content filters (not just to moderate incoming content but also to get additional fun)
 - improve/fix similarity logic
 - extend to more LLM apis
-- extend to get not only RSS easy way (minimal and basic. I use RSSHub, which is a super software, then no wheel invention recursion needed but something out of the box is needed for those who prefer less stuff to configure/manage)
+- extend to get not only RSS
 - complete the configuration logic with env vars for easier docker run
-- extend to generate rewritten HTML from JSON with theme support
-- extend to generate media from processed content
-- deploy to telegram, gotify, ntfy
+- extend to generate HTML/media from rewritten JSON with themes/styles
 - improve/fix debug page
+- add tests
+- overall code improvements
 - here something i forgot 😅
 
 ## Disclaimer
