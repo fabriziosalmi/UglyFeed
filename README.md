@@ -17,6 +17,7 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - 🌎 Deploy XML feed to GitHub or GitLab
 - 📈 Evaluate generated content
 - 🖥️ Web UI based on Streamlit
+- 👨‍💻 pip installable package
 
 **Requirements**
 - 🐍 Python
@@ -62,6 +63,7 @@ Once all scripts completed go to the **Deploy** page where you can push the fina
 
 Please refer to the extended [documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md) to better understand how to get the best from this application.
 
+
 ## Use cases
 
 The project can be easily customized to fit several use cases:
@@ -89,7 +91,6 @@ Feel free to open issues or submit pull requests. Any contributions are welcome!
 
 Here some improvements I am still working on:
 
-- make UglyFeed a python package too for easier automation and integration on existing pipelines and applications
 - modularize, simplify and improve content filters (not just to moderate incoming content but also to get additional fun)
 - improve/fix similarity logic
 - extend to more LLM apis
