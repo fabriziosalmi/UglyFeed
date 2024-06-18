@@ -76,8 +76,6 @@ The project can be easily customized to fit several use cases:
 - **Creative Writing Assistance**: Assist writers by generating rewritten drafts of their work, helping overcome writer's block and sparking new ideas.
 - **Content Repurposing**: Transform long-form content into shorter, more digestible formats like infographics, slideshows, and social media snippets.
 - **Fake News Detection Datasets**: Generate datasets by rewriting news articles for use in training models to recognize and combat fake news.
-- **Image Captioning**: Integrate with image recognition systems to create engaging and accurate descriptions for images.
-- **AI-Driven Research Companions**: Develop virtual research assistants that can provide concise summaries and save time.
 
 ## Contribution
 
