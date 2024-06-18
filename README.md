@@ -52,10 +52,10 @@ In the **Configuration** page (or by manually editing the `config.yaml` file) yo
 Execute all scripts in the **Run scripts** page easily by clicking on the button **Run `main.py`, `llm_processor.py`, `json2rss.py` sequentially**.
 You can check for logs, errors and informational messages.
 
-### Get the final rewritten XML feed
+### Serve the final rewritten XML feed via HTTP
 Once all scripts completed go to the **View and Serve XML** page where you can view and download the generated XML feed. If you start the HTTP server you can access to the XML url at `http://container_ip:8001/uglyfeed.xml`
 
-### Deploy the final rewritten XML feed
+### Deploy the final rewritten XML feed to GitHub/GitLab
 Once all scripts completed go to the **Deploy** page where you can push the final rewritten XML file to the configured GitHub/GitLab repository, the public XML URL to use by RSS readers is returned for each enabled platform.
 
 ## Documentation
