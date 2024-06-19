@@ -17,15 +17,15 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - 🌎 Deploy XML feed to GitHub or GitLab
 - 📈 Evaluate generated content
 - 🖥️ Web UI based on Streamlit
-- 👨‍💻 [Docker installable package](https://hub.docker.com/r/fabriziosalmi/uglyfeed)
-- 👨‍💻 [Pip installable package](https://pypi.org/project/uglypy/)
-- 👨‍💻 [Github action available](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-8b-8192.yml)
-- 👨‍💻 [RSS test feeds available](https://github.com/fabriziosalmi/uglyfeed-cdn)
+- 🐳 [Docker installable package](https://hub.docker.com/r/fabriziosalmi/uglyfeed)
+- 🐍 [Pip installable package](https://pypi.org/project/uglypy/)
+- ⚙️ [Github action workflow available](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-8b-8192.yml)
+- 📰 [RSS test feeds available](https://github.com/fabriziosalmi/uglyfeed-cdn)
 
 **Requirements**
 - 🐍 Python
 - 🌎 Internet connection
-- 📰 [an RSS reader](https://github.com/topics/rss-reader) (to retrieve the final feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on laptop and [NetNewsWire](https://netnewswire.com/) on mobile)
+- 📲 [an RSS reader](https://github.com/topics/rss-reader) (to retrieve the final feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on laptop and [NetNewsWire](https://netnewswire.com/) on mobile)
 - 🤖 a large language model
 
 **Supported API and models**
