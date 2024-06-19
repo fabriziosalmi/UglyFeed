@@ -3,8 +3,8 @@ Welcome to the UglyFeed documentation. This guide provides detailed information 
 
 ## Installation and automated runs (GitHub Actions)
 
-You can use UglyFeed repo as GitHub action application source and you own repository as XML CDN, a file named uglyfeed.xml will be saved to your own repository once a day 🥳
-This means that you don't need to install and run anything on yout computer, saving time and space 👾
+You can use UglyFeed repo as GitHub action application source and you own repository as XML CDN, a file named uglyfeed.xml will be saved to your own repository once a day. 
+You don't need to install and run anything on your computer, just copy and configure actions to fit your own needs. _I'll add more actions in the next days to cover popular setups_.
 
 Available actions:
 
