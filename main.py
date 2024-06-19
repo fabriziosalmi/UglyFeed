@@ -28,21 +28,28 @@ def ensure_directory_exists(directory: str) -> None:
         logging.info(f"Creating missing directory: {directory}")
         os.makedirs(directory)
 
-def merge_configs(default_config, env_config, cli_config):
-    """Merge configurations with priority: CLI > ENV > default (YAML)."""
-    merged_config = default_config.copy()
+def get_env_variable(key, default=None):
+    """Retrieve environment variable or use default if not set."""
+    value = os.getenv(key.upper(), default)
+    if value is None:
+        logging.info(f"Environment variable {key.upper()} is not set; using default value.")
+    return value
+
+def merge_configs(yaml_config, env_config, cli_config):
+    """Merge configurations with priority: CLI > ENV > YAML."""
+    final_config = yaml_config.copy()
     
     # Update with environment variables if they are set
     for key, value in env_config.items():
         if value is not None:
-            merged_config[key] = value
+            final_config[key] = value
 
     # Update with command-line arguments if they are set
     for key, value in cli_config.items():
         if value is not None:
-            merged_config[key] = value
+            final_config[key] = value
 
-    return merged_config
+    return final_config
 
 def main(config: dict) -> None:
     """Main function to process RSS feeds and group similar articles."""
@@ -121,14 +128,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Load default configuration from the YAML file
-    config = load_config(args.config)
+    yaml_config = load_config(args.config)
 
     # Override with environment variables if they exist
     env_config = {
-        'similarity_threshold': float(os.getenv('SIMILARITY_THRESHOLD', config.get('similarity_threshold'))),
-        'min_samples': int(os.getenv('MIN_SAMPLES', config.get('similarity_options', {}).get('min_samples', None))),
-        'eps': float(os.getenv('EPS', config.get('similarity_options', {}).get('eps', None))),
-        'output_folder': os.getenv('OUTPUT_FOLDER', config.get('folders', {}).get('output_folder', 'output'))
+        'similarity_threshold': float(get_env_variable('SIMILARITY_THRESHOLD', yaml_config.get('similarity_threshold'))),
+        'min_samples': int(get_env_variable('MIN_SAMPLES', yaml_config.get('similarity_options', {}).get('min_samples', None))),
+        'eps': float(get_env_variable('EPS', yaml_config.get('similarity_options', {}).get('eps', None))),
+        'output_folder': get_env_variable('OUTPUT_FOLDER', yaml_config.get('folders', {}).get('output_folder', 'output'))
     }
 
     # Override with command-line arguments if provided
@@ -140,7 +147,7 @@ if __name__ == "__main__":
     }
 
     # Merge all configurations with priority: CLI > ENV > YAML
-    final_config = merge_configs(config, env_config, cli_config)
+    final_config = merge_configs(yaml_config, env_config, cli_config)
 
     # Update config dictionary with merged options
     if 'similarity_options' not in final_config:
