@@ -17,7 +17,8 @@ UglyFeed is a **simple** Python application designed to **retrieve**, **aggregat
 - 🌎 Deploy XML feed to GitHub or GitLab
 - 📈 Evaluate generated content
 - 🖥️ Web UI based on Streamlit
-- 👨‍💻 pip installable package
+- 👨‍💻 Pip installable package
+- 👨‍💻 Github action available
 
 **Requirements**
 - 🐍 Python
