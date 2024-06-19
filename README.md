@@ -89,7 +89,7 @@ Feel free to open issues or submit pull requests. Any contributions are welcome!
 
 ## Roadmap
 
-> I started this project a month ago to experiment, get fun, learn and contribute to the open source community in my free time. I am so grateful to those who already made me empowering this pathway in a so short timeframe 🙏
+> I started this project a month ago to experiment, get fun, learn and contribute to the open source community on my free time. I am so grateful to those who already made me empowering this pathway in a so short timeframe 🙏
 
 Here some improvements I am still working on:
 
