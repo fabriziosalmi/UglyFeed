@@ -1,6 +1,16 @@
 # Documentation
 Welcome to the UglyFeed documentation. This guide provides detailed information to run UglyFeed.
 
+## Installation and automated runs (GitHub Actions)
+
+You can use UglyFeed repo as GitHub action application source and you own repository as XML CDN, a file named uglyfeed.xml will be saved to your own repository once a day 🥳
+This means that you don't need to install and run anything on yout computer, saving time and space 👾
+
+Available actions:
+
+- [Daily delivery via Groq and llama3-8b-8192](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-8b-8192.yml)
+
+
 ## Installation (pip)
 
 You can use UglyFeed also via `pip install uglypy`. Users with already in place pipelines can now easily adopt the UglyFeed features. Here the [pypi.org uglypy page](https://pypi.org/project/uglypy/0.0.1/), please check the documentation to understand how to run it.
