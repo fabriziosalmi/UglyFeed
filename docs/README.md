@@ -32,11 +32,10 @@ If you want to disable Streamlit telemetry just run this command:
 `streamlit run gui.py --server.address 0.0.0.0 --browser.gatherUsageStats false`
 
 ## Installation and run (with Docker)
-
-To start the UglyFeed app, use the following `docker run` command:
+Populate config.yaml and feeds.txt with your own settings and mount such files in the container. To start the UglyFeed app, use the following `docker run` command:
 
 ```bash
-docker run -p 8001:8001 -p 8501:8501 fabriziosalmi/uglyfeed:latest
+docker run -p 8001:8001 -p 8501:8501 -v /path/to/local/feeds.txt:/app/input/feeds.txt -v /path/to/local/config.yaml:/app/config.yaml fabriziosalmi/uglyfeed:latest
 ```
 
 ## Installation and run (Docker Compose)
