@@ -16,7 +16,7 @@ preprocessing:
 
 vectorization:
   method: "tfidf"  # Options: 'tfidf', 'count', 'hashing'
-  ngram_range: [1, 2]  # Convert from tuple to list
+  ngram_range: !!python/tuple [1, 2]  # Use YAML tag to indicate a tuple
   max_df: 0.85
   min_df: 0.01
   max_features: 5000  # Limit the number of features to reduce memory usage
