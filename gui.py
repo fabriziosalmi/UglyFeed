@@ -388,6 +388,44 @@ elif selected_option == "Configuration":
 
     st.divider()
 
+    # Preprocessing Options
+    st.subheader("Preprocessing Options")
+    st.session_state.config_data['preprocessing']['remove_html'] = st.checkbox("Remove HTML Tags", value=st.session_state.config_data['preprocessing']['remove_html'])
+    st.session_state.config_data['preprocessing']['lowercase'] = st.checkbox("Convert to Lowercase", value=st.session_state.config_data['preprocessing']['lowercase'])
+    st.session_state.config_data['preprocessing']['remove_punctuation'] = st.checkbox("Remove Punctuation", value=st.session_state.config_data['preprocessing']['remove_punctuation'])
+    st.session_state.config_data['preprocessing']['lemmatization'] = st.checkbox("Apply Lemmatization", value=st.session_state.config_data['preprocessing']['lemmatization'])
+    st.session_state.config_data['preprocessing']['stop_words'] = st.text_input("Stop Words Language", st.session_state.config_data['preprocessing']['stop_words'])
+    st.session_state.config_data['preprocessing']['use_stemming'] = st.checkbox("Use Stemming", value=st.session_state.config_data['preprocessing']['use_stemming'])
+
+    # Handle additional stopwords input and splitting
+    additional_stopwords = ", ".join(st.session_state.config_data['preprocessing']['additional_stopwords'])
+    additional_stopwords_input = st.text_input("Additional Stopwords (comma separated)", additional_stopwords).strip()
+    st.session_state.config_data['preprocessing']['additional_stopwords'] = [word.strip() for word in additional_stopwords_input.split(",") if word.strip()]
+
+    st.session_state.config_data['preprocessing']['min_word_length'] = st.number_input("Minimum Word Length", min_value=1, value=st.session_state.config_data['preprocessing']['min_word_length'])
+
+    st.divider()
+
+    # Vectorization Options
+    st.subheader("Vectorization Options")
+    vectorization_methods = ["tfidf", "count", "hashing"]
+    selected_method = st.selectbox("Vectorization Method", vectorization_methods, index=vectorization_methods.index(st.session_state.config_data['vectorization']['method']))
+    st.session_state.config_data['vectorization']['method'] = selected_method
+
+    # Ensure ngram_range is handled as a list of two elements
+    ngram_range = st.session_state.config_data['vectorization']['ngram_range']
+    if isinstance(ngram_range, list) and len(ngram_range) == 2:
+        st.session_state.config_data['vectorization']['ngram_range'] = st.slider("N-gram Range", 1, 5, (ngram_range[0], ngram_range[1]))
+    else:
+        st.session_state.config_data['vectorization']['ngram_range'] = st.slider("N-gram Range", 1, 5, (1, 2))
+
+    st.session_state.config_data['vectorization']['max_df'] = st.slider("Max Document Frequency (max_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['max_df'])
+    st.session_state.config_data['vectorization']['min_df'] = st.slider("Min Document Frequency (min_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['min_df'])
+    st.session_state.config_data['vectorization']['max_features'] = st.number_input("Max Features", min_value=1, value=st.session_state.config_data['vectorization']['max_features'])
+
+
+    st.divider()
+
     st.subheader("RSS Feed Details")
     st.session_state.config_data['feed_title'] = st.text_input("Feed Title", st.session_state.config_data['feed_title'])
     st.session_state.config_data['feed_link'] = st.text_input("Feed Link", st.session_state.config_data['feed_link'])
