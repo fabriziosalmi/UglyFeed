@@ -1,14 +1,19 @@
-name: uglyfeed
+version: '3.8'
+
 services:
-    uglyfeed:
-        ports:
-            - 8001:8001
-            - 8501:8501
-        container_name: uglyfeed
-        networks:
-            - uglyfeed
-        image: fabriziosalmi/uglyfeed:latest
+  uglyfeed:
+    image: fabriziosalmi/uglyfeed:latest
+    ports:
+      - "8001:8001"
+      - "8501:8501"
+    volumes:
+      - /path/to/local/feeds.txt:/app/input/feeds.txt
+      - /path/to/local/config.yaml:/app/config.yaml
+    container_name: uglyfeed
+    networks:
+      - uglyfeed_network
+
 networks:
-    uglyfeed:
-        external: true
-        name: uglyfeed
+  uglyfeed_network:
+    external:
+      name: uglyfeed
