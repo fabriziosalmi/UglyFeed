@@ -1,15 +1,28 @@
-## similarity_checker.py settings
-
-# Similarity configuration settings
+# Similarity configuration settings (similarity_checker.py)
 similarity_threshold: 0.66
 similarity_options:
-  min_samples: 2    # Minimum number of samples in a cluster for DBSCAN
-  eps: 0.66       # Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN
+  eps: 0.66                  # Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN
+  min_samples: 2            # Minimum number of samples in a cluster for DBSCAN
+
+preprocessing:
+  remove_html: true
+  lowercase: true
+  remove_punctuation: true
+  lemmatization: true
+  stop_words: "italian"
+  use_stemming: false
+  additional_stopwords: ["specific", "words"]
+  min_word_length: 3
+
+vectorization:
+  method: "tfidf"  # Options: 'tfidf', 'count', 'hashing'
+  ngram_range: [1, 2]
+  max_df: 0.85
+  min_df: 0.01
+  max_features: 5000  # Limit the number of features to reduce memory usage
   
 
-## llm_processor.py settings
-
-# API configuration settings
+# API configuration settings (llm_processor.py)
 # Only one API configuration should be active at any time.
 api_config:
   selected_api: "Groq"  # Active API can be "OpenAI", "Groq", or "Ollama"
@@ -59,11 +72,8 @@ content_prefix: >
 #  Pay particular attention to narrative cohesion and detail accuracy.
 #  Summarize the information if necessary, always maintaining quality and relevance. 
 #  The generated content must be in English.
-    
 
-## json2rss.py settings
-
-# Limit settings for content retrieval and processing
+# Limit settings for content retrieval and processing (json2rss.py)
 max_items: 50          # Maximum number of items to process
 max_age_days: 10       # Maximum age of items in days to be considered
 feed_title: "UglyFeed RSS"
@@ -83,7 +93,7 @@ scheduling_period: hours
 ## Custom HTTP server port
 http_server_port: 8001
 
-## deploy
+## deploy (deploy_xml.py)
 github_token: "your_github_token"
 gitlab_token: "your_gitlab_token"
 github_repo: "your_github_username/uglyfeed-cdn"
