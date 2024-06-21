@@ -45,7 +45,7 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 To start the UglyFeed app, use the following `docker run` command:
 
 ```bash
-docker run -p 8001:8001 -p 8501:8501 fabriziosalmi/uglyfeed:latest
+docker run -p 8001:8001 -p 8501:8501 -v /path/to/local/feeds.txt:/app/input/feeds.txt -v /path/to/local/config.yaml:/app/config.yaml fabriziosalmi/uglyfeed:latest
 ```
 
 ### Configure the application
