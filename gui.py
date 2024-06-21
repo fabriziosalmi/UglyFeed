@@ -383,7 +383,7 @@ elif selected_option == "Configuration":
 
     st.divider()
 
-    st.subheader("RSS Feeds")
+    st.subheader("Source RSS Feeds")
     st.session_state.feeds = st.text_area("Enter one RSS feed URL per line:", st.session_state.feeds)
 
     st.divider()
@@ -422,19 +422,6 @@ elif selected_option == "Configuration":
     st.session_state.config_data['vectorization']['max_df'] = st.slider("Max Document Frequency (max_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['max_df'])
     st.session_state.config_data['vectorization']['min_df'] = st.slider("Min Document Frequency (min_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['min_df'])
     st.session_state.config_data['vectorization']['max_features'] = st.number_input("Max Features", min_value=1, value=st.session_state.config_data['vectorization']['max_features'])
-
-
-    st.divider()
-
-    st.subheader("RSS Feed Details")
-    st.session_state.config_data['feed_title'] = st.text_input("Feed Title", st.session_state.config_data['feed_title'])
-    st.session_state.config_data['feed_link'] = st.text_input("Feed Link", st.session_state.config_data['feed_link'])
-    st.session_state.config_data['feed_description'] = st.text_input("Feed Description", st.session_state.config_data['feed_description'])
-    st.session_state.config_data['feed_language'] = st.text_input("Feed Language", st.session_state.config_data['feed_language'])
-    st.session_state.config_data['feed_self_link'] = st.text_input("Feed Self-Link", st.session_state.config_data['feed_self_link'])
-    st.session_state.config_data['author'] = st.text_input("Author", st.session_state.config_data['author'])
-    st.session_state.config_data['category'] = st.text_input("Category", st.session_state.config_data['category'])
-    st.session_state.config_data['copyright'] = st.text_input("Copyright", st.session_state.config_data['copyright'])
 
     st.divider()
 
@@ -475,6 +462,18 @@ elif selected_option == "Configuration":
 
     st.divider()
 
+    st.subheader("RSS Feed Details")
+    st.session_state.config_data['feed_title'] = st.text_input("Feed Title", st.session_state.config_data['feed_title'])
+    st.session_state.config_data['feed_link'] = st.text_input("Feed Link", st.session_state.config_data['feed_link'])
+    st.session_state.config_data['feed_description'] = st.text_input("Feed Description", st.session_state.config_data['feed_description'])
+    st.session_state.config_data['feed_language'] = st.text_input("Feed Language", st.session_state.config_data['feed_language'])
+    st.session_state.config_data['feed_self_link'] = st.text_input("Feed Self-Link", st.session_state.config_data['feed_self_link'])
+    st.session_state.config_data['author'] = st.text_input("Author", st.session_state.config_data['author'])
+    st.session_state.config_data['category'] = st.text_input("Category", st.session_state.config_data['category'])
+    st.session_state.config_data['copyright'] = st.text_input("Copyright", st.session_state.config_data['copyright'])
+
+    st.divider()
+    
     st.subheader("Scheduling Options")
     scheduling_enabled = st.session_state.config_data.get('scheduling_enabled', False)
     st.session_state.config_data['scheduling_enabled'] = st.checkbox("Enable Scheduled Execution", value=scheduling_enabled)
