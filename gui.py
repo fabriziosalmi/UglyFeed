@@ -411,14 +411,6 @@ elif selected_option == "Configuration":
     vectorization_methods = ["tfidf", "count", "hashing"]
     selected_method = st.selectbox("Vectorization Method", vectorization_methods, index=vectorization_methods.index(st.session_state.config_data['vectorization']['method']))
     st.session_state.config_data['vectorization']['method'] = selected_method
-
-    # Ensure ngram_range is handled as a list of two elements
-    ngram_range = st.session_state.config_data['vectorization']['ngram_range']
-    if isinstance(ngram_range, list) and len(ngram_range) == 2:
-        st.session_state.config_data['vectorization']['ngram_range'] = st.slider("N-gram Range", 1, 5, (ngram_range[0], ngram_range[1]))
-    else:
-        st.session_state.config_data['vectorization']['ngram_range'] = st.slider("N-gram Range", 1, 5, (1, 2))
-
     st.session_state.config_data['vectorization']['max_df'] = st.slider("Max Document Frequency (max_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['max_df'])
     st.session_state.config_data['vectorization']['min_df'] = st.slider("Min Document Frequency (min_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['min_df'])
     st.session_state.config_data['vectorization']['max_features'] = st.number_input("Max Features", min_value=1, value=st.session_state.config_data['vectorization']['max_features'])
