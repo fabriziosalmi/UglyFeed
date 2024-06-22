@@ -63,6 +63,26 @@ The stack defined in the `docker-compose.yaml` file has been succesfully tested 
 - `min_samples` (Minimum number of samples in a cluster for DBSCAN, example: `3`)
 - `eps` (Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN, example: `0.65`)
 
+**Preprocessing**
+> Control text preprocessing steps before feeding into the system:
+
+- `remove_html` (example: `true`): Remove HTML tags from the text.
+- `lowercase` (example: `true`): Convert all text to lowercase.
+- `remove_punctuation` (example: `true`): Remove punctuation from the text.
+- `lemmatization` (example: `true`): Apply lemmatization to reduce words to their base form.
+- `stop_words` (example: `italian`): Language for stop words removal.
+- `use_stemming` (example: `false`): Apply stemming to reduce words to their root form.
+- `additional_stopwords` (example: `["specific", "words"]`): Additional specific words to remove from the text.
+- `min_word_length` (example: `3`): Minimum length of words to keep.
+
+**Vectorization**
+> Define how text is converted into numerical vectors:
+
+- `method` (example: `tfidf`): Vectorization method, options include `tfidf`, `count`, or `hashing`.
+- `max_df` (example: `0.85`): Maximum document frequency to filter out terms that are too common.
+- `min_df` (example: `0.01`): Minimum document frequency to filter out terms that are too rare.
+- `max_features` (example: `5000`): Maximum number of features to retain in the vectorized representation.
+
 **LLM API and model**
 > You can use OpenAI API, Groq API or Ollama API:
 
