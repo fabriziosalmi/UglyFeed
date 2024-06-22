@@ -2,9 +2,13 @@
 
 UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **filter**, **rewrite**, **evaluate** and **serve** content (RSS feeds) written by a large language model. This repository provides the code, the **[documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md)** and all necessary files to run the application.
 
+![GitHub last commit](https://img.shields.io/github/last-commit/fabriziosalmi/UglyFeed) [![Pylint](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml) [![CodeQL](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql) ![Docker Pulls](https://img.shields.io/docker/pulls/fabriziosalmi/uglyfeed) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-raw/fabriziosalmi/UglyFeed) ![PyPI - Downloads](https://img.shields.io/pypi/dm/uglypy?label=uglypy)
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/docs/UglyFeed.png" alt="UglyFeed" height="64" style="">
 </p>
+
+
 
 ## Features
 
@@ -84,10 +88,6 @@ The project can be easily customized to fit several use cases:
 ## Contribution
 
 Feel free to open issues or submit pull requests. Any contributions are welcome!
-
-[![Pylint](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml) [![CodeQL](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql) ![Docker Pulls](https://img.shields.io/docker/pulls/fabriziosalmi/uglyfeed) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-raw/fabriziosalmi/UglyFeed) ![PyPI - Downloads](https://img.shields.io/pypi/dm/uglypy?label=uglypy)
-
-
 
 
 ## Roadmap
