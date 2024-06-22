@@ -24,16 +24,77 @@ def generate_title(articles: List[Dict]) -> str:
     common_words = [word for word, count in word_counts.most_common(10) if len(word) > 3][:3]
     return ' '.join(common_words)
 
-def calculate_similarity(articles: List[Dict]) -> float:
-    """Calculate the average pairwise cosine similarity of articles."""
-    if len(articles) <= 1:
+def calculate_similarity(articles: List[Dict],
+                         ngram_range: tuple = (1, 1),
+                         min_df: int = 1,
+                         max_df: float = 1.0,
+                         max_features: int = None,
+                         stop_words: List[str] = None) -> float:
+    """
+    Calculate the average pairwise cosine similarity of articles.
+
+    Parameters:
+        articles (List[Dict]): List of articles, each with 'title' and 'content'.
+        ngram_range (tuple): The range of n-values for different n-grams to be extracted. Defaults to (1, 1).
+        min_df (int): Minimum document frequency for terms. Defaults to 1.
+        max_df (float): Maximum document frequency for terms. Defaults to 1.0.
+        max_features (int): Maximum number of features to consider. Defaults to None (consider all features).
+        stop_words (List[str]): List of words to be ignored in the TF-IDF vectorization. Defaults to None.
+
+    Returns:
+        float: The average pairwise cosine similarity.
+    """
+    num_articles = len(articles)
+
+    if num_articles <= 1:
+        logging.info("Insufficient articles for similarity calculation.")
         return 0.0
-    texts = [f"{article['title']} {article['content']}" for article in articles]
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(texts)
-    cosine_sim_matrix = cosine_similarity(tfidf_matrix)
-    num_comparisons = len(articles) * (len(articles) - 1) / 2
-    return np.tril(cosine_sim_matrix, -1).sum() / num_comparisons if num_comparisons > 0 else 0.0
+
+    try:
+        # Combine titles and content for each article to form the text corpus
+        texts = [f"{article['title']} {article['content']}" for article in articles]
+
+        # Create the TF-IDF vectorizer with specified parameters and transform the texts
+        vectorizer = TfidfVectorizer(
+            ngram_range=ngram_range,
+            min_df=min_df,
+            max_df=max_df,
+            max_features=max_features,
+            stop_words=stop_words
+        )
+        tfidf_matrix = vectorizer.fit_transform(texts)
+
+        # Check if the TF-IDF matrix is empty
+        if tfidf_matrix.shape[0] == 0 or tfidf_matrix.shape[1] == 0:
+            logging.warning("TF-IDF matrix is empty, returning zero similarity.")
+            return 0.0
+
+        # Compute the cosine similarity matrix
+        cosine_sim_matrix = cosine_similarity(tfidf_matrix, dense_output=False)
+
+        # Extract the lower triangular values excluding the diagonal
+        lower_triangular_indices = np.tril_indices(num_articles, -1)
+        lower_triangular_values = cosine_sim_matrix[lower_triangular_indices]
+
+        num_comparisons = lower_triangular_values.size
+
+        if num_comparisons == 0:
+            logging.info("No valid comparisons found, returning zero similarity.")
+            return 0.0
+
+        # Calculate the mean of the lower triangular values of the cosine similarity matrix
+        average_similarity = lower_triangular_values.mean()
+
+        logging.info("Calculated average similarity: %.4f", average_similarity)
+        return average_similarity
+
+    except Exception as e:
+        logging.error("Error in calculating similarity: %s", e)
+        return 0.0
+
+
+
+
 
 def process_article(article: Dict) -> Dict:
     """Process an article by removing HTML tags and unwanted fields."""
