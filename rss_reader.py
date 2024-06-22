@@ -24,30 +24,34 @@ TAG_RE = re.compile(r"<[^<]+?>")
 def fetch_feeds_from_file(file_path: str) -> List[Dict]:
     """Fetch and parse RSS feeds from a file containing URLs with progress display."""
     articles = []
-    with open(file_path, 'r', encoding='utf-8') as file:
-        urls = [url.strip() for url in file.readlines()]
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            urls = [url.strip() for url in file.readlines()]
 
-    # Streamlit progress bar
-    progress_bar = st.progress(0)
+        # Streamlit progress bar
+        progress_bar = st.progress(0)
 
-    # Function to parse individual feed URLs
-    def parse_feed(url):
-        feed = feedparser.parse(url)
-        return [{
-            'title': entry.title,
-            'content': entry.description if hasattr(entry, 'description') else '',
-            'link': entry.link
-        } for entry in feed.entries]
+        # Function to parse individual feed URLs
+        def parse_feed(url):
+            feed = feedparser.parse(url)
+            return [{
+                'title': entry.title,
+                'content': entry.description if hasattr(entry, 'description') else '',
+                'link': entry.link
+            } for entry in feed.entries]
 
-    # Parallel feed parsing
-    all_articles = Parallel(n_jobs=-1)(delayed(parse_feed)(url) for url in urls)
+        # Parallel feed parsing
+        all_articles = Parallel(n_jobs=-1)(delayed(parse_feed)(url) for url in urls)
 
-    # Flatten list of lists
-    for i, articles_batch in enumerate(all_articles):
-        articles.extend(articles_batch)
-        progress_bar.progress((i + 1) / len(urls))
+        # Flatten list of lists
+        for i, articles_batch in enumerate(all_articles):
+            articles.extend(articles_batch)
+            progress_bar.progress((i + 1) / len(urls))
 
-    logging.info(f"Total articles fetched and parsed: {len(articles)}")
+        logging.info(f"Total articles fetched and parsed: {len(articles)}")
+    except Exception as e:
+        logging.error("Error fetching feeds: %s", e)
+
     return articles
 
 
@@ -75,7 +79,8 @@ def compute_tfidf(texts: List[str], config: Dict[str, Any]) -> np.ndarray:
         'ngram_range': tuple(config.get('ngram_range', [1, 2])),
         'max_df': config.get('max_df', 0.85),
         'min_df': config.get('min_df', 0.01),
-        'max_features': config.get('max_features', None)
+        'max_features': config.get('max_features', None),
+        'stop_words': config.get('stop_words', None)
     }
     vectorizer = TfidfVectorizer(**vectorizer_params)
     return vectorizer.fit_transform(texts)
@@ -83,7 +88,7 @@ def compute_tfidf(texts: List[str], config: Dict[str, Any]) -> np.ndarray:
 
 def calculate_pairwise_similarities(tfidf_matrix: np.ndarray) -> np.ndarray:
     """Calculate the cosine similarity matrix for the TF-IDF matrix."""
-    return cosine_similarity(tfidf_matrix)
+    return cosine_similarity(tfidf_matrix, dense_output=False)
 
 
 def cluster_articles(cosine_sim_matrix: np.ndarray, config: Dict[str, Any]) -> List[int]:
@@ -111,12 +116,12 @@ def merge_cluster_articles(cluster_labels: List[int], articles: List[Dict[str, s
     return merged_texts
 
 
-def calculate_average_similarity(merged_texts: List[str]) -> float:
+def calculate_average_similarity(merged_texts: List[str], config: Dict[str, Any]) -> float:
     """Calculate the average pairwise cosine similarity of merged texts."""
     if len(merged_texts) <= 1:
         return 0.0
 
-    tfidf_matrix = compute_tfidf(merged_texts, config={})
+    tfidf_matrix = compute_tfidf(merged_texts, config)
     cosine_sim_matrix = calculate_pairwise_similarities(tfidf_matrix)
 
     tril_indices = np.tril_indices_from(cosine_sim_matrix, -1)
@@ -158,7 +163,7 @@ def calculate_similarity(articles: List[Dict[str, str]], config: Dict[str, Any])
         merged_texts = merge_cluster_articles(cluster_labels, articles)
 
         # Compute the average similarity of merged texts
-        average_similarity = calculate_average_similarity(merged_texts)
+        average_similarity = calculate_average_similarity(merged_texts, config)
 
         return average_similarity
     except Exception as e:
