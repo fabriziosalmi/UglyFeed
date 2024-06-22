@@ -85,7 +85,8 @@ The project can be easily customized to fit several use cases:
 
 Feel free to open issues or submit pull requests. Any contributions are welcome!
 
-[![Pylint](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml) [![CodeQL](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql) ![Docker Pulls](https://img.shields.io/docker/pulls/fabriziosalmi/uglyfeed) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-raw/fabriziosalmi/UglyFeed)
+[![Pylint](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml) [![CodeQL](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql) ![Docker Pulls](https://img.shields.io/docker/pulls/fabriziosalmi/uglyfeed) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-raw/fabriziosalmi/UglyFeed) ![PyPI - Downloads](https://img.shields.io/pypi/dm/uglypy?label=uglypy)
+
 
 
 
