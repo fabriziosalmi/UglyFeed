@@ -1,310 +1,19 @@
 import streamlit as st
 import os
-import requests
-import psutil
-import subprocess
-import yaml
-import socket
-import shutil
-import threading
-import schedule
-import time
-import xml.etree.ElementTree as ET
-from datetime import datetime
 from pathlib import Path
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+import requests  # To handle HTTP requests
+import psutil  # To get system statistics
+import socket  # To get network information
+import yaml
+from config import load_config, ensure_default_config, save_configuration
+from logging_setup import setup_logging
+from server import toggle_server, copy_xml_to_static, uglyfeed_file  # Import uglyfeed_file here
+from scheduling import start_scheduling, run_scripts_sequentially, job_stats_global
+from script_runner import run_script
+from utils import get_local_ip, find_available_port, get_xml_stats, get_xml_item_count, get_new_item_count
 
-import logging
-import streamlit as st
-
-# Define a custom logging filter
-class LevelFilter(logging.Filter):
-    def __init__(self, level):
-        self.level = level
-    def filter(self, record):
-        return record.levelno >= self.level
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-# Create a stream handler for capturing logs
-info_handler = logging.StreamHandler()
-info_handler.setLevel(logging.INFO)
-info_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-
-# Create another stream handler for error logs
-error_handler = logging.StreamHandler()
-error_handler.setLevel(logging.WARNING)  # Capturing WARNING and above
-error_handler.addFilter(LevelFilter(logging.WARNING))
-error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-
-# Add handlers to the logger
-logger.addHandler(info_handler)
-logger.addHandler(error_handler)
-
-
-
-
-# Define paths
-feeds_path = Path("input/feeds.txt")
-config_path = Path("config.yaml")
-uglyfeeds_dir = Path("uglyfeeds")
-uglyfeed_file = "uglyfeed.xml"
-static_dir = Path(".streamlit") / "static" / "uglyfeeds"
-version_file = Path("version.txt")
-docs_dir = Path("docs")
-
-# Ensure necessary directories and files exist
-os.makedirs("input", exist_ok=True)
-os.makedirs("output", exist_ok=True)
-os.makedirs("rewritten", exist_ok=True)
-os.makedirs(uglyfeeds_dir, exist_ok=True)
-os.makedirs(static_dir, exist_ok=True)
-
-# Global variable to hold job execution stats
-job_stats_global = []
-
-def load_config():
-    """Load existing configuration if available."""
-    if config_path.exists():
-        with open(config_path, "r") as f:
-            return yaml.safe_load(f)
-    return {}
-
-def ensure_default_config(config_data):
-    """Ensure all required keys are in the config_data with default values."""
-    defaults = {
-        'similarity_threshold': 0.66,
-        'similarity_options': {
-            'min_samples': 2,
-            'eps': 0.66
-        },
-        'api_config': {
-            'selected_api': "OpenAI",
-            'openai_api_url': "https://api.openai.com/v1/chat/completions",
-            'openai_api_key': "",
-            'openai_model': "gpt-3.5-turbo",
-            'groq_api_url': "https://api.groq.com/openai/v1/chat/completions",
-            'groq_api_key': "",
-            'groq_model': "llama3-70b-8192",
-            'ollama_api_url': "http://localhost:11434/api/chat",
-            'ollama_model': "phi3"
-        },
-        'folders': {
-            'output_folder': "output",
-            'rewritten_folder': "rewritten"
-        },
-        'content_prefix': "In qualità di giornalista esperto, utilizza un tono professionale, preciso e dettagliato...",
-        'max_items': 50,
-        'max_age_days': 10,
-        'scheduling_enabled': False,
-        'scheduling_interval': 2,
-        'scheduling_period': 'minutes',
-        'feed_title': "UglyFeed RSS",
-        'feed_link': "https://github.com/fabriziosalmi/UglyFeed",
-        'feed_description': "This is a default description for the feed.",
-        'feed_language': "it",
-        'feed_self_link': "https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml",
-        'author': "UglyFeed",
-        'category': "Fun",
-        'copyright': "None",
-        'http_server_port': 8001  # Default server port
-    }
-
-    def recursive_update(d, u):
-        for k, v in u.items():
-            if isinstance(v, dict):
-                d[k] = recursive_update(d.get(k, {}), v)
-            else:
-                d.setdefault(k, v)
-        return d
-
-    return recursive_update(config_data, defaults)
-
-
-
-
-def save_configuration():
-    """Save configuration and feeds to file."""
-    with open(config_path, "w") as f:
-        yaml.dump(st.session_state.config_data, f)
-    with open(feeds_path, "w") as f:
-        f.write(st.session_state.feeds)
-    st.success("Configuration and feeds saved.")
-
-def get_local_ip():
-    """Get the local IP address."""
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-        try:
-            s.connect(('10.254.254.254', 1))
-            local_ip = s.getsockname()[0]
-        except OSError:
-            local_ip = '127.0.0.1'
-    return local_ip
-
-def find_available_port(base_port):
-    """Find an available port starting from a base port."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        while True:
-            try:
-                s.bind(("", base_port))
-                s.close()
-                return base_port
-            except OSError:
-                base_port += 1
-
-def run_script(script_name):
-    """Execute a script and capture its output and errors."""
-    process = subprocess.run(["python", script_name], capture_output=True, text=True)
-    output = process.stdout.strip() if process.stdout else "No output"
-    errors = process.stderr.strip() if process.stderr else "No errors"
-    return output, errors
-
-def run_scripts_sequentially():
-    """Run main.py, llm_processor.py, and json2rss.py sequentially and log their outputs."""
-    global job_stats_global
-    scripts = ["main.py", "llm_processor.py", "json2rss.py"]
-    item_count_before = get_xml_item_count()
-
-    # Prepare containers for output and error logs
-    info_log_content = []
-    error_log_content = []
-
-    for script in scripts:
-        with st.spinner(f"Executing {script}..."):
-            output, errors = run_script(script)
-
-            # Collect logs for Streamlit display
-            info_log_content.append(f"Output of {script}:\n{output}")
-            if errors.strip() and errors != "No errors":
-                error_log_content.append(f"Errors or logs of {script}:\n{errors}")
-
-            # Log output and errors
-            logger.info(f"Output of {script}:\n{output}")
-            if errors.strip() and errors != "No errors":
-                logger.error(f"Errors or logs of {script}:\n{errors}")
-
-            # Display real useful informations in Streamlit text areas
-            st.text_area(f"Output of {script}", errors, height=200)
-
-    new_items = get_new_item_count(item_count_before)
-    job_stats_global.append({
-        'script': ', '.join(scripts),
-        'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'status': 'Success',
-        'new_items': new_items
-    })
-
-
-
-class XMLHTTPRequestHandler(SimpleHTTPRequestHandler):
-    """Custom HTTP handler to serve XML with correct content type and cache headers."""
-    def do_GET(self):
-        if self.path.endswith(".xml"):
-            self.send_response(200)
-            self.send_header("Content-Type", "application/xml")
-            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0")
-            self.end_headers()
-            with open(static_dir / self.path.lstrip('/'), 'rb') as file:
-                self.wfile.write(file.read())
-        else:
-            super().do_GET()
-
-def get_config_value(config, key, default_value):
-    """Get the configuration value from environment variables, config file, or default."""
-    return os.getenv(key.upper(), config.get(key, default_value))
-
-def start_custom_server(port):
-    """Start the HTTP server to serve XML."""
-    server_address = ('', port)
-    httpd = HTTPServer(server_address, XMLHTTPRequestHandler)
-    httpd.serve_forever()
-
-def stop_server():
-    """Stop the HTTP server."""
-    if st.session_state.server_thread and st.session_state.server_thread.is_alive():
-        # Set the server thread to None to signal it should stop
-        st.session_state.server_thread = None
-        st.warning("Server stopped. Please restart the application to stop the server completely.")
-    else:
-        st.info("Server is not running.")
-
-def toggle_server(start):
-    """Toggle the HTTP server on or off."""
-    if start:
-        if st.session_state.server_thread is None or not st.session_state.server_thread.is_alive():
-            # Get the port from the session state, environment variable, or config file
-            port = int(get_config_value(st.session_state.config_data, 'http_server_port', 8001))
-            st.session_state.custom_server_port = port
-            st.session_state.server_thread = threading.Thread(target=start_custom_server, args=(st.session_state.custom_server_port,), daemon=True)
-            st.session_state.server_thread.start()
-            st.success(f"Server started on port {st.session_state.custom_server_port}")
-        else:
-            st.warning("Server is already running.")
-    else:
-        stop_server()
-
-
-def copy_xml_to_static():
-    """Ensure XML is copied to Streamlit static directory."""
-    if uglyfeeds_dir.exists() and (uglyfeeds_dir / uglyfeed_file).exists():
-        destination_path = static_dir / uglyfeed_file
-        shutil.copy(uglyfeeds_dir / uglyfeed_file, destination_path)
-        return destination_path
-    return None
-
-def list_markdown_files(docs_dir):
-    """List all Markdown files in the docs directory."""
-    return [file for file in docs_dir.glob("*.md")]
-
-def get_xml_stats():
-    """Get quick stats from the XML file."""
-    if not (uglyfeeds_dir / uglyfeed_file).exists():
-        return None, None, None
-    tree = ET.parse(uglyfeeds_dir / uglyfeed_file)
-    root = tree.getroot()
-    items = root.findall(".//item")
-    item_count = len(items)
-    last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    return item_count, last_updated, uglyfeeds_dir / uglyfeed_file
-
-def get_xml_item_count():
-    """Get the current count of items in the XML."""
-    if not (uglyfeeds_dir / uglyfeed_file).exists():
-        return 0
-    tree = ET.parse(uglyfeeds_dir / uglyfeed_file)
-    root = tree.getroot()
-    items = root.findall(".//item")
-    return len(items)
-
-def get_new_item_count(old_count):
-    """Calculate the new items count based on the old count."""
-    new_count = get_xml_item_count()
-    if old_count is None or new_count is None:
-        return 0
-    return new_count - old_count
-
-def schedule_jobs(interval, period):
-    """Schedule jobs to run periodically."""
-    def job():
-        run_scripts_sequentially()
-        job_stats_global.append({
-            'script': 'Scheduled Job',
-            'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'status': 'Success'
-        })
-
-    if period == 'minutes':
-        schedule.every(interval).minutes.do(job)
-    elif period == 'hours':
-        schedule.every(interval).hours.do(job)
-    elif period == 'days':
-        schedule.every(interval).days.do(job)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+# Initialize logging
+logger = setup_logging()
 
 # Initialize session state
 if 'config_data' not in st.session_state:
@@ -314,16 +23,21 @@ if 'server_thread' not in st.session_state:
 
 # Load RSS feeds
 if 'feeds' not in st.session_state:
+    st.session_state.feeds = ""
+    feeds_path = Path("input/feeds.txt")
     if feeds_path.exists():
         with open(feeds_path, "r") as f:
             st.session_state.feeds = f.read()
-    else:
-        st.session_state.feeds = ""
+
+# Ensure necessary directories and files exist
+os.makedirs("input", exist_ok=True)
+os.makedirs("output", exist_ok=True)
+os.makedirs("rewritten", exist_ok=True)
+os.makedirs(Path("uglyfeeds"), exist_ok=True)
+os.makedirs(Path(".streamlit") / "static" / "uglyfeeds", exist_ok=True)
 
 # Start scheduling if enabled in the config
-if st.session_state.config_data.get('scheduling_enabled', False):
-    scheduling_thread = threading.Thread(target=schedule_jobs, args=(st.session_state.config_data['scheduling_interval'], st.session_state.config_data['scheduling_period']), daemon=True)
-    scheduling_thread.start()
+start_scheduling(st.session_state.config_data['scheduling_interval'], st.session_state.config_data['scheduling_period'], st.session_state)
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
@@ -346,10 +60,9 @@ st.sidebar.markdown("""
     </a>
     """, unsafe_allow_html=True)
 
-
-# Introduction Page
+# Pages based on the selected option
 if selected_option == "Introduction":
-    # Add title with GitHub icon on the left
+    # Introduction Page content
     st.markdown("""
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
         <img src="https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed.png?raw=true"
@@ -358,7 +71,6 @@ if selected_option == "Introduction":
     </div>
     """, unsafe_allow_html=True)
 
-    # Description with styled markdown
     st.markdown("""
     <p style="font-size: 16px; line-height: 1.6; text-align: justify;">
         This application provides a graphical user interface to manage and process RSS feeds using the UglyFeed project.
@@ -377,8 +89,8 @@ if selected_option == "Introduction":
     </p>
     """, unsafe_allow_html=True)
 
-
 elif selected_option == "Configuration":
+    # Configuration Page content
     st.header("Configuration")
 
     st.divider()
@@ -397,7 +109,6 @@ elif selected_option == "Configuration":
     st.session_state.config_data['preprocessing']['stop_words'] = st.text_input("Stop Words Language", st.session_state.config_data['preprocessing']['stop_words'])
     st.session_state.config_data['preprocessing']['use_stemming'] = st.checkbox("Use Stemming", value=st.session_state.config_data['preprocessing']['use_stemming'])
 
-    # Handle additional stopwords input and splitting
     additional_stopwords = ", ".join(st.session_state.config_data['preprocessing']['additional_stopwords'])
     additional_stopwords_input = st.text_input("Additional Stopwords (comma separated)", additional_stopwords).strip()
     st.session_state.config_data['preprocessing']['additional_stopwords'] = [word.strip() for word in additional_stopwords_input.split(",") if word.strip()]
@@ -465,7 +176,7 @@ elif selected_option == "Configuration":
     st.session_state.config_data['copyright'] = st.text_input("Copyright", st.session_state.config_data['copyright'])
 
     st.divider()
-    
+
     st.subheader("Scheduling Options")
     scheduling_enabled = st.session_state.config_data.get('scheduling_enabled', False)
     st.session_state.config_data['scheduling_enabled'] = st.checkbox("Enable Scheduled Execution", value=scheduling_enabled)
@@ -492,14 +203,13 @@ elif selected_option == "Configuration":
     st.divider()
 
     if st.button("Save Configuration and Feeds"):
-        save_configuration()
+        save_configuration(st.session_state.config_data, st.session_state.feeds)
+        st.success("Configuration and feeds saved successfully!")
 
-
-# Run Scripts Section
 elif selected_option == "Run Scripts":
+    # Run Scripts Page content
     st.header("Run Scripts")
 
-    # Add example text or instructions
     st.markdown("""
     This section allows you to run the necessary scripts to process and generate the RSS feed.
 
@@ -507,17 +217,15 @@ elif selected_option == "Run Scripts":
     - **llm_processor.py** uses the Large Language Model to rewrite and enhance the feed content.
     - **json2rss.py** converts the processed and rewritten JSON data into a valid RSS feed.
 
-    Output and errors are shown for each scripts for debugging purpose.
+    Output and errors are shown for each script for debugging purposes.
 
     """)
 
-    # Run the scripts sequentially
     if st.button("Run main.py, llm_processor.py, and json2rss.py sequentially"):
-        run_scripts_sequentially()
+        run_scripts_sequentially(run_script, get_new_item_count, get_xml_item_count, logger, st)
 
-
-# View and Serve XML Section
 elif selected_option == "View and Serve XML":
+    # View and Serve XML Page content
     st.header("View and Serve XML")
 
     xml_file_path = copy_xml_to_static()
@@ -538,53 +246,44 @@ elif selected_option == "View and Serve XML":
 
         st.subheader("Control HTTP Server for XML Serving")
         if st.button("Start HTTP Server"):
-            toggle_server(True)
+            toggle_server(True, st.session_state.config_data['http_server_port'], st.session_state)
         if st.button("Stop HTTP Server"):
-            toggle_server(False)
+            toggle_server(False, st.session_state.config_data['http_server_port'], st.session_state)
 
         if st.session_state.server_thread and st.session_state.server_thread.is_alive():
             local_ip = get_local_ip()
-            serve_url = f"http://{local_ip}:{st.session_state.custom_server_port}/{uglyfeed_file}"
+            serve_url = f"http://{local_ip}:{st.session_state.config_data['http_server_port']}/{uglyfeed_file}"
             st.markdown(f"**Serving `{uglyfeed_file}` at:**\n\n[{serve_url}]({serve_url})")
         else:
             st.info("Server is not running.")
 
-
-# Import the deploy function from deploy_xml.py
-from deploy_xml import deploy_xml, load_config
-
-# Deploy Section
-if selected_option == "Deploy":
+elif selected_option == "Deploy":
+    # Deploy Page content
     st.header("Deploy XML File")
 
-    # Load configuration
-    config = load_config()
+    from deploy_xml import deploy_xml, load_config
 
+    config = load_config()
     st.write("This section allows you to deploy the `uglyfeed.xml` file to GitHub and GitLab.")
     st.write("Current configuration:")
     st.json(config)
 
-    # Button to start deployment
     if st.button("Deploy to GitHub and GitLab"):
         try:
             with st.spinner("Deploying..."):
-                # Deploy the XML file
                 urls = deploy_xml('uglyfeeds/uglyfeed.xml', config)
-
                 if urls:
                     st.success("Deployment successful!")
                     st.write("File deployed to the following URLs:")
                     for platform, url in urls.items():
                         st.markdown(f"**{platform.capitalize()}**: [View]({url})")
 
-                    # Store the deployment URLs in session state
                     st.session_state['urls'] = urls
                 else:
                     st.warning("No deployments were made. Check if the configuration is correct.")
         except Exception as e:
             st.error(f"An error occurred during deployment: {e}")
 
-    # Display previous deployment status if available
     st.subheader("Previous Deployment Status")
     if 'urls' in st.session_state:
         st.write("Last deployed to the following URLs:")
@@ -593,13 +292,10 @@ if selected_option == "Deploy":
     else:
         st.info("No previous deployments found.")
 
-
-
-# Debug Section
 elif selected_option == "Debug":
+    # Debug Page content
     st.header("Debug")
 
-    # Job Execution Logs
     st.subheader("Job Execution Logs")
     if job_stats_global:
         with st.expander("View Detailed Logs"):
@@ -615,7 +311,6 @@ elif selected_option == "Debug":
     else:
         st.info("No job executions have been recorded yet.")
 
-    # XML File Stats
     st.subheader("XML File Stats")
     item_count, last_updated, xml_path = get_xml_stats()
     if item_count is not None:
@@ -626,7 +321,6 @@ elif selected_option == "Debug":
     else:
         st.warning("No XML file found or file is empty. Please ensure the XML file is generated properly.")
 
-    # Check if HTTP server on port 8001 is running
     st.subheader("HTTP Server Status (Port 8001)")
     try:
         response = requests.get('http://localhost:8001', timeout=5)
@@ -637,7 +331,6 @@ elif selected_option == "Debug":
     except requests.ConnectionError:
         st.error("HTTP server on port 8001 is not running.")
 
-    # System Information
     st.subheader("System Information")
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
@@ -649,23 +342,18 @@ elif selected_option == "Debug":
     st.write(f"**CPU Usage:** `{cpu_usage}%`")
     st.write(f"**Memory Usage:** `{memory_info.percent}%` (Available: `{memory_info.available // (1024 ** 2)} MB`)")
 
-    # Current Configuration
     st.subheader("Current Configuration")
     with st.expander("View Config.yaml Content"):
         st.text_area("Config.yaml Content", yaml.dump(st.session_state.config_data), height=300)
         if st.button("Refresh Configuration"):
-            # Code to refresh configuration can be placed here
-            st.experimental_rerun()  # This will refresh the Streamlit app
+            st.experimental_rerun()
 
-    # Loaded Feeds
     st.subheader("Loaded Feeds")
     with st.expander("View Feeds Content"):
         st.text_area("Feeds Content", st.session_state.feeds, height=200)
         if st.button("Refresh Feeds"):
-            # Code to refresh feeds can be placed here
-            st.experimental_rerun()  # This will refresh the Streamlit app
+            st.experimental_rerun()
 
-    # Download Logs
     st.subheader("Download Logs")
     logs_path = Path('logs.txt')
     if logs_path.exists():
@@ -676,7 +364,6 @@ elif selected_option == "Debug":
     else:
         st.warning("No log file found. Please ensure logs are being recorded properly.")
 
-    # Log Level Slider
     st.subheader("Adjust Log Level")
     log_level = st.select_slider(
         "Select log level",
