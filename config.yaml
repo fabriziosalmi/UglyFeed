@@ -40,11 +40,14 @@ api_config:
   groq_api_key: "your_groq_api_key"
   groq_model: "llama3-8b-8192"
 
+  # anthropic_api_key: "your_anthropic_api_key"
+  # anthropic_api_url: "https://api.anthropic.com/v1/messages"
+  # anthropic_model: "claude-3-haiku-20240307"
+  
   # Ollama API configuration
   # ollama_api_url: "http://localhost:11434/api/chat"
   # ollama_model: "phi3"
-
-
+  
 # Folder configuration settings
 folders:
   output_folder: "output"       # Directory for storing aggregated feeds
