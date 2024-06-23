@@ -36,16 +36,15 @@ jobs:
       - name: Build package
         run: python setup.py sdist bdist_wheel
 
-      - name: Check if important files were changed
-        id: check_important_files
+      - name: List changed files
+        id: list_changed_files
         run: |
-          if git rev-parse HEAD~1 >/dev/null 2>&1; then
-            git diff --name-only HEAD~1 > changed_files.txt
-          else
-            echo "First commit or no previous commit available."
-            echo "setup.py" > changed_files.txt  # Assume changes in important files to trigger the action
-          fi
+          git diff --name-only HEAD~1 > changed_files.txt || echo "setup.py" > changed_files.txt
           cat changed_files.txt
+          echo "CHANGED_FILES=$(cat changed_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
+
+      - name: Check if important files were changed
+        run: |
           if grep -E 'setup.py|requirements.txt|config.py' changed_files.txt; then
             echo "IMPORTANT_FILES_CHANGED=true" >> $GITHUB_ENV
           else
