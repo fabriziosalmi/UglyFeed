@@ -184,19 +184,31 @@ elif selected_option == "Configuration":
     selected_api = st.selectbox("Select API", api_options, index=api_options.index(st.session_state.config_data['api_config']['selected_api']))
     st.session_state.config_data['api_config']['selected_api'] = selected_api
 
+    # Initialize default keys for selected API if not present
     if selected_api == "OpenAI":
+        st.session_state.config_data['api_config'].setdefault('openai_api_url', '')
+        st.session_state.config_data['api_config'].setdefault('openai_api_key', '')
+        st.session_state.config_data['api_config'].setdefault('openai_model', '')
         st.session_state.config_data['api_config']['openai_api_url'] = st.text_input("OpenAI API URL", st.session_state.config_data['api_config']['openai_api_url'])
         st.session_state.config_data['api_config']['openai_api_key'] = st.text_input("OpenAI API Key", st.session_state.config_data['api_config']['openai_api_key'], type="password")
         st.session_state.config_data['api_config']['openai_model'] = st.text_input("OpenAI Model", st.session_state.config_data['api_config']['openai_model'])
     elif selected_api == "Groq":
+        st.session_state.config_data['api_config'].setdefault('groq_api_url', '')
+        st.session_state.config_data['api_config'].setdefault('groq_api_key', '')
+        st.session_state.config_data['api_config'].setdefault('groq_model', '')
         st.session_state.config_data['api_config']['groq_api_url'] = st.text_input("Groq API URL", st.session_state.config_data['api_config']['groq_api_url'])
         st.session_state.config_data['api_config']['groq_api_key'] = st.text_input("Groq API Key", st.session_state.config_data['api_config']['groq_api_key'], type="password")
         st.session_state.config_data['api_config']['groq_model'] = st.text_input("Groq Model", st.session_state.config_data['api_config']['groq_model'])
     elif selected_api == "Anthropic":
+        st.session_state.config_data['api_config'].setdefault('anthropic_api_url', '')
+        st.session_state.config_data['api_config'].setdefault('anthropic_api_key', '')
+        st.session_state.config_data['api_config'].setdefault('anthropic_model', '')
         st.session_state.config_data['api_config']['anthropic_api_url'] = st.text_input("Anthropic API URL", st.session_state.config_data['api_config']['anthropic_api_url'])
         st.session_state.config_data['api_config']['anthropic_api_key'] = st.text_input("Anthropic API Key", st.session_state.config_data['api_config']['anthropic_api_key'])
         st.session_state.config_data['api_config']['anthropic_model'] = st.text_input("Anthropic Model", st.session_state.config_data['api_config']['anthropic_model'])
-    else:
+    elif selected_api == "Ollama":
+        st.session_state.config_data['api_config'].setdefault('ollama_api_url', '')
+        st.session_state.config_data['api_config'].setdefault('ollama_model', '')
         st.session_state.config_data['api_config']['ollama_api_url'] = st.text_input("Ollama API URL", st.session_state.config_data['api_config']['ollama_api_url'])
         st.session_state.config_data['api_config']['ollama_model'] = st.text_input("Ollama Model", st.session_state.config_data['api_config']['ollama_model'])
 
