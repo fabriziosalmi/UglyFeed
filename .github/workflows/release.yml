@@ -25,7 +25,7 @@ jobs:
       - name: Extract version number from setup.py
         id: get_version
         run: |
-          VERSION=$(python -c "import re; version_line = next(line for line in open('setup.py') if line.startswith('    version=')); print(re.search(r'[\"\\\']([^\"\\\']+)[\"\\\']', version_line).group(1))")
+          VERSION=$(python -c "import ast; from pathlib import Path; setup_ast = ast.parse(Path('setup.py').read_text()); version = next(node.value.s for node in ast.walk(setup_ast) if isinstance(node, ast.keyword) and node.arg == 'version'); print(version)")
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Build package
