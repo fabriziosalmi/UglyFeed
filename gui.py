@@ -261,11 +261,27 @@ elif selected_option == "Run Scripts":
     - **json2rss.py** converts the processed and rewritten JSON data into a valid RSS feed.
 
     Output and errors are shown for each script for debugging purposes.
-
     """)
 
     if st.button("Run main.py, llm_processor.py, and json2rss.py sequentially"):
-        run_scripts_sequentially(run_script, get_new_item_count, get_xml_item_count, logger, st)
+        scripts = ["main.py", "llm_processor.py", "json2rss.py"]
+
+        for script in scripts:
+            st.write(f"### Running {script}")
+            output, errors = run_script(script)
+
+            if output:
+                st.subheader("Output:")
+                st.text_area(label="", value=output, height=200)
+
+            if errors:
+                st.subheader("Errors:")
+                st.text_area(label="", value=errors, height=100)
+
+            st.write("---")  # Separator between scripts
+
+
+
 
 
 elif selected_option == "View and Serve XML":
