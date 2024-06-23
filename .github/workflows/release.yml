@@ -22,6 +22,10 @@ jobs:
       - name: Install dependencies
         run: pip install setuptools wheel twine
 
+      - name: Read version number
+        id: get_version
+        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+
       - name: Build package
         run: python setup.py sdist bdist_wheel
 
@@ -64,8 +68,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
+          tag_name: v${{ env.VERSION }}  # Use the version from the VERSION file
+          release_name: Release ${{ env.VERSION }}
           body: |
             ## Changes in this Release
             - Automatically generated release based on the following commit: ${{ github.sha }}
@@ -87,6 +91,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/*.whl
-          asset_name: uglypy-${{ github.run_number }}.whl
+          asset_name: uglypy-${{ env.VERSION }}.whl
           asset_content_type: application/zip
-
