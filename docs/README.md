@@ -1,25 +1,25 @@
 # Documentation
-Welcome to the UglyFeed documentation. This guide provides detailed information to run UglyFeed.
+Welcome to the UglyFeed documentation. This guide provides detailed information on how to run UglyFeed.
 
-## Installation and automated runs (GitHub Actions)
+## Installation and Automated Runs (GitHub Actions)
 
-You can use UglyFeed repo as GitHub action application source and you own repository as XML CDN, a file named uglyfeed.xml will be saved to your own repository once a day. 
-You don't need to install and run anything on your computer, just copy and configure actions to fit your own needs. _I'll add more actions in the next days to cover popular setups_.
+You can use the UglyFeed repository as a GitHub action application source, and your own repository as an XML CDN. A file named `uglyfeed.xml` will be saved to your repository daily. No local installation or execution is required; simply configure the actions to suit your needs. Additional actions will be added soon for popular setups.
 
 Available actions:
 
 - [Daily delivery via Groq and llama3-8b-8192](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-8b-8192.yml)
 
-
 ## Installation (pip)
 
-You can use UglyFeed also via `pip install uglypy`. Users with already in place pipelines can now easily adopt the UglyFeed features. Here the [pypi.org uglypy page](https://pypi.org/project/uglypy/0.0.1/), please check the documentation to understand how to run it.
+UglyFeed can be installed via `pip` using the `uglypy` package. This integration allows users to incorporate UglyFeed features into existing pipelines easily. For more information, visit the [PyPI page for uglypy](https://pypi.org/project/uglypy/0.0.1/). Note that version 0.0.1 may lack some features, which will be added soon.
 
-⚠️ Note that the 0.0.1 version is missing some features, I will add them very soon :) 
+```bash
+pip install uglypy
+```
 
-## Installation and run (without Docker)
+## Installation and Run (Without Docker)
 
-Clone the repository and run the web application:
+To run the UglyFeed web application without Docker, clone the repository and start the application with Streamlit:
 
 ```sh
 git clone https://github.com/fabriziosalmi/UglyFeed.git
@@ -27,20 +27,23 @@ cd UglyFeed
 streamlit run gui.py --server.address 0.0.0.0
 ```
 
-If you want to disable Streamlit telemetry just run this command: 
+To disable Streamlit telemetry, use the following command:
 
-`streamlit run gui.py --server.address 0.0.0.0 --browser.gatherUsageStats false`
+```sh
+streamlit run gui.py --server.address 0.0.0.0 --browser.gatherUsageStats false
+```
 
-## Installation and run (with Docker)
-Populate config.yaml and feeds.txt with your own settings and mount such files in the container. To start the UglyFeed app, use the following `docker run` command:
+## Installation and Run (With Docker)
+
+To run the UglyFeed app using Docker, populate the `config.yaml` and `feeds.txt` with your settings, and mount these files in the container:
 
 ```bash
 docker run -p 8001:8001 -p 8501:8501 -v /path/to/local/feeds.txt:/app/input/feeds.txt -v /path/to/local/config.yaml:/app/config.yaml fabriziosalmi/uglyfeed:latest
 ```
 
-## Installation and run (Docker Compose)
+## Installation and Run (Docker Compose)
 
-To start the UglyFeed app, use the following `docker run` command:
+For an easier setup with Docker Compose, use the following commands:
 
 ```bash
 git clone https://github.com/fabriziosalmi/UglyFeed.git
@@ -48,102 +51,127 @@ cd UglyFeed
 docker compose up -d
 ```
 
-The stack defined in the `docker-compose.yaml` file has been succesfully tested on Portainer 🎉
+The stack defined in the `docker-compose.yaml` file has been successfully tested on Portainer 🎉.
 
 ## Configuration
-- You can change source feeds by modifying the `input/feeds.txt` file or in the **Configuration** page of the web application.
-- All others options can be changed via environment variables, by updating the `config.yaml` file or in the **Configuration** page of the web application.
 
-### Options
+You can customize UglyFeed's behavior by modifying the configuration files or using the web application's **Configuration** page.
 
-**Similarity**
-> For a general use the default values seems to be a good fit to aggressively filter out some noise. To increase items count try to reduce min_samples to 2 and play around eps and similarity.
+### Configuration Files
 
-- `similarity_threshold` (range: 0-1, example: `0.5`)
-- `min_samples` (Minimum number of samples in a cluster for DBSCAN, example: `3`)
-- `eps` (Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN, example: `0.65`)
+- **`feeds.txt`**: Specify the source feeds.
+- **`config.yaml`**: Modify settings such as preprocessing, vectorization, similarity options, and API configurations.
 
-**Preprocessing**
-> Control text preprocessing steps before feeding into the system:
+### Configuration Options
 
-- `remove_html` (example: `true`): Remove HTML tags from the text.
-- `lowercase` (example: `true`): Convert all text to lowercase.
-- `remove_punctuation` (example: `true`): Remove punctuation from the text.
-- `lemmatization` (example: `true`): Apply lemmatization to reduce words to their base form.
-- `stop_words` (example: `italian`): Language for stop words removal.
-- `use_stemming` (example: `false`): Apply stemming to reduce words to their root form.
-- `additional_stopwords` (example: `["specific", "words"]`): Additional specific words to remove from the text.
-- `min_word_length` (example: `3`): Minimum length of words to keep.
+#### Pre-processing
 
-**Vectorization**
-> Define how text is converted into numerical vectors:
+Control the steps to preprocess text before feeding it into the system:
 
-- `method` (example: `tfidf`): Vectorization method, options include `tfidf`, `count`, or `hashing`.
-- `max_df` (example: `0.85`): Maximum document frequency to filter out terms that are too common.
-- `min_df` (example: `0.01`): Minimum document frequency to filter out terms that are too rare.
-- `max_features` (example: `5000`): Maximum number of features to retain in the vectorized representation.
+- `remove_html` (default: `true`): Remove HTML tags from the text.
+- `lowercase` (default: `true`): Convert text to lowercase.
+- `remove_punctuation` (default: `true`): Remove punctuation.
+- `lemmatization` (default: `true`): Apply lemmatization to reduce words to their base form.
+- `use_stemming` (default: `false`): Apply stemming to reduce words to their root form.
+- `additional_stopwords` (default: `[]`): List of additional words to remove.
 
-**LLM API and model**
-> You can use OpenAI API, Groq API or Ollama API:
+#### Vectorization
 
-- `selected_api` (Active API can be `OpenAI`, `Groq`, or `Ollama`)
+Define how text is converted into numerical vectors:
 
-- `openai_api_url` (OpenAI API chat completions endpoint)
-- `openai_api_key` (OpenAI API key) 
-- `openai_model` (OpenAI [models](https://platform.openai.com/docs/models))
+- `method` (default: `tfidf`): Vectorization method (`tfidf`, `count`, or `hashing`).
+- `ngram_range` (default: `[1, 2]`): The range of n-values for n-grams.
+- `max_df` (default: `0.85`): Maximum document frequency to filter out common terms.
+- `min_df` (default: `0.01`): Minimum document frequency to filter out rare terms.
+- `max_features` (default: `5000`): Maximum number of features to retain.
 
-- `groq_api_url` (Groq API OpenAI compatible chat completion endpoint)
-- `groq_api_key` (Groq API key)
-- `groq_model` (Groq [models](https://console.groq.com/docs/models)) 
+#### Similarity
 
-- `ollama_api_url` (Ollama API endpoint)
-- `ollama_model` (Ollama [models](https://platform.openai.com/docs/models)) 
+Control how items are grouped based on similarity:
 
-**Instructions/role/prompt**
-> You can force the LLM to translate, aggregate, summarize, extend, say the opposite or any other creative mix you can imagine, just test it against a bunch of source feeds to fit to your own needs. If you need some ideas check the [prompts folder](https://github.com/fabriziosalmi/UglyFeed/tree/main/prompts)
+- `method` (default: `dbscan`): Clustering method (`dbscan`, `kmeans`, or `agglomerative`).
+- `eps` (default: `0.5`): Maximum distance for items to be considered neighbors in `dbscan`.
+- `min_samples` (default: `2`): Minimum number of samples in a cluster for `dbscan`.
+- `n_clusters` (default: `5`): Number of clusters for `kmeans` and `agglomerative`.
+- `linkage` (default: `average`): Linkage criterion for `agglomerative` clustering.
 
-- `content_prefix` (prompt to be used as instruction for the rewriting process)
+#### API Configuration
 
-**XML feed**
-> You can set limits for content retention.
+Specify the API for processing:
 
-- `max_items`: `250` (Maximum number of items to process for the rewriting process)
-- `max_age_days`: `7` (Maximum age of items in days to be considered)
-- `feed_title`: `Default Feed Title`
-- `feed_link`: `https://example.com`
-- `feed_description`: `This is a default description for the feed.`
-- `feed_language`: `en`
-- `feed_self_link`: `https://example.com/feed.xml`
-- `author`: `Default Author`
-- `category`: `Default Category`
-- `copyright`: `Copyright info`
-  
-**Scheduler**
-> You can set automated jobs for retrieval, aggregation, rewriting and XML generation (deployment job will be soon added to the same pipeline)
+- `selected_api` (default: `Groq`): Active API (`OpenAI`, `Groq`, `Anthropic` or `Ollama`).
 
-- `scheduling_enabled`: `false` or `true` (Enable the scheduler)
-- `scheduling_interval`: `4`
-- `scheduling_period`: `hours` or `minutes`
+##### OpenAI API
 
-**HTTP server port**
-> You can change the port used by the custom HTTP server used to serve the final valid XML rewritten feed
+- `openai_api_url`: API endpoint for OpenAI chat completions.
+- `openai_api_key`: OpenAI API key.
+- `openai_model`: OpenAI model to use (e.g., `gpt-3.5-turbo`).
 
-- `http_server_port`: `8001`
+##### Groq API
 
-**Deploy**
-> You can publish the final generated XML feed to your own GitHub or GitLab repository.
+- `groq_api_url` (default: `https://api.groq.com/openai/v1/chat/completions`): Groq API endpoint.
+- `groq_api_key`: Groq API key.
+- `groq_model` (default: `llama3-8b-8192`): Groq model to use.
 
-- `enable_github`: `false` or `true`
-- `github_repo`: `your_github_username/uglyfeed-cdn`
-- `github_token`: `your_github_token`
+##### Anthropic API
 
-- `enable_gitlab`: `false` or `true`
-- `gitlab_repo`: `your_gitlab_username/uglyfeed-cdn`
-- `gitlab_token`: `your_gitlab_token`
+- `anthropic_api_url` (default: `https://api.anthropic.com/v1/messages`): Anthropic API endpoint.
+- `anthropic_api_key`: Anthropic API key.
+- `anthropic_model`:  Anthropic model to use (e.g., `claude-3-haiku-20240307`, `claude-3-sonnet-20240229`, `claude-3-opus-20240229`)
+##### Ollama API
 
+- `ollama_api_url`: Ollama API endpoint.
+- `ollama_model`: Ollama model to use.
 
-### Use
+#### Content Generation
 
-- Run all main scripts from the `Run scripts` page, feeds items will be aggregated by similarity and rewritten following the LLM instruction/prompt and options. Logs are shown in the page for debugging purposes.
-- You can go to the View and Serve XML page where you can view and download the generated XML. You can also enable the HTTP server to have a valid XML URL to use with any RSS reader.
-- You can go to the Deploy page to publish the XML to GitHub or GitLab, a public URL you can use with any RSS reader will be returned.
+Set the instructions for the LLM to process and rewrite content:
+
+- `content_prefix`: Instruction template for content rewriting.
+
+#### XML Feed
+
+Define the settings for the XML feed:
+
+- `max_items` (default: `50`): Maximum number of items to process.
+- `max_age_days` (default: `10`): Maximum age of items in days to consider.
+- `feed_title` (default: `"UglyFeed RSS"`): Title of the feed.
+- `feed_link` (default: `"https://github.com/fabriziosalmi/UglyFeed"`): Link for the feed.
+- `feed_description` (default: `"A dynamically generated feed using UglyFeed."`): Description of the feed.
+- `feed_language` (default: `it`): Language of the feed.
+- `feed_self_link` (default: `"https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/examples/uglyfeed-source-1.xml"`): Self-referencing link for the feed.
+- `author` (default: `"UglyFeed"`): Author of the feed.
+- `category` (default: `"Technology"`): Category of the feed.
+- `copyright` (default: `"UglyFeed"`): Copyright information.
+
+#### Scheduler
+
+Enable and configure automated jobs:
+
+- `scheduling_enabled` (default: `true`): Enable the scheduler.
+- `scheduling_interval` (default: `4`): Interval for the scheduler.
+- `scheduling_period` (default: `hours`): Period for the interval (`hours` or `minutes`).
+
+#### HTTP Server Port
+
+Change the port for the custom HTTP server:
+
+- `http_server_port` (default: `8001`): Port number for the HTTP server.
+
+#### Deployment
+
+Configure deployment to GitHub or GitLab:
+
+- `enable_github` (default: `false`): Enable GitHub deployment.
+- `github_repo`: GitHub repository for deployment.
+- `github_token`: GitHub token for authentication.
+- `enable_gitlab` (default: `false`): Enable GitLab deployment.
+- `gitlab_repo`: GitLab repository for deployment.
+- `gitlab_token`: GitLab token for authentication.
+
+### Usage
+
+- **Run Scripts**: From the `Run scripts` page, aggregate feed items by similarity and rewrite them according to the LLM instructions. Logs are displayed for debugging.
+- **View and Serve XML**: View and download the generated XML, or enable the HTTP server to provide a valid XML URL for any RSS reader.
+- **Deploy**: Publish the XML feed to GitHub or GitLab. A public URL will be provided for use with any RSS reader.
+
