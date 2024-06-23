@@ -271,6 +271,7 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
         try:
             with open(new_filename, 'w', encoding='utf-8') as outfile:
                 json.dump(new_data, outfile, ensure_ascii=False, indent=4)
+            print(f"Rewritten file saved to {new_filename}")
             logger.info(f"Rewritten file saved to {new_filename}")
         except IOError as e:
             logger.error(f"Error writing to {new_filename}: {e}")
