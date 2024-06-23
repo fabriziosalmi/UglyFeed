@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main  # Adjust to the branches you want to trigger releases
-
+  workflow_dispatch:
+  
 jobs:
   release:
     runs-on: ubuntu-latest
