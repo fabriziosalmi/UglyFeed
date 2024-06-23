@@ -1,25 +1,27 @@
-# Similarity configuration settings (similarity_checker.py)
-similarity_threshold: 0.66
-similarity_options:
-  eps: 0.66                  # Maximum distance between two samples for one to be considered as in the neighborhood of the other in DBSCAN
-  min_samples: 2            # Minimum number of samples in a cluster for DBSCAN
+# Pre-processing source feeds
+similarity_threshold: 0.50
 
 preprocessing:
   remove_html: true
   lowercase: true
   remove_punctuation: true
   lemmatization: true
-  stop_words: "italian"
   use_stemming: false
-  additional_stopwords: ["specific", "words"]
-  min_word_length: 3
+  additional_stopwords: []
 
 vectorization:
-  method: "tfidf"  # Options: 'tfidf', 'count', 'hashing'
+  method: 'tfidf'
+  ngram_range: [1, 2]
   max_df: 0.85
   min_df: 0.01
-  max_features: 5000  # Limit the number of features to reduce memory usage
-  
+  max_features: 5000
+
+similarity_options:
+  method: 'dbscan'  # Can be 'dbscan', 'kmeans', 'agglomerative'
+  eps: 0.5
+  min_samples: 2
+  n_clusters: 5  # Only for 'kmeans' and 'agglomerative'
+  linkage: 'average'  # Only for 'agglomerative'
 
 # API configuration settings (llm_processor.py)
 # Only one API configuration should be active at any time.
