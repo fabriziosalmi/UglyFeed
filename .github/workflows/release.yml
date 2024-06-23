@@ -1,12 +1,12 @@
-name: Automated Release
+name: Build and Release Python Package
 
 on:
   push:
-    branches:
-      - main  # Adjust to the branches where you want to create releases
+    tags:
+      - 'v*.*.*'  # Trigger on version tags
 
 jobs:
-  create_release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,97 +19,44 @@ jobs:
           python-version: '3.9'
 
       - name: Install Dependencies
-        run: pip install semver
+        run: pip install setuptools wheel twine
 
-      - name: Determine Version Bump
-        id: version
+      - name: Build Package
         run: |
-          # Read the current version from the VERSION file
-          if [ -f VERSION ]; then
-            current_version=$(cat VERSION)
-          else
-            current_version="0.0.0"
-          fi
+          python setup.py sdist bdist_wheel
 
-          echo "Current version: $current_version"
-
-          # Get list of changed files in the latest commit
-          changed_files=$(git diff --name-only HEAD~1 HEAD)
-          
-          # Define important files or folders for MINOR version bump
-          important_files_or_folders=("main.py" "llm_processor.py" "json2rss.py" "config.yaml" "server.py" "deploy_xml.py" "docs/")
-
-          # Initialize version bump type
-          version_bump="patch"  # Default bump type
-
-          # Check for a [MAJOR] keyword in the commit message
-          commit_message="${{ github.event.head_commit.message }}"
-
-          if [[ "$commit_message" == *"[MAJOR]"* ]]; then
-            version_bump="major"
-          else
-            # Check changed files to classify the bump type
-            for file in $changed_files; do
-              for important in "${important_files_or_folders[@]}"; do
-                if [[ "$file" == "$important"* ]]; then
-                  version_bump="minor"
-                  break 2
-                fi
-              done
-            done
-          fi
-
-          # Determine the next version based on the bump type
-          if [[ "$version_bump" == "major" ]]; then
-            next_version=$(python -c "import semver; print(semver.VersionInfo.parse('$current_version').bump_major())")
-          elif [[ "$version_bump" == "minor" ]]; then
-            next_version=$(python -c "import semver; print(semver.VersionInfo.parse('$current_version').bump_minor())")
-          else
-            next_version=$(python -c "import semver; print(semver.VersionInfo.parse('$current_version').bump_patch())")
-          fi
-
-          # Write the next version back to the VERSION file
-          echo $next_version > VERSION
-
-          echo "next_version=$next_version" >> $GITHUB_ENV
-          echo "version_bump=$version_bump" >> $GITHUB_ENV
-
-      - name: Commit and Push Version Change
+      - name: Create Virtual Environment
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add VERSION
-          git commit -m "Bump version to ${{ env.next_version }}"
-          git tag -a "v${{ env.next_version }}" -m "Version ${{ env.next_version }}"
-          git push origin main --tags
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install Package in Virtual Environment
+        run: |
+          source venv/bin/activate
+          pip install dist/*.whl
+
+      - name: Test Installation
+        run: |
+          source venv/bin/activate
+          python -c "import my_module; print(my_module.__version__)"
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/*.whl
+          asset_name: my_project-${{ github.ref_name }}.whl
+          asset_content_type: application/zip
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.next_version }}
-          release_name: Release ${{ env.next_version }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           body: |
             ## Changes in this Release
-            - Automatically generated release based on the following commit: ${{ github.sha }}
-            - Commit message: ${{ github.event.head_commit.message }}
-            - Version bump type: ${{ env.version_bump }}
+            - Automatically generated release for version ${{ github.ref }}.
           draft: false
-          prerelease: ${{ contains(github.event.head_commit.message, '[PRE-RELEASE]') }}
-
-      - name: Upload Release Asset (Optional)
-        uses: actions/upload-release-asset@v1
-        if: steps.create_release.outputs.upload_url != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./path/to/your/asset.zip
-          asset_name: asset.zip
-          asset_content_type: application/zip
-
-      - name: Notify on Failure (Optional)
-        if: failure()
-        run: echo "Release failed. Notify maintainers."
-        # You can add actions here to send notifications, for example, to a Slack channel.
+          prerelease: false
