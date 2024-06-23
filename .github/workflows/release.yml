@@ -51,6 +51,19 @@ jobs:
             echo "IMPORTANT_FILES_CHANGED=false" >> $GITHUB_ENV
           fi  # This line closes the if block properly
 
+      - name: Publish to Test PyPI
+        if: env.IMPORTANT_FILES_CHANGED == 'true'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: |
+          twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+      - name: Verify installation from Test PyPI
+        if: env.IMPORTANT_FILES_CHANGED == 'true'
+        run: |
+          pip install --index-url https://test.pypi.org/simple/ uglypy --extra-index-url https://pypi.org/simple
+
       - name: Publish package to PyPI
         if: env.IMPORTANT_FILES_CHANGED == 'true'
         env:
