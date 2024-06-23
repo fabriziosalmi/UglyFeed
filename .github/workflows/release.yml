@@ -5,7 +5,7 @@ on:
     branches:
       - main  # Adjust to the branches you want to trigger releases
   workflow_dispatch:
-  
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -22,9 +22,11 @@ jobs:
       - name: Install dependencies
         run: pip install setuptools wheel twine
 
-      - name: Read version number
+      - name: Extract version number from setup.py
         id: get_version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        run: |
+          VERSION=$(python -c "import re; version_line = next(line for line in open('setup.py') if line.startswith('    version=')); print(re.search(r'[\"\\\']([^\"\\\']+)[\"\\\']', version_line).group(1))")
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Build package
         run: python setup.py sdist bdist_wheel
@@ -40,10 +42,22 @@ jobs:
         run: |
           pip install --index-url https://test.pypi.org/simple/ uglypy --extra-index-url https://pypi.org/simple
 
+      - name: Check if commit affects non-excluded files
+        id: check_changes
+        run: |
+          echo "CHANGED_FILES=$(git diff --name-only HEAD~1)" >> $GITHUB_ENV
+          echo "CHANGED_FILES=${{ steps.check_changes.outputs.CHANGED_FILES }}"
+        shell: bash
+        env:
+          CHANGED_FILES: ${{ steps.check_changes.outputs.CHANGED_FILES }}
+        outputs:
+          non_excluded_changes: ${{ steps.check_changes.outputs.CHANGED_FILES != '' && !steps.check_changes.outputs.CHANGED_FILES =~ '\.txt$' && !steps.check_changes.outputs.CHANGED_FILES =~ '\.md$' }}
+
       - name: Publish package to PyPI
         if: |
           github.event_name == 'push' &&
           github.ref == 'refs/heads/main' &&
+          steps.check_changes.outputs.non_excluded_changes &&
           !contains(github.event.head_commit.message, 'pylint') &&
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
@@ -59,6 +73,7 @@ jobs:
         if: |
           github.event_name == 'push' &&
           github.ref == 'refs/heads/main' &&
+          steps.check_changes.outputs.non_excluded_changes &&
           !contains(github.event.head_commit.message, 'pylint') &&
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
@@ -68,7 +83,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: v${{ env.VERSION }}  # Use the version from the VERSION file
+          tag_name: v${{ env.VERSION }}  # Use the version from setup.py
           release_name: Release ${{ env.VERSION }}
           body: |
             ## Changes in this Release
@@ -80,6 +95,7 @@ jobs:
       - name: Upload Release Asset (Optional)
         if: |
           steps.create_release.outputs.upload_url != '' &&
+          steps.check_changes.outputs.non_excluded_changes &&
           !contains(github.event.head_commit.message, 'pylint') &&
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
