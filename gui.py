@@ -1,23 +1,61 @@
 import streamlit as st
 import os
 from pathlib import Path
-import requests  # To handle HTTP requests
-import psutil  # To get system statistics
-import socket  # To get network information
 import yaml
 from config import load_config, ensure_default_config, save_configuration
 from logging_setup import setup_logging
-from server import toggle_server, copy_xml_to_static, uglyfeed_file  # Import uglyfeed_file here
+from server import toggle_server, copy_xml_to_static, uglyfeed_file
 from scheduling import start_scheduling, run_scripts_sequentially, job_stats_global
 from script_runner import run_script
-from utils import get_local_ip, find_available_port, get_xml_stats, get_xml_item_count, get_new_item_count
+from utils import get_local_ip, get_xml_stats, get_xml_item_count, get_new_item_count
+
+import streamlit as st
+from config import load_config, ensure_default_config, save_configuration
+
+# Load the configuration
+config = load_config("config.yaml")
+
+# Ensure defaults are set
+config = ensure_default_config(config)
 
 # Initialize logging
 logger = setup_logging()
 
+# Define helper functions to convert between lists and tuples
+def convert_list_to_tuple(data, keys):
+    """Convert specific list values to tuples for given keys in the dictionary."""
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if key in keys and isinstance(value, list):
+                data[key] = tuple(value)
+            elif isinstance(value, dict):
+                convert_list_to_tuple(value, keys)
+            elif isinstance(value, list):
+                for item in value:
+                    convert_list_to_tuple(item, keys)
+    return data
+
+def convert_tuple_to_list(data, keys):
+    """Convert specific tuple values to lists for given keys in the dictionary."""
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if key in keys and isinstance(value, tuple):
+                data[key] = list(value)
+            elif isinstance(value, dict):
+                convert_tuple_to_list(value, keys)
+            elif isinstance(value, list):
+                for item in value:
+                    convert_tuple_to_list(item, keys)
+    return data
+
+# Load configuration and convert necessary lists to tuples
+config_keys_with_tuples = ['ngram_range']
+config = load_config('config.yaml')
+config = convert_list_to_tuple(config, config_keys_with_tuples)
+
 # Initialize session state
 if 'config_data' not in st.session_state:
-    st.session_state.config_data = ensure_default_config(load_config())
+    st.session_state.config_data = ensure_default_config(config)
 if 'server_thread' not in st.session_state:
     st.session_state.server_thread = None
 
@@ -106,14 +144,11 @@ elif selected_option == "Configuration":
     st.session_state.config_data['preprocessing']['lowercase'] = st.checkbox("Convert to Lowercase", value=st.session_state.config_data['preprocessing']['lowercase'])
     st.session_state.config_data['preprocessing']['remove_punctuation'] = st.checkbox("Remove Punctuation", value=st.session_state.config_data['preprocessing']['remove_punctuation'])
     st.session_state.config_data['preprocessing']['lemmatization'] = st.checkbox("Apply Lemmatization", value=st.session_state.config_data['preprocessing']['lemmatization'])
-    st.session_state.config_data['preprocessing']['stop_words'] = st.text_input("Stop Words Language", st.session_state.config_data['preprocessing']['stop_words'])
     st.session_state.config_data['preprocessing']['use_stemming'] = st.checkbox("Use Stemming", value=st.session_state.config_data['preprocessing']['use_stemming'])
 
     additional_stopwords = ", ".join(st.session_state.config_data['preprocessing']['additional_stopwords'])
     additional_stopwords_input = st.text_input("Additional Stopwords (comma separated)", additional_stopwords).strip()
     st.session_state.config_data['preprocessing']['additional_stopwords'] = [word.strip() for word in additional_stopwords_input.split(",") if word.strip()]
-
-    st.session_state.config_data['preprocessing']['min_word_length'] = st.number_input("Minimum Word Length", min_value=1, value=st.session_state.config_data['preprocessing']['min_word_length'])
 
     st.divider()
 
@@ -122,6 +157,7 @@ elif selected_option == "Configuration":
     vectorization_methods = ["tfidf", "count", "hashing"]
     selected_method = st.selectbox("Vectorization Method", vectorization_methods, index=vectorization_methods.index(st.session_state.config_data['vectorization']['method']))
     st.session_state.config_data['vectorization']['method'] = selected_method
+    st.session_state.config_data['vectorization']['ngram_range'] = st.slider("N-Gram Range", 1, 3, st.session_state.config_data['vectorization']['ngram_range'])
     st.session_state.config_data['vectorization']['max_df'] = st.slider("Max Document Frequency (max_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['max_df'])
     st.session_state.config_data['vectorization']['min_df'] = st.slider("Min Document Frequency (min_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['min_df'])
     st.session_state.config_data['vectorization']['max_features'] = st.number_input("Max Features", min_value=1, value=st.session_state.config_data['vectorization']['max_features'])
@@ -129,9 +165,14 @@ elif selected_option == "Configuration":
     st.divider()
 
     st.subheader("Similarity Options")
+    clustering_methods = ["dbscan", "kmeans", "agglomerative"]
+    selected_method = st.selectbox("Clustering Method", clustering_methods, index=clustering_methods.index(st.session_state.config_data['similarity_options']['method']))
+    st.session_state.config_data['similarity_options']['method'] = selected_method
     st.session_state.config_data['similarity_threshold'] = st.slider("Similarity Threshold", 0.0, 1.0, st.session_state.config_data['similarity_threshold'])
-    st.session_state.config_data['similarity_options']['min_samples'] = st.number_input("Minimum Samples", min_value=1, value=st.session_state.config_data['similarity_options']['min_samples'])
     st.session_state.config_data['similarity_options']['eps'] = st.number_input("Epsilon (eps)", min_value=0.0, value=st.session_state.config_data['similarity_options']['eps'], step=0.01)
+    st.session_state.config_data['similarity_options']['min_samples'] = st.number_input("Minimum Samples", min_value=1, value=st.session_state.config_data['similarity_options']['min_samples'])
+    st.session_state.config_data['similarity_options']['n_clusters'] = st.number_input("Number of Clusters (n_clusters)", min_value=1, value=st.session_state.config_data['similarity_options']['n_clusters'])
+    st.session_state.config_data['similarity_options']['linkage'] = st.selectbox("Linkage Type", ["ward", "complete", "average", "single"], index=2)  # Default to 'average'
 
     st.divider()
 
@@ -203,7 +244,9 @@ elif selected_option == "Configuration":
     st.divider()
 
     if st.button("Save Configuration and Feeds"):
-        save_configuration(st.session_state.config_data, st.session_state.feeds)
+        # Convert tuples back to lists before saving
+        config_to_save = convert_tuple_to_list(st.session_state.config_data, config_keys_with_tuples)
+        save_configuration(config_to_save, st.session_state.feeds)
         st.success("Configuration and feeds saved successfully!")
 
 elif selected_option == "Run Scripts":
@@ -223,6 +266,7 @@ elif selected_option == "Run Scripts":
 
     if st.button("Run main.py, llm_processor.py, and json2rss.py sequentially"):
         run_scripts_sequentially(run_script, get_new_item_count, get_xml_item_count, logger, st)
+
 
 elif selected_option == "View and Serve XML":
     # View and Serve XML Page content
