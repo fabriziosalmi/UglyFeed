@@ -180,7 +180,7 @@ elif selected_option == "Configuration":
     st.divider()
 
     st.subheader("API and LLM Options")
-    api_options = ["OpenAI", "Groq", "Ollama"]
+    api_options = ["OpenAI", "Groq", "Ollama", "Anthropic"]
     selected_api = st.selectbox("Select API", api_options, index=api_options.index(st.session_state.config_data['api_config']['selected_api']))
     st.session_state.config_data['api_config']['selected_api'] = selected_api
 
@@ -192,6 +192,10 @@ elif selected_option == "Configuration":
         st.session_state.config_data['api_config']['groq_api_url'] = st.text_input("Groq API URL", st.session_state.config_data['api_config']['groq_api_url'])
         st.session_state.config_data['api_config']['groq_api_key'] = st.text_input("Groq API Key", st.session_state.config_data['api_config']['groq_api_key'], type="password")
         st.session_state.config_data['api_config']['groq_model'] = st.text_input("Groq Model", st.session_state.config_data['api_config']['groq_model'])
+    elif selected_api == "Anthropic":
+        st.session_state.config_data['api_config']['anthropic_api_url'] = st.text_input("Anthropic API URL", st.session_state.config_data['api_config']['anthropic_api_url'])
+        st.session_state.config_data['api_config']['anthropic_api_key'] = st.text_input("Anthropic API Key", st.session_state.config_data['api_config']['anthropic_api_key'])
+        st.session_state.config_data['api_config']['anthropic_model'] = st.text_input("Anthropic Model", st.session_state.config_data['api_config']['anthropic_model'])
     else:
         st.session_state.config_data['api_config']['ollama_api_url'] = st.text_input("Ollama API URL", st.session_state.config_data['api_config']['ollama_api_url'])
         st.session_state.config_data['api_config']['ollama_model'] = st.text_input("Ollama Model", st.session_state.config_data['api_config']['ollama_model'])
