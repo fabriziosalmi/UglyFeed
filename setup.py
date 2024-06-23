@@ -8,7 +8,7 @@ setup(
     name='uglypy',  # The package name on PyPI
     version='0.0.2',  # Initial version, update manually for major changes
     author='Fabrizio Salmi',
-    author_email='fabrizio@example.com',  # Replace with your email
+    author_email='fabrizio.salmi@gmail.com',  # Replace with your email
     description='A Python package for aggregating and processing RSS feeds with LLM-enhanced content rewriting.',
     long_description=long_description,
     long_description_content_type='text/markdown',
