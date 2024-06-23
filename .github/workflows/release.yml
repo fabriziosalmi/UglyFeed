@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main  # Adjust to the branches you want to trigger releases
+    paths:
+      - 'setup.py'          # Trigger on changes to setup.py
+      - 'requirements.txt'  # Trigger on changes to requirements.txt (optional)
+      - 'config.py'         # Trigger on changes to config.py (if it impacts the release)
+      - 'dist/*'            # Trigger if the distribution files are changed (optional)
   workflow_dispatch:
 
 jobs:
@@ -42,30 +47,17 @@ jobs:
         run: |
           pip install --index-url https://test.pypi.org/simple/ uglypy --extra-index-url https://pypi.org/simple
 
-      - name: Check if commit affects non-excluded files
-        id: check_changes
+      - name: Check if important files were changed
+        id: check_important_files
         run: |
-          if git rev-parse HEAD~1 >/dev/null 2>&1; then
-            CHANGED_FILES=$(git diff --name-only HEAD~1)
+          git diff --name-only HEAD~1 > changed_files.txt
+          if grep -E 'setup.py|requirements.txt|config.py' changed_files.txt; then
+            echo "IMPORTANT_FILES_CHANGED=true" >> $GITHUB_ENV
           else
-            CHANGED_FILES=$(git diff --name-only 4b825dc642cb6eb9a060e54bf8d69288fbee4904)
-          fi
-          echo "CHANGED_FILES=$(echo $CHANGED_FILES | tr '\n' ' ' | sed 's/ /%20/g')" >> $GITHUB_ENV
-        shell: bash
+            echo "IMPORTANT_FILES_CHANGED=false" >> $GITHUB_ENV
 
       - name: Publish package to PyPI
-        if: |
-          github.event_name == 'push' &&
-          github.ref == 'refs/heads/main' &&
-          !contains(github.event.head_commit.message, 'pylint') &&
-          !contains(github.event.head_commit.message, 'dependabot') &&
-          !contains(github.event.head_commit.message, 'CodeQL') &&
-          !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci') &&
-          env.CHANGED_FILES != '' &&
-          !startsWith(env.CHANGED_FILES, ' ') &&
-          !endsWith(env.CHANGED_FILES, '.txt') &&
-          !endsWith(env.CHANGED_FILES, '.md')
+        if: env.IMPORTANT_FILES_CHANGED == 'true'
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
@@ -73,18 +65,7 @@ jobs:
           twine upload dist/*
 
       - name: Create GitHub Release
-        if: |
-          github.event_name == 'push' &&
-          github.ref == 'refs/heads/main' &&
-          !contains(github.event.head_commit.message, 'pylint') &&
-          !contains(github.event.head_commit.message, 'dependabot') &&
-          !contains(github.event.head_commit.message, 'CodeQL') &&
-          !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci') &&
-          env.CHANGED_FILES != '' &&
-          !startsWith(env.CHANGED_FILES, ' ') &&
-          !endsWith(env.CHANGED_FILES, '.txt') &&
-          !endsWith(env.CHANGED_FILES, '.md')
+        if: env.IMPORTANT_FILES_CHANGED == 'true'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
@@ -100,16 +81,7 @@ jobs:
 
       - name: Upload Release Asset (Optional)
         if: |
-          steps.create_release.outputs.upload_url != '' &&
-          !contains(github.event.head_commit.message, 'pylint') &&
-          !contains(github.event.head_commit.message, 'dependabot') &&
-          !contains(github.event.head_commit.message, 'CodeQL') &&
-          !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci') &&
-          env.CHANGED_FILES != '' &&
-          !startsWith(env.CHANGED_FILES, ' ') &&
-          !endsWith(env.CHANGED_FILES, '.txt') &&
-          !endsWith(env.CHANGED_FILES, '.md')
+          steps.create_release.outputs.upload_url != ''
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
