@@ -282,7 +282,7 @@ elif selected_option == "Run Scripts":
                 st.text_area(label="", value=output, height=200)
 
             if errors:
-                st.subheader("Errors:")
+                st.subheader("Debug:")
                 st.text_area(label="", value=errors, height=100)
 
             st.write("---")  # Separator between scripts
