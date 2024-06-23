@@ -1,18 +1,19 @@
-name: Publish to PyPI
+name: Deploy releses (GitHub, Pypi, DockerHub)
 
 on:
   push:
     branches:
-      - main  # Adjust to the branches you want to trigger releases
+      - main
     paths:
-      - 'setup.py'          # Trigger on changes to setup.py
-      - 'requirements.txt'  # Trigger on changes to requirements.txt (optional)
-      - 'config.py'         # Trigger on changes to config.py (if it impacts the release)
-      - 'dist/*'            # Trigger if the distribution files are changed (optional)
+      - 'setup.py'
+      - 'requirements.txt'
+      - 'config.py'
+      - 'Dockerfile'
+      - '.github/workflows/release.yml'
   workflow_dispatch:
 
 jobs:
-  release:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'  # Use the Python version you are targeting
+          python-version: '3.9'
 
       - name: Install dependencies
         run: pip install setuptools wheel twine
@@ -30,29 +31,13 @@ jobs:
       - name: Extract version number from setup.py
         id: get_version
         run: |
-          VERSION=$(python -c "import ast; from pathlib import Path; setup_ast = ast.parse(Path('setup.py').read_text()); version = next(node.value.s for node in ast.walk(setup_ast) if isinstance(node, ast.keyword) and node.arg == 'version'); print(version)")
+          VERSION=$(python -c "import re; version_line = next(line for line in open('setup.py') if line.startswith('    version=')); print(re.search(r'[\"\\\']([^\"\\\']+)[\"\\\']', version_line).group(1))")
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Build package
         run: python setup.py sdist bdist_wheel
 
-      - name: List changed files
-        id: list_changed_files
-        run: |
-          git diff --name-only HEAD~1 > changed_files.txt || echo "setup.py" > changed_files.txt
-          cat changed_files.txt
-          echo "CHANGED_FILES=$(cat changed_files.txt | tr '\n' ' ')" >> $GITHUB_ENV
-
-      - name: Check if important files were changed
-        run: |
-          if grep -E 'setup.py|requirements.txt|config.py' changed_files.txt; then
-            echo "IMPORTANT_FILES_CHANGED=true" >> $GITHUB_ENV
-          else
-            echo "IMPORTANT_FILES_CHANGED=false" >> $GITHUB_ENV
-          fi  # This line closes the if block properly
-
       - name: Publish to Test PyPI
-        if: env.IMPORTANT_FILES_CHANGED == 'true'
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
@@ -60,25 +45,54 @@ jobs:
           twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
       - name: Verify installation from Test PyPI
-        if: env.IMPORTANT_FILES_CHANGED == 'true'
         run: |
           pip install --index-url https://test.pypi.org/simple/ uglypy --extra-index-url https://pypi.org/simple
 
       - name: Publish package to PyPI
-        if: env.IMPORTANT_FILES_CHANGED == 'true'
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          !contains(github.event.head_commit.message, 'pylint') &&
+          !contains(github.event.head_commit.message, 'dependabot') &&
+          !contains(github.event.head_commit.message, 'CodeQL') &&
+          !contains(github.event.head_commit.message, 'chore') &&
+          !contains(github.event.head_commit.message, 'ci')
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
           twine upload dist/*
 
+      - name: Build and push Docker image
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          !contains(github.event.head_commit.message, 'pylint') &&
+          !contains(github.event.head_commit.message, 'dependabot') &&
+          !contains(github.event.head_commit.message, 'CodeQL') &&
+          !contains(github.event.head_commit.message, 'chore') &&
+          !contains(github.event.head_commit.message, 'ci')
+        run: |
+          docker build -t fabriziosalmi/uglyfeed:${{ env.VERSION }} .
+          docker tag fabriziosalmi/uglyfeed:${{ env.VERSION }} fabriziosalmi/uglyfeed:latest
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker push fabriziosalmi/uglyfeed:${{ env.VERSION }}
+          docker push fabriziosalmi/uglyfeed:latest
+
       - name: Create GitHub Release
-        if: env.IMPORTANT_FILES_CHANGED == 'true'
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          !contains(github.event.head_commit.message, 'pylint') &&
+          !contains(github.event.head_commit.message, 'dependabot') &&
+          !contains(github.event.head_commit.message, 'CodeQL') &&
+          !contains(github.event.head_commit.message, 'chore') &&
+          !contains(github.event.head_commit.message, 'ci')
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: v${{ env.VERSION }}  # Use the version from setup.py
+          tag_name: v${{ env.VERSION }}
           release_name: Release ${{ env.VERSION }}
           body: |
             ## Changes in this Release
@@ -89,7 +103,12 @@ jobs:
 
       - name: Upload Release Asset (Optional)
         if: |
-          steps.create_release.outputs.upload_url != ''
+          steps.create_release.outputs.upload_url != '' &&
+          !contains(github.event.head_commit.message, 'pylint') &&
+          !contains(github.event.head_commit.message, 'dependabot') &&
+          !contains(github.event.head_commit.message, 'CodeQL') &&
+          !contains(github.event.head_commit.message, 'chore') &&
+          !contains(github.event.head_commit.message, 'ci')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
