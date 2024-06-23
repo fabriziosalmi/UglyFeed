@@ -1,63 +1,70 @@
-name: Build and Release Python Package
+name: Publish to PyPI
 
 on:
   push:
-    tags:
-      - 'v*.*.*'  # Trigger on version tags
-  workflow_dispatch:
+    branches:
+      - main  # Adjust to the branches you want to trigger releases
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Set Up Python
+      - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: '3.9'  # Use the Python version you are targeting
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pip install setuptools wheel twine
 
-      - name: Build Package
-        run: |
-          python setup.py sdist bdist_wheel
+      - name: Build package
+        run: python setup.py sdist bdist_wheel
 
-      - name: Create Virtual Environment
+      - name: Publish to Test PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
         run: |
-          python -m venv venv
-          source venv/bin/activate
+          twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
-      - name: Install Package in Virtual Environment
+      - name: Verify installation from Test PyPI
         run: |
-          source venv/bin/activate
-          pip install dist/*.whl
+          pip install --index-url https://test.pypi.org/simple/ uglypy --extra-index-url https://pypi.org/simple
 
-      - name: Test Installation
+      - name: Publish package to PyPI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          source venv/bin/activate
-          python -c "import my_module; print(my_module.__version__)"
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/*.whl
-          asset_name: my_project-${{ github.ref_name }}.whl
-          asset_content_type: application/zip
+          twine upload dist/*
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: v${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
           body: |
             ## Changes in this Release
-            - Automatically generated release for version ${{ github.ref }}.
+            - Automatically generated release based on the following commit: ${{ github.sha }}
+            - Commit message: ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
+
+      - name: Upload Release Asset (Optional)
+        uses: actions/upload-release-asset@v1
+        if: steps.create_release.outputs.upload_url != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/*.whl
+          asset_name: uglypy-${{ github.run_number }}.whl
+          asset_content_type: application/zip
+
