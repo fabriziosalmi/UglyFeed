@@ -1,18 +1,13 @@
-name: Release and Docker Deploy
+name: Publish to PyPI and Docker Hub
 
 on:
   push:
     branches:
-      - main
-    paths:
-      - 'setup.py'
-      - 'requirements.txt'
-      - 'config.py'
-      - 'Dockerfile'
+      - main  # Adjust to the branches you want to trigger releases
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,20 +17,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: '3.9'  # Use the Python version you are targeting
+
+      - name: Extract version from setup.py
+        id: extract_version
+        run: |
+          VERSION=$(python -c "import re; version_line = next(line for line in open('setup.py') if line.strip().startswith('version=')); print(re.search(r'version=[\"\\']([^\"\\']+)[\"\\']', version_line).group(1))")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        shell: bash
 
       - name: Install dependencies
         run: pip install setuptools wheel twine
-
-      - name: Extract version number from setup.py
-        id: get_version
-        run: |
-          VERSION=$(python -c "
-          import re
-          version_line = next(line for line in open('setup.py') if line.startswith('    version='))
-          version = re.search(r'\"([^\"]+)\"', version_line).group(1)
-          print(version)")
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Build package
         run: python setup.py sdist bdist_wheel
@@ -59,28 +51,14 @@ jobs:
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
           !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci')
+          !contains(github.event.head_commit.message, 'ci') &&
+          !contains(github.event.head_commit.message, '.md') &&
+          !contains(github.event.head_commit.message, '.txt')
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
           twine upload dist/*
-
-      - name: Build and push Docker image
-        if: |
-          github.event_name == 'push' &&
-          github.ref == 'refs/heads/main' &&
-          !contains(github.event.head_commit.message, 'pylint') &&
-          !contains(github.event.head_commit.message, 'dependabot') &&
-          !contains(github.event.head_commit.message, 'CodeQL') &&
-          !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci')
-        run: |
-          docker build -t fabriziosalmi/uglyfeed:${{ env.VERSION }} .
-          docker tag fabriziosalmi/uglyfeed:${{ env.VERSION }} fabriziosalmi/uglyfeed:latest
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push fabriziosalmi/uglyfeed:${{ env.VERSION }}
-          docker push fabriziosalmi/uglyfeed:latest
 
       - name: Create GitHub Release
         if: |
@@ -90,7 +68,9 @@ jobs:
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
           !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci')
+          !contains(github.event.head_commit.message, 'ci') &&
+          !contains(github.event.head_commit.message, '.md') &&
+          !contains(github.event.head_commit.message, '.txt')
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
@@ -104,19 +84,33 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset (Optional)
+      - name: Build Docker image
         if: |
-          steps.create_release.outputs.upload_url != '' &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
           !contains(github.event.head_commit.message, 'pylint') &&
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
           !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/*.whl
-          asset_name: uglypy-${{ env.VERSION }}.whl
-          asset_content_type: application/zip
+          !contains(github.event.head_commit.message, 'ci') &&
+          !contains(github.event.head_commit.message, '.md') &&
+          !contains(github.event.head_commit.message, '.txt')
+        run: |
+          docker build -t fabriziosalmi/uglyfeed:latest .
+
+      - name: Push Docker image
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          !contains(github.event.head_commit.message, 'pylint') &&
+          !contains(github.event.head_commit.message, 'dependabot') &&
+          !contains(github.event.head_commit.message, 'CodeQL') &&
+          !contains(github.event.head_commit.message, 'chore') &&
+          !contains(github.event.head_commit.message, 'ci') &&
+          !contains(github.event.head_commit.message, '.md') &&
+          !contains(github.event.head_commit.message, '.txt')
+        run: |
+          docker tag fabriziosalmi/uglyfeed:latest fabriziosalmi/uglyfeed:${{ env.VERSION }}
+          echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+          docker push fabriziosalmi/uglyfeed:${{ env.VERSION }}
+          docker push fabriziosalmi/uglyfeed:latest
