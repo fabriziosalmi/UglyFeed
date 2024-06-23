@@ -148,7 +148,7 @@ Define the settings for the XML feed:
 
 Enable and configure automated jobs:
 
-- `scheduling_enabled` (default: `true`): Enable the scheduler.
+- `scheduling_enabled` (default: `false`): Enable the scheduler.
 - `scheduling_interval` (default: `4`): Interval for the scheduler.
 - `scheduling_period` (default: `hours`): Period for the interval (`hours` or `minutes`).
 
