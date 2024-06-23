@@ -49,6 +49,7 @@ jobs:
             echo "IMPORTANT_FILES_CHANGED=true" >> $GITHUB_ENV
           else
             echo "IMPORTANT_FILES_CHANGED=false" >> $GITHUB_ENV
+          fi  # This line closes the if block properly
 
       - name: Publish package to PyPI
         if: env.IMPORTANT_FILES_CHANGED == 'true'
