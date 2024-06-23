@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main  # Adjust to the branches you want to trigger releases
-  workflow_dispatch:
-  
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -37,7 +36,14 @@ jobs:
           pip install --index-url https://test.pypi.org/simple/ uglypy --extra-index-url https://pypi.org/simple
 
       - name: Publish package to PyPI
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          !contains(github.event.head_commit.message, 'pylint') &&
+          !contains(github.event.head_commit.message, 'dependabot') &&
+          !contains(github.event.head_commit.message, 'CodeQL') &&
+          !contains(github.event.head_commit.message, 'chore') &&
+          !contains(github.event.head_commit.message, 'ci')
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
@@ -45,6 +51,14 @@ jobs:
           twine upload dist/*
 
       - name: Create GitHub Release
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          !contains(github.event.head_commit.message, 'pylint') &&
+          !contains(github.event.head_commit.message, 'dependabot') &&
+          !contains(github.event.head_commit.message, 'CodeQL') &&
+          !contains(github.event.head_commit.message, 'chore') &&
+          !contains(github.event.head_commit.message, 'ci')
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,8 +73,14 @@ jobs:
           prerelease: false
 
       - name: Upload Release Asset (Optional)
+        if: |
+          steps.create_release.outputs.upload_url != '' &&
+          !contains(github.event.head_commit.message, 'pylint') &&
+          !contains(github.event.head_commit.message, 'dependabot') &&
+          !contains(github.event.head_commit.message, 'CodeQL') &&
+          !contains(github.event.head_commit.message, 'chore') &&
+          !contains(github.event.head_commit.message, 'ci')
         uses: actions/upload-release-asset@v1
-        if: steps.create_release.outputs.upload_url != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
