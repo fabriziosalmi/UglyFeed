@@ -96,11 +96,9 @@ Feel free to open issues or submit pull requests. Any contributions are welcome!
 
 Here some improvements I am still working on:
 
-- improve/fix similarity logic and debug pages + overall code improvements and tests
+- overall code improvements and tests
 - extend to more LLM apis (Anthropic, Mistral)
-- complete the configuration logic with env vars for easier docker run
 - extend to generate HTML/media from rewritten JSON with themes/styles (tentatives with PiperTTS and others)
-- extend to get not only RSS (moved to the [uglyfeed-cdn](https://github.com/fabriziosalmi/uglyfeed-cdn) repo)
 - here something i forgot 😅
 
 ## Disclaimer
