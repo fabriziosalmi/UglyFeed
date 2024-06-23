@@ -15,7 +15,7 @@ from openai import OpenAI
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Maximum context length for Groq API (this may need adjustment based on the actual limit)
+# Maximum context length for LLM APIs
 MAX_TOKENS = 32768
 
 def requests_retry_session(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504), session=None):
@@ -121,6 +121,81 @@ def call_ollama_api(api_url, combined_content, model):
             logger.error(f"Ollama API response content: {response.text}")
         return None
 
+
+def call_anthropic_api(api_url, combined_content, model, api_key):
+    data = json.dumps({
+        "model": model,
+        "messages": [
+            {"role": "user", "content": combined_content}
+        ],
+        "max_tokens": 4096
+    })
+    headers = {
+        'Content-Type': 'application/json',
+        'x-api-key': api_key,
+        'anthropic-version': '2023-06-01'
+    }
+    logger.debug(f"Anthropic API request data: {data}")
+    try:
+        response = requests_retry_session().post(api_url, data=data, headers=headers)
+        response.raise_for_status()
+        try:
+            response_json = response.json()
+            logger.debug(f"Anthropic API response: {response_json}")
+
+            # Print the full response for debugging purposes
+            print("Anthropic API response:", response_json)
+
+            # Extract the content from the response
+            if 'content' in response_json and isinstance(response_json['content'], list):
+                # Assuming the desired text is in the first object of the content array
+                content_items = response_json['content']
+                text_content = " ".join(item['text'] for item in content_items if 'text' in item)
+                return text_content
+            else:
+                logger.error(f"Expected 'content' key with list structure not found in response: {response_json}")
+                return None
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON response from Anthropic API: {e}")
+            logger.error(f"Response content: {response.text}")
+            return None
+    except requests.RequestException as e:
+        logger.error(f"Anthropic API request failed: {e}")
+        if response is not None:
+            logger.error(f"Anthropic API response content: {response.text}")
+        return None
+
+
+
+
+def call_mistral_api(api_url, combined_content, model, api_key):
+    data = json.dumps({
+        "model": model,
+        "prompt": combined_content,
+        "max_tokens": MAX_TOKENS
+    })
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    }
+    logger.debug(f"Mistral API request data: {data}")
+    try:
+        response = requests_retry_session().post(api_url, data=data, headers=headers)
+        response.raise_for_status()
+        try:
+            response_json = response.json()
+            logger.debug(f"Mistral API response: {response_json}")
+            return response_json['choices'][0]['message']['content']
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON response from Mistral API: {e}")
+            logger.error(f"Response content: {response.text}")
+            return None
+    except requests.RequestException as e:
+        logger.error(f"Mistral API request failed: {e}")
+        if response is not None:
+            logger.error(f"Mistral API response content: {response.text}")
+        return None
+
 def parse_retry_after(response_json):
     try:
         message = response_json['error']['message']
@@ -154,13 +229,6 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
 
     logger.info(f"Processing {filepath} - combined content prepared.")
 
-    # testing
-    log_message = f"Processing {filepath} - combined content prepared."
-    logger.info(log_message)
-    print(log_message)
-
-    # end test
-
     logger.debug(f"Combined content: {combined_content}")
 
     if estimate_token_count(combined_content) > MAX_TOKENS:
@@ -171,6 +239,10 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
         rewritten_content = call_openai_api(api_url, combined_content, model, api_key)
     elif api_type == "groq":
         rewritten_content = call_groq_api(api_url, combined_content, model, api_key)
+    elif api_type == "anthropic":
+        rewritten_content = call_anthropic_api(api_url, combined_content, model, api_key)
+    elif api_type == "mistral":
+        rewritten_content = call_mistral_api(api_url, combined_content, model, api_key)
     else:
         rewritten_content = call_ollama_api(api_url, combined_content, model)
 
@@ -200,11 +272,6 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
             with open(new_filename, 'w', encoding='utf-8') as outfile:
                 json.dump(new_data, outfile, ensure_ascii=False, indent=4)
             logger.info(f"Rewritten file saved to {new_filename}")
-
-            log_message2 = f"Rewritten file saved to {new_filename}"
-            logger.info(log_message2)
-            print(log_message2)
-
         except IOError as e:
             logger.error(f"Error writing to {new_filename}: {e}")
     else:
@@ -220,8 +287,12 @@ def validate_config(api_config):
         required_keys = ['groq_api_url', 'groq_api_key', 'groq_model']
     elif selected_api == "Ollama":
         required_keys = ['ollama_api_url', 'ollama_model']
+    elif selected_api == "Anthropic":
+        required_keys = ['anthropic_api_url', 'anthropic_api_key', 'anthropic_model']
+    elif selected_api == "Mistral":
+        required_keys = ['mistral_api_url', 'mistral_api_key', 'mistral_model']
     else:
-        raise ValueError("Invalid API selection. Please choose OpenAI, Groq, or Ollama.")
+        raise ValueError("Invalid API selection. Please choose OpenAI, Groq, Ollama, Anthropic, or Mistral.")
 
     missing_keys = [key for key in required_keys if not api_config.get(key)]
     if missing_keys:
@@ -253,11 +324,21 @@ def main(config_path):
         model = api_config['groq_model']
         api_key = api_config['groq_api_key']
         api_type = 'groq'
-    else:  # Ollama
+    elif selected_api == 'Ollama':
         api_url = api_config['ollama_api_url']
         model = api_config['ollama_model']
         api_key = None  # Ollama does not need an API key
         api_type = 'ollama'
+    elif selected_api == 'Anthropic':
+        api_url = api_config['anthropic_api_url']
+        model = api_config['anthropic_model']
+        api_key = api_config['anthropic_api_key']
+        api_type = 'anthropic'
+    elif selected_api == 'Mistral':
+        api_url = api_config['mistral_api_url']
+        model = api_config['mistral_model']
+        api_key = api_config['mistral_api_key']
+        api_type = 'mistral'
 
     output_folder = folder_config.get('output_folder', 'output')
     rewritten_folder = folder_config.get('rewritten_folder', 'rewritten')
