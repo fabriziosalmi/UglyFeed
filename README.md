@@ -36,7 +36,8 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - OpenAI API (`gpt-3.5-turbo`, `gpt4`, `gpt4o`)
 - Ollama API (all models like `llama3`, `phi3`, `qwen2`)
 - Groq API (`llama3-8b-8192`, `llama3-70b-8192`, `gemma-7b-it`, `mixtral-8x7b-32768`)
-
+- Anthropic API (`claude-3-haiku-20240307`, `claude-3-sonnet-20240229`, `claude-3-opus-20240229`)
+  
 ## Quick start
 
 ### Prerequisites
@@ -97,7 +98,6 @@ Feel free to open issues or submit pull requests. Any contributions are welcome!
 Here some improvements I am still working on:
 
 - overall code improvements and tests
-- extend to more LLM apis (Anthropic, Mistral)
 - extend to generate HTML/media from rewritten JSON with themes/styles (tentatives with PiperTTS and others)
 - here something i forgot 😅
 
