@@ -1,7 +1,7 @@
+# logging_setup.py
+
 import logging
 import logging.config
-import queue
-from typing import Union
 
 # Define a logging configuration using a dictionary.
 LOGGING_CONFIG = {
@@ -25,31 +25,27 @@ LOGGING_CONFIG = {
             'formatter': 'standard',
             'stream': 'ext://sys.stderr',
         },
-        'queue': {
-            'class': 'logging.handlers.QueueHandler',
-            'queue': 'ext://logging.handlers.QueueHandler',
+        # Optional: Add a file handler if you want to log to a file
+        'file': {
+            'class': 'logging.FileHandler',
+            'level': 'DEBUG',
             'formatter': 'standard',
+            'filename': 'app.log',
+            'mode': 'a',
         },
     },
     'loggers': {
         '__main__': {
-            'handlers': ['queue'],
+            'handlers': ['console_info', 'console_error'],  # Add 'file' if you want file logging
             'level': 'DEBUG',
             'propagate': False,
         },
     },
     'root': {
-        'handlers': ['queue'],
+        'handlers': ['console_info', 'console_error'],  # Add 'file' if you want file logging
         'level': 'DEBUG',
     },
-    'filters': {
-        'warning_filter': {
-            '()': 'logging.Filter',
-            'name': 'warning_filter',
-        },
-    },
 }
-
 
 def setup_logging() -> logging.Logger:
     try:
@@ -57,26 +53,6 @@ def setup_logging() -> logging.Logger:
 
         # Create the logger
         logger = logging.getLogger(__name__)
-
-        # Queue handler to manage asynchronous logging
-        log_queue = queue.Queue(-1)
-        queue_handler = logging.handlers.QueueHandler(log_queue)
-        queue_listener = logging.handlers.QueueListener(log_queue, *logger.handlers)
-        queue_listener.start()
-
-        logger.addHandler(queue_handler)
-
-        # Adding console handlers explicitly
-        console_info_handler = logging.StreamHandler()
-        console_info_handler.setLevel(logging.INFO)
-        console_info_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-
-        console_error_handler = logging.StreamHandler()
-        console_error_handler.setLevel(logging.WARNING)
-        console_error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-
-        logger.addHandler(console_info_handler)
-        logger.addHandler(console_error_handler)
 
         # Log a diagnostics message to confirm successful setup
         logger.debug("Logging setup complete and operational.")
@@ -87,11 +63,9 @@ def setup_logging() -> logging.Logger:
         print(f"Failed to configure logging: {e}")
         raise
 
-
 def get_logger(name: str) -> logging.Logger:
     """Get a logger with the specified name."""
     return logging.getLogger(name)
-
 
 # Usage example:
 if __name__ == "__main__":
