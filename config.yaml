@@ -90,7 +90,7 @@ category: "Technology"
 copyright: "UglyFeed"
 
 ## scheduler
-scheduling_enabled: true
+scheduling_enabled: false
 scheduling_interval: 4
 scheduling_period: hours
 
