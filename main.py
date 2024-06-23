@@ -8,7 +8,7 @@ import feedparser
 import json
 import re
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, HashingVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import AgglomerativeClustering, DBSCAN, KMeans
 from tqdm import tqdm
