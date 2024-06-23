@@ -37,7 +37,7 @@ jobs:
           changed_files=$(git diff --name-only HEAD~1 HEAD)
           
           # Define important files or folders for MINOR version bump
-          important_files_or_folders=("important_file1.py" "important_folder1/" "docs/README.md")
+          important_files_or_folders=("main.py" "llm_processor.py" "json2rss.py" "config.yaml" "server.py" "deploy_xml.py" "docs/")
 
           # Initialize version bump type
           version_bump="patch"  # Default bump type
