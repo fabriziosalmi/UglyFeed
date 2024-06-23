@@ -11,7 +11,8 @@ Available actions:
 
 ## Installation (pip)
 
-UglyFeed can be installed via `pip` using the `uglypy` package. This integration allows users to incorporate UglyFeed features into existing pipelines easily. For more information, visit the [PyPI page for uglypy](https://pypi.org/project/uglypy/0.0.1/). Note that version 0.0.1 may lack some features, which will be added soon.
+UglyFeed can be installed via `pip` using the `uglypy` package. This integration allows users to incorporate UglyFeed features into existing pipelines easily. 
+For more information, visit the [PyPI page for uglypy](https://pypi.org/project/uglypy/).
 
 ```bash
 pip install uglypy
