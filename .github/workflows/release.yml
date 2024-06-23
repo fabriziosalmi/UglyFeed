@@ -1,0 +1,115 @@
+name: Automated Release
+
+on:
+  push:
+    branches:
+      - main  # Adjust to the branches where you want to create releases
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: pip install semver
+
+      - name: Determine Version Bump
+        id: version
+        run: |
+          # Read the current version from the VERSION file
+          if [ -f VERSION ]; then
+            current_version=$(cat VERSION)
+          else
+            current_version="0.0.0"
+          fi
+
+          echo "Current version: $current_version"
+
+          # Get list of changed files in the latest commit
+          changed_files=$(git diff --name-only HEAD~1 HEAD)
+          
+          # Define important files or folders for MINOR version bump
+          important_files_or_folders=("important_file1.py" "important_folder1/" "docs/README.md")
+
+          # Initialize version bump type
+          version_bump="patch"  # Default bump type
+
+          # Check for a [MAJOR] keyword in the commit message
+          commit_message="${{ github.event.head_commit.message }}"
+
+          if [[ "$commit_message" == *"[MAJOR]"* ]]; then
+            version_bump="major"
+          else
+            # Check changed files to classify the bump type
+            for file in $changed_files; do
+              for important in "${important_files_or_folders[@]}"; do
+                if [[ "$file" == "$important"* ]]; then
+                  version_bump="minor"
+                  break 2
+                fi
+              done
+            done
+          fi
+
+          # Determine the next version based on the bump type
+          if [[ "$version_bump" == "major" ]]; then
+            next_version=$(python -c "import semver; print(semver.VersionInfo.parse('$current_version').bump_major())")
+          elif [[ "$version_bump" == "minor" ]]; then
+            next_version=$(python -c "import semver; print(semver.VersionInfo.parse('$current_version').bump_minor())")
+          else
+            next_version=$(python -c "import semver; print(semver.VersionInfo.parse('$current_version').bump_patch())")
+          fi
+
+          # Write the next version back to the VERSION file
+          echo $next_version > VERSION
+
+          echo "next_version=$next_version" >> $GITHUB_ENV
+          echo "version_bump=$version_bump" >> $GITHUB_ENV
+
+      - name: Commit and Push Version Change
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add VERSION
+          git commit -m "Bump version to ${{ env.next_version }}"
+          git tag -a "v${{ env.next_version }}" -m "Version ${{ env.next_version }}"
+          git push origin main --tags
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.next_version }}
+          release_name: Release ${{ env.next_version }}
+          body: |
+            ## Changes in this Release
+            - Automatically generated release based on the following commit: ${{ github.sha }}
+            - Commit message: ${{ github.event.head_commit.message }}
+            - Version bump type: ${{ env.version_bump }}
+          draft: false
+          prerelease: ${{ contains(github.event.head_commit.message, '[PRE-RELEASE]') }}
+
+      - name: Upload Release Asset (Optional)
+        uses: actions/upload-release-asset@v1
+        if: steps.create_release.outputs.upload_url != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./path/to/your/asset.zip
+          asset_name: asset.zip
+          asset_content_type: application/zip
+
+      - name: Notify on Failure (Optional)
+        if: failure()
+        run: echo "Release failed. Notify maintainers."
+        # You can add actions here to send notifications, for example, to a Slack channel.
