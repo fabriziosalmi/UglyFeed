@@ -1,4 +1,4 @@
-name: Deploy releses (GitHub, Pypi, DockerHub)
+name: Release and Docker Deploy
 
 on:
   push:
@@ -9,7 +9,6 @@ on:
       - 'requirements.txt'
       - 'config.py'
       - 'Dockerfile'
-      - '.github/workflows/release.yml'
   workflow_dispatch:
 
 jobs:
@@ -31,7 +30,11 @@ jobs:
       - name: Extract version number from setup.py
         id: get_version
         run: |
-          VERSION=$(python -c "import re; version_line = next(line for line in open('setup.py') if line.startswith('    version=')); print(re.search(r'[\"\\\']([^\"\\\']+)[\"\\\']', version_line).group(1))")
+          VERSION=$(python -c "
+          import re
+          version_line = next(line for line in open('setup.py') if line.startswith('    version='))
+          version = re.search(r'\"([^\"]+)\"', version_line).group(1)
+          print(version)")
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Build package
