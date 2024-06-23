@@ -45,24 +45,23 @@ jobs:
       - name: Check if commit affects non-excluded files
         id: check_changes
         run: |
-          echo "CHANGED_FILES=$(git diff --name-only HEAD~1)" >> $GITHUB_ENV
-          echo "CHANGED_FILES=${{ steps.check_changes.outputs.CHANGED_FILES }}"
+          CHANGED_FILES=$(git diff --name-only HEAD~1)
+          echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
         shell: bash
-        env:
-          CHANGED_FILES: ${{ steps.check_changes.outputs.CHANGED_FILES }}
-        outputs:
-          non_excluded_changes: ${{ steps.check_changes.outputs.CHANGED_FILES != '' && !steps.check_changes.outputs.CHANGED_FILES =~ '\.txt$' && !steps.check_changes.outputs.CHANGED_FILES =~ '\.md$' }}
 
       - name: Publish package to PyPI
         if: |
           github.event_name == 'push' &&
           github.ref == 'refs/heads/main' &&
-          steps.check_changes.outputs.non_excluded_changes &&
           !contains(github.event.head_commit.message, 'pylint') &&
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
           !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci')
+          !contains(github.event.head_commit.message, 'ci') &&
+          env.CHANGED_FILES != '' &&
+          !startsWith(env.CHANGED_FILES, ' ') &&
+          !endsWith(env.CHANGED_FILES, '.txt') &&
+          !endsWith(env.CHANGED_FILES, '.md')
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
@@ -73,12 +72,15 @@ jobs:
         if: |
           github.event_name == 'push' &&
           github.ref == 'refs/heads/main' &&
-          steps.check_changes.outputs.non_excluded_changes &&
           !contains(github.event.head_commit.message, 'pylint') &&
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
           !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci')
+          !contains(github.event.head_commit.message, 'ci') &&
+          env.CHANGED_FILES != '' &&
+          !startsWith(env.CHANGED_FILES, ' ') &&
+          !endsWith(env.CHANGED_FILES, '.txt') &&
+          !endsWith(env.CHANGED_FILES, '.md')
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
@@ -95,12 +97,15 @@ jobs:
       - name: Upload Release Asset (Optional)
         if: |
           steps.create_release.outputs.upload_url != '' &&
-          steps.check_changes.outputs.non_excluded_changes &&
           !contains(github.event.head_commit.message, 'pylint') &&
           !contains(github.event.head_commit.message, 'dependabot') &&
           !contains(github.event.head_commit.message, 'CodeQL') &&
           !contains(github.event.head_commit.message, 'chore') &&
-          !contains(github.event.head_commit.message, 'ci')
+          !contains(github.event.head_commit.message, 'ci') &&
+          env.CHANGED_FILES != '' &&
+          !startsWith(env.CHANGED_FILES, ' ') &&
+          !endsWith(env.CHANGED_FILES, '.txt') &&
+          !endsWith(env.CHANGED_FILES, '.md')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
