@@ -1,15 +1,35 @@
 # Documentation
 Welcome to the UglyFeed documentation. This guide provides detailed information on how to run UglyFeed.
 
-## Installation and Automated Runs (GitHub Actions)
+- [Installation and Automated Runs](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
+- [Installation (Pip)](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#-installation-pip)
+- [Installation and run (without Docker)](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#%EF%B8%8F-installation-and-run-without-docker)
+- [Installation and Run (Docker)](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#-installation-and-run-docker)
+- [Installation and Run (Docker Compose)](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#-installation-and-run-docker-compose)
+- [Configuration](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#-configuration)
+- [Usage](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#%EF%B8%8F-usage)
 
-You can use the UglyFeed repository as a GitHub action application source, and your own repository as an XML CDN. A file named `uglyfeed.xml` will be saved to your repository daily. No local installation or execution is required; simply configure the actions to suit your needs. Additional actions will be added soon for popular setups.
 
-Available actions:
+## ⚙️ Installation and Automated Runs (GitHub Actions)
 
-- [Daily delivery via Groq and llama3-8b-8192](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-8b-8192.yml)
+You can use the UglyFeed repository as a GitHub action application source, and your own public repository as an XML CDN. A file named `uglyfeed.xml` will be saved to your repository daily. No local installation or execution is required; simply configure the actions to suit your needs. 
 
-## Installation (pip)
+- 📙 Additional actions will be added soon for popular setups supporting remote Ollama servers and more setups.
+- 🔒 To mask your important vars you can use a private repository and, of course, protect all params by using GitHub Actions secrets only.
+
+Here the current available actions:
+
+**Daily delivery via GitHub Actions**
+
+- [Groq and llama3-8b-8192](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-8b-8192.yml)
+- [Groq and llama3-70b-8192](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-70b-8192.yml)
+- [Groq and gemma-7b-it](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-gemma-7b-it.yml)
+- [Groq and mixtral-8x7b-32768](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-mixtral-8x7b-32768.yml)
+- [OpenAI and gpt-3.5-turbo](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-OpenAI-gpt-3.5-turbo.yml)
+- [OpenAI and gpt-4](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-OpenAI-gpt-4.yml)
+- [OpenAI and gpt-4o](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-OpenAI-gpt-4o.yml)
+
+## 🐍 Installation (pip)
 
 UglyFeed can be installed via `pip` using the `uglypy` package. This integration allows users to incorporate UglyFeed features into existing pipelines easily. 
 For more information, visit the [PyPI page for uglypy](https://pypi.org/project/uglypy/).
@@ -18,7 +38,7 @@ For more information, visit the [PyPI page for uglypy](https://pypi.org/project/
 pip install uglypy
 ```
 
-## Installation and Run (Without Docker)
+## 🖥️ Installation and Run (Without Docker)
 
 To run the UglyFeed web application without Docker, clone the repository and start the application with Streamlit:
 
@@ -27,14 +47,18 @@ git clone https://github.com/fabriziosalmi/UglyFeed.git
 cd UglyFeed
 streamlit run gui.py --server.address 0.0.0.0
 ```
+That command will run UglyFeed web UI on all interfaces, if You prefer to make it listen on localhost only go this way:
+```
+streamlit run gui.py --server.address 127.0.0.1
+```
 
 To disable Streamlit telemetry, use the following command:
 
 ```sh
-streamlit run gui.py --server.address 0.0.0.0 --browser.gatherUsageStats false
+streamlit run gui.py --browser.gatherUsageStats false
 ```
 
-## Installation and Run (With Docker)
+## 🐳 Installation and Run (Docker)
 
 To run the UglyFeed app using Docker, populate the `config.yaml` and `feeds.txt` with your settings, and mount these files in the container:
 
@@ -42,7 +66,7 @@ To run the UglyFeed app using Docker, populate the `config.yaml` and `feeds.txt`
 docker run -p 8001:8001 -p 8501:8501 -v /path/to/local/feeds.txt:/app/input/feeds.txt -v /path/to/local/config.yaml:/app/config.yaml fabriziosalmi/uglyfeed:latest
 ```
 
-## Installation and Run (Docker Compose)
+## 🐳 Installation and Run (Docker Compose)
 
 For an easier setup with Docker Compose, use the following commands:
 
@@ -54,7 +78,7 @@ docker compose up -d
 
 The stack defined in the `docker-compose.yaml` file has been successfully tested on Portainer 🎉.
 
-## Configuration
+## 📝 Configuration
 
 You can customize UglyFeed's behavior by modifying the configuration files or using the web application's **Configuration** page.
 
@@ -170,7 +194,7 @@ Configure deployment to GitHub or GitLab:
 - `gitlab_repo`: GitLab repository for deployment.
 - `gitlab_token`: GitLab token for authentication.
 
-### Usage
+## ▶️ Usage
 
 - **Run Scripts**: From the `Run scripts` page, aggregate feed items by similarity and rewrite them according to the LLM instructions. Logs are displayed for debugging.
 - **View and Serve XML**: View and download the generated XML, or enable the HTTP server to provide a valid XML URL for any RSS reader.
