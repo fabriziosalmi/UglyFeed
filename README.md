@@ -56,7 +56,14 @@ docker run -p 8001:8001 -p 8501:8501 -v /path/to/local/feeds.txt:/app/input/feed
 ```
 
 ### Configure the application
-In the **Configuration** page (or by manually editing the `config.yaml` file) you will find aggregation similarity, LLM API, LLM model, retention, scheduler and deploy options.
+In the **Configuration** page (or by manually editing the `config.yaml` file) you will find all configuration options. You must change at least the source feeds you want to aggregate, the LLM API and model to use to rewrite the aggregated feeds. You can then retrieve the final `uglyfeed.xml` feed in many ways: 
+
+- local filesystem
+- download from web UI
+- HTTP server url
+- HTTPS GitHub CDN url
+
+> You can easily extend it to send it to cms, notification or messaging systems.
 
 ### Execute the application scripts
 Execute all scripts in the **Run scripts** page easily by clicking on the button **Run `main.py`, `llm_processor.py`, `json2rss.py` sequentially**.
