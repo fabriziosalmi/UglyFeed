@@ -14,7 +14,7 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 
 - 📡 Retrieve RSS feeds
 - 🧮 Aggregate feeds items by similarity
-- 🤖 Rewrite content using LLM API
+- ✨ Rewrite content using LLM API
 - 💾 Save rewritten feeds to JSON files
 - 🔁 Convert JSON to valid RSS feed
 - 🌐 Serve XML feed via HTTP server
@@ -25,6 +25,7 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - 🐍 [Pip installable package](https://pypi.org/project/uglypy/)
 - ⚙️ [Github actions workflows](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
 - 📰 [RSS test feeds available](https://github.com/fabriziosalmi/uglyfeed-cdn)
+- 🤖 Same codebase for all releases
 
 
 **Requirements**
