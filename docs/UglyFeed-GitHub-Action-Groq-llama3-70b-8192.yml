@@ -64,7 +64,7 @@ jobs:
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         SELECTED_API: ${{ vars.SELECTED_API }}
         GROQ_API_URL: ${{ vars.GROQ_API_URL }}
-        GROQ_MODEL: llama3-70b-8192
+        GROQ_MODEL: "llama3-70b-8192"
         OUTPUT_FOLDER: ${{ github.workspace }}/UglyFeed/output
         REWRITTEN_FOLDER: ${{ github.workspace }}/UglyFeed/rewritten
         GENERATOR_TOKEN: ${{ secrets.GENERATOR_TOKEN }}
