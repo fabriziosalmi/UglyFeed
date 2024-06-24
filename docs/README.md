@@ -1,13 +1,13 @@
 # Documentation
 Welcome to the UglyFeed documentation. This guide provides detailed information on how to run UglyFeed.
 
-- [Installation and Automated Runs](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
-- [Installation (Pip)](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#-installation-pip)
-- [Installation and run (without Docker)](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#%EF%B8%8F-installation-and-run-without-docker)
-- [Installation and Run (Docker)](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#-installation-and-run-docker)
-- [Installation and Run (Docker Compose)](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#-installation-and-run-docker-compose)
-- [Configuration](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#-configuration)
-- [Usage](https://github.com/fabriziosalmi/UglyFeed/edit/main/docs/README.md#%EF%B8%8F-usage)
+- [Installation and Automated Runs](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
+- [Installation (Pip)](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#-installation-pip)
+- [Installation and run (without Docker)](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-run-without-docker)
+- [Installation and Run (Docker)](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#-installation-and-run-docker)
+- [Installation and Run (Docker Compose)](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#-installation-and-run-docker-compose)
+- [Configuration](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#-configuration)
+- [Usage](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-usage)
 
 
 ## ⚙️ Installation and Automated Runs (GitHub Actions)
