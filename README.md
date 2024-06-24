@@ -23,8 +23,9 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - 🖥️ Web UI based on Streamlit
 - 🐳 [Docker installable package](https://hub.docker.com/r/fabriziosalmi/uglyfeed)
 - 🐍 [Pip installable package](https://pypi.org/project/uglypy/)
-- ⚙️ [Github action workflow available](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-8b-8192.yml)
+- ⚙️ [Github actions workflows](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
 - 📰 [RSS test feeds available](https://github.com/fabriziosalmi/uglyfeed-cdn)
+
 
 **Requirements**
 - 🌎 Internet connection
