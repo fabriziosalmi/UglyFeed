@@ -12,7 +12,7 @@ Welcome to the UglyFeed documentation. This guide provides detailed information 
 
 ## ⚙️ Installation and Automated Runs (GitHub Actions)
 
-You can use the UglyFeed repository as a GitHub action application source, and your own public repository as an XML CDN. A file named `uglyfeed.xml` will be saved to your repository daily. No local installation or execution is required; simply configure the actions to suit your needs. 
+You can use the UglyFeed repository as a GitHub Actions application source, and your own public repository as an XML CDN. A file named `uglyfeed.xml` will be saved to your repository daily. No local installation or execution is required; simply configure the actions to suit your needs. 
 
 - 📙 Additional actions will be added soon for popular setups supporting remote Ollama servers and more setups.
 - 🔒 To mask your important vars you can use a private repository and, of course, protect all params by using GitHub Actions secrets only.
