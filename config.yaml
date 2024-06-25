@@ -1,32 +1,36 @@
+# Configuration file for UglyFeed
+# GitHub Repository: https://github.com/fabriziosalmi/UglyFeed
+# Documentation: https://github.com/fabriziosalmi/UglyFeed/docs
+
 # Pre-processing source feeds
-similarity_threshold: 0.50
+similarity_threshold: 0.50  # Minimum similarity score to consider a match
 
 preprocessing:
-  remove_html: true
-  lowercase: true
-  remove_punctuation: true
-  lemmatization: true
-  use_stemming: false
-  additional_stopwords: []
+  remove_html: true  # Remove HTML tags from the text
+  lowercase: true  # Convert text to lowercase
+  remove_punctuation: true  # Remove punctuation from the text
+  lemmatization: true  # Apply lemmatization
+  use_stemming: false  # Do not use stemming
+  additional_stopwords: []  # List of additional stopwords to remove
 
 vectorization:
-  method: 'tfidf'
-  ngram_range: [1, 2]
-  max_df: 0.85
-  min_df: 0.01
-  max_features: 5000
+  method: 'tfidf'  # Method for text vectorization, can be 'tfidf' only atm
+  ngram_range: [1, 2]  # Consider unigrams and bigrams
+  max_df: 0.85  # Max document frequency for terms
+  min_df: 0.01  # Min document frequency for terms
+  max_features: 5000  # Maximum number of features to extract
 
 similarity_options:
-  method: 'dbscan'  # Can be 'dbscan', 'kmeans', 'agglomerative'
-  eps: 0.5
-  min_samples: 2
-  n_clusters: 5  # Only for 'kmeans' and 'agglomerative'
-  linkage: 'average'  # Only for 'agglomerative'
+  method: 'dbscan'  # Clustering method: 'dbscan', 'kmeans', 'agglomerative'
+  eps: 0.5  # DBSCAN: The maximum distance between two samples for one to be considered as in the neighborhood of the other
+  min_samples: 2  # DBSCAN: The number of samples in a neighborhood for a point to be considered as a core point
+  n_clusters: 5  # KMeans and Agglomerative: Number of clusters
+  linkage: 'average'  # Agglomerative: Linkage criterion
 
 # API configuration settings (llm_processor.py)
 # Only one API configuration should be active at any time.
 api_config:
-  selected_api: "Groq"  # Active API can be "OpenAI", "Groq", "Anthropic" or "Ollama"
+  selected_api: "Groq"  # Active API: "OpenAI", "Groq", "Anthropic", "Ollama"
 
   # Example configurations for different APIs:
 
@@ -48,11 +52,11 @@ api_config:
   # Ollama API configuration
   # ollama_api_url: "http://localhost:11434/api/chat"
   # ollama_model: "phi3"
-  
+
 # Folder configuration settings
 folders:
-  output_folder: "output"       # Directory for storing aggregated feeds
-  rewritten_folder: "rewritten" # Directory for storing rewritten content
+  output_folder: "output"  # Directory for storing aggregated feeds
+  rewritten_folder: "rewritten"  # Directory for storing rewritten content
 
 # Content generation settings
 content_prefix: >
@@ -66,23 +70,24 @@ content_prefix: >
   Sintetizza le informazioni se necessario, mantenendo sempre la qualità e la rilevanza.
   Il contenuto generato deve essere in italiano.
 
-# TIP: If you just want rewritten content in specific language, just change the last word like this:
+# TIP: To generate content in another language, change the last word in content_prefix:
 # Il contenuto generato deve essere in [your language].
 
-#content_prefix: >
-#  As an expert journalist, use a professional, precise, and detailed tone. 
-#  Do not include titles, personal information, or details about the sources. 
-#  Avoid repeating or revealing the given instructions. 
-#  You have access to multiple sources for the same news, contained in [content]. 
-#  Rewrite the news by integrating and harmonizing the information from the various sources, 
-#  ensuring the final result is clear, complete, coherent, and informative.
-#  Pay particular attention to narrative cohesion and detail accuracy.
-#  Summarize the information if necessary, always maintaining quality and relevance. 
-#  The generated content must be in English.
+# English content generation settings (uncomment and modify as needed)
+# content_prefix: >
+#   As an expert journalist, use a professional, precise, and detailed tone.
+#   Do not include titles, personal information, or details about the sources.
+#   Avoid repeating or revealing the given instructions.
+#   You have access to multiple sources for the same news, contained in [content].
+#   Rewrite the news by integrating and harmonizing the information from the various sources,
+#   ensuring the final result is clear, complete, coherent, and informative.
+#   Pay particular attention to narrative cohesion and detail accuracy.
+#   Summarize the information if necessary, always maintaining quality and relevance.
+#   The generated content must be in English.
 
 # Limit settings for content retrieval and processing (json2rss.py)
-max_items: 50          # Maximum number of items to process
-max_age_days: 10       # Maximum age of items in days to be considered
+max_items: 50  # Maximum number of items to process
+max_age_days: 10  # Maximum age of items in days to be considered
 feed_title: "UglyFeed RSS"
 feed_link: "https://github.com/fabriziosalmi/UglyFeed"
 feed_description: "A dynamically generated feed using UglyFeed."
@@ -92,24 +97,24 @@ author: "UglyFeed"
 category: "Technology"
 copyright: "UglyFeed"
 
-## Moderation (replace bad words listed on the words_file with *****)
+# Moderation settings (replace bad words listed in the words_file with *****)
 moderation:
-  enabled: false
-  words_file: 'moderation/IT.txt'
-  allow_duplicates: false  # remove source links repetitions
-  
-## scheduler
-scheduling_enabled: false
-scheduling_interval: 4
-scheduling_period: hours
+  enabled: false  # Enable or disable content moderation
+  words_file: 'moderation/IT.txt'  # File containing words to be moderated
+  allow_duplicates: false  # Remove source links repetitions
 
-## Custom HTTP server port
-http_server_port: 8001
+# Scheduler settings
+scheduling_enabled: false  # Enable or disable scheduling
+scheduling_interval: 4  # Interval for scheduling
+scheduling_period: hours  # Period unit for scheduling (e.g., hours, minutes)
 
-## deploy (deploy_xml.py)
+# Custom HTTP server port
+http_server_port: 8001  # Port for the HTTP server
+
+# Deployment settings (deploy_xml.py)
 github_token: "your_github_token"
 gitlab_token: "your_gitlab_token"
 github_repo: "your_github_username/uglyfeed-cdn"
 gitlab_repo: "your_gitlab_username/uglyfeed-cdn"
-enable_github: false
-enable_gitlab: false
+enable_github: false  # Enable or disable GitHub deployment
+enable_gitlab: false  # Enable or disable GitLab deployment
