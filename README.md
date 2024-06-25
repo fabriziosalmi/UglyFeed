@@ -107,7 +107,7 @@ Feel free to open issues or submit pull requests. Any contributions are welcome!
 Here some improvements I am still working on:
 
 - overall code improvements and tests
-- extend to generate HTML/media from rewritten JSON with themes/styles (tentatives with PiperTTS and others)
+- generate media from rewritten content
 - here something i forgot 😅
 
 ## Disclaimer
