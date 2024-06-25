@@ -1,4 +1,0 @@
-gtts
-pydub
-python-dotenv
-pyyaml
