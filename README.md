@@ -34,6 +34,7 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
   
 ## Packages
 
+- 💾 [Source code](https://github.com/fabriziosalmi/UglyFeed/releases/latest)
 - 🐳 [Docker installable package](https://hub.docker.com/r/fabriziosalmi/uglyfeed)
 - 🐍 [Pip installable package](https://pypi.org/project/uglypy/)
 - ⚙️ [Github actions workflows](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
