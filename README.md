@@ -1,13 +1,8 @@
-# UglyFeed
+# <img src="https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/docs/UglyFeed.png" alt="UglyFeed" height="32" width="32"> UglyFeed
 
 UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **filter**, **rewrite**, **evaluate** and **serve** content (RSS feeds) written by a large language model. This repository provides the [code](https://github.com/fabriziosalmi/UglyFeed.git), the **[documentation](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md)**, a [FAQ](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/faq.md) page and some optional scripts to evaluate the generated content.
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/fabriziosalmi/UglyFeed) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-raw/fabriziosalmi/UglyFeed) [![Pylint](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/pylint.yml) [![CodeQL](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/fabriziosalmi/UglyFeed/actions/workflows/github-code-scanning/codeql) ![Docker Pulls](https://img.shields.io/docker/pulls/fabriziosalmi/uglyfeed) ![PyPI - Downloads](https://img.shields.io/pypi/dm/uglypy?label=uglypy)
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/fabriziosalmi/UglyFeed/main/docs/UglyFeed.png" alt="UglyFeed" height="64" style="">
-</p>
-
 
 
 ## Features
