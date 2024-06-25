@@ -45,7 +45,7 @@ To run the UglyFeed web application without Docker, clone the repository and sta
 ```sh
 git clone https://github.com/fabriziosalmi/UglyFeed.git
 cd UglyFeed
-streamlit run gui.py --server.address 0.0.0.0
+streamlit run gui.py
 ```
 That command will run UglyFeed web UI on all interfaces, if You prefer to make it listen on localhost only go this way:
 ```
