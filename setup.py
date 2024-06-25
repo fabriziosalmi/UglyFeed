@@ -6,13 +6,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='uglypy',  # The package name on PyPI
-    version='0.0.26',  # Initial version, update manually for major changes
+    version='0.0.27',  # Initial version, update manually for major changes
     author='Fabrizio Salmi',
     author_email='fabrizio.salmi@gmail.com',  # Replace with your email
     description='A Python package for aggregating and processing RSS feeds with LLM-enhanced content rewriting.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/fabriziosalmi/UglyFeed',  # Project URL
+    url='https://github.com/fabriziosalmi/UglyFeed',  # Correct key for homepage
     project_urls={
         "Bug Tracker": "https://github.com/fabriziosalmi/UglyFeed/issues",
         "Documentation": "https://github.com/fabriziosalmi/UglyFeed/blob/main/docs",
