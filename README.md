@@ -48,8 +48,10 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 ### Prerequisites
 
 - **Docker**: Ensure you have Docker installed on your system. You can download and install it from [Docker's official site](https://www.docker.com/get-started).
-- **Ollama** to run local models or an **OpenAI** or **Groq** API key.
+- **Ollama** to run local models or an **OpenAI**, **Groq** or **Anthropic** API key.
 
+> You can use your own models by running a compatible OpenAI LLM server. You must change the OpenAI API url parameter.
+ 
 ### Running the Container
 
 To start the UglyFeed app, use the following `docker run` command:
