@@ -112,7 +112,9 @@ def process_item(item, config, moderated_words):
     """Process individual JSON item to XML item element."""
     item_element = Element('item')
 
-    moderation_enabled = get_config_value(config, 'moderation', {}).get('enabled', False)
+    moderation_config = config.get('moderation', {})
+    moderation_enabled = moderation_config.get('enabled', False)
+    allow_duplicates = moderation_config.get('allow_duplicates', True)
 
     item_title = SubElement(item_element, 'title')
     title_text = item.get('title', 'No Title')
@@ -123,9 +125,12 @@ def process_item(item, config, moderated_words):
     content = escape_xml_chars(replace_swear_words(content, moderated_words) if moderation_enabled else content)
 
     if 'links' in item:
-        unique_links = list(dict.fromkeys(item['links']))  # Remove duplicate links
+        links = item['links']
+        if not allow_duplicates:
+            links = list(dict.fromkeys(item['links']))  # Remove duplicate links
+
         content += "<br/><br/><small><b>Sources</b></small><br/><ul>"
-        for link in unique_links:
+        for link in links:
             content += f'<li><small><a href="{link}" target="_blank">{link}</a></small></li>'
         content += "</ul>"
 
@@ -150,8 +155,9 @@ def process_item(item, config, moderated_words):
 
 def create_rss_feed(json_data, output_path, config):
     """Create or update an RSS feed based on provided JSON data."""
-    moderation_enabled = get_config_value(config, 'moderation', {}).get('enabled', False)
-    moderated_words_file = get_config_value(config, 'moderation', {}).get('words_file', 'moderated.txt')
+    moderation_config = config.get('moderation', {})
+    moderation_enabled = moderation_config.get('enabled', False)
+    moderated_words_file = moderation_config.get('words_file', 'moderated.txt')
     moderated_words = load_moderated_words(moderated_words_file) if moderation_enabled else []
 
     if os.path.exists(output_path):
@@ -203,29 +209,44 @@ def main():
     parser.add_argument('--config', type=str, default='config.yaml', help='Path to the configuration file')
     parser.add_argument('--max_items', type=int, help='Override maximum number of items in the RSS feed')
     parser.add_argument('--max_age_days', type=int, help='Override maximum age of items in days')
+    parser.add_argument('--feed_title', type=str, help='Override feed title')
+    parser.add_argument('--feed_link', type=str, help='Override feed link')
+    parser.add_argument('--feed_description', type=str, help='Override feed description')
+    parser.add_argument('--feed_language', type=str, help='Override feed language')
+    parser.add_argument('--feed_self_link', type=str, help='Override feed self link')
+    parser.add_argument('--author', type=str, help='Override author')
+    parser.add_argument('--category', type=str, help='Override category')
+    parser.add_argument('--copyright', type=str, help='Override copyright')
+    parser.add_argument('--moderation_enabled', type=bool, help='Enable or disable moderation')
+    parser.add_argument('--moderated_words_file', type=str, help='Path to the moderated words file')
+    parser.add_argument('--allow_duplicates', type=bool, help='Allow or disallow duplicate links')
+    parser.add_argument('--rewritten_dir', type=str, help='Directory for rewritten JSON files')
+    parser.add_argument('--output_dir', type=str, help='Output directory for RSS feed')
     args = parser.parse_args()
 
     config = load_config(args.config)
 
     # Override config values with environment variables if present
-    global MAX_ITEMS
-    MAX_ITEMS = int(get_config_value(config, 'max_items', 50))
-    global MAX_AGE_DAYS
-    MAX_AGE_DAYS = int(get_config_value(config, 'max_age_days', 30))
+    config.update({k: get_config_value(config, k, v) for k, v in config.items()})
+    # Override nested moderation config with environment variables
+    if 'moderation' in config:
+        config['moderation'].update({k: get_config_value(config['moderation'], k, v) for k, v in config['moderation'].items()})
 
     # Override config values if command-line arguments are provided
-    if args.max_items is not None:
-        MAX_ITEMS = args.max_items
+    for key, value in vars(args).items():
+        if value is not None:
+            if key.startswith('moderation_'):
+                moderation_key = key.split('_', 1)[1]
+                config.setdefault('moderation', {})[moderation_key] = value
+            else:
+                config[key] = value
 
-    if args.max_age_days is not None:
-        MAX_AGE_DAYS = args.max_age_days
+    logging.info(f"Configuration: {json.dumps(config, indent=4)}")
 
-    logging.info(f"Configuration: MAX_ITEMS={MAX_ITEMS}, MAX_AGE_DAYS={MAX_AGE_DAYS}")
+    rewritten_dir = config.get('rewritten_dir', 'rewritten')
+    output_path = os.path.join(config.get('output_dir', 'uglyfeeds'), 'uglyfeed.xml')
 
-    rewritten_dir = get_config_value(config, 'rewritten_dir', 'rewritten')
-    output_path = os.path.join(get_config_value(config, 'output_dir', 'uglyfeeds'), 'uglyfeed.xml')
-
-    os.makedirs(get_config_value(config, 'output_dir', 'uglyfeeds'), exist_ok=True)
+    os.makedirs(config.get('output_dir', 'uglyfeeds'), exist_ok=True)
 
     json_data = read_json_files(rewritten_dir)
 
