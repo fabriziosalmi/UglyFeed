@@ -143,6 +143,7 @@ Specify the API for processing:
 - `anthropic_api_url` (default: `https://api.anthropic.com/v1/messages`): Anthropic API endpoint.
 - `anthropic_api_key`: Anthropic API key.
 - `anthropic_model`:  Anthropic model to use (e.g., `claude-3-haiku-20240307`, `claude-3-sonnet-20240229`, `claude-3-opus-20240229`)
+
 ##### Ollama API
 
 - `ollama_api_url`: Ollama API endpoint.
@@ -152,14 +153,16 @@ Specify the API for processing:
 
 Set the instructions for the LLM to process and rewrite content:
 
-- `content_prefix`: Instruction template for content rewriting.
+- `prompt_file`: Path to the file containing the instruction template for content rewriting.
 
 #### Content Moderation
 Replace words with ***** while generating final XML feed and remove duplicates source links:
 ```
 moderation:
   enabled: false
-  words_file: 'moderation/IT.txt'
+  words_file: 'moder
+
+ation/IT.txt'
   allow_duplicates: false
 ```
 
@@ -210,4 +213,3 @@ Configure deployment to GitHub or GitLab:
 - **Run Scripts**: From the `Run scripts` page, aggregate feed items by similarity and rewrite them according to the LLM instructions. Logs are displayed for debugging.
 - **View and Serve XML**: View and download the generated XML, or enable the HTTP server to provide a valid XML URL for any RSS reader.
 - **Deploy**: Publish the XML feed to GitHub or GitLab. A public URL will be provided for use with any RSS reader.
-
