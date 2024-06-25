@@ -22,3 +22,6 @@ tqdm==4.66.3
 typer==0.9.0
 streamlit
 schedule
+# pydub
+# python-dotenv
+# gtts

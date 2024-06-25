@@ -103,8 +103,8 @@ enable_github: false  # Enable or disable GitHub deployment
 enable_gitlab: false  # Enable or disable GitLab deployment
 
 # TTS
-# tts_input: "rewritten"
-# tts_output: "media"
-# tts_language: "it"
-# speed_factor: 1.25
-# enable_tts: false
+tts_input: "rewritten"
+tts_output: "media"
+tts_language: "it"
+speed_factor: 1.25
+enable_tts: false
