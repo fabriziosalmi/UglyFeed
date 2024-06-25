@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-setup(
+setup(xs
     name='uglypy',  # The package name on PyPI
     version='0.0.21',  # Initial version, update manually for major changes
     author='Fabrizio Salmi',
