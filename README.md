@@ -26,6 +26,7 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - ⚙️ [Github actions workflows](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
 - 📰 [RSS test feeds available](https://github.com/fabriziosalmi/uglyfeed-cdn)
 - 🤖 Same codebase for all releases
+- 🛑 Simple post-filter moderation 
 
 
 **Requirements**
