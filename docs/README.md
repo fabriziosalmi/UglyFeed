@@ -84,10 +84,14 @@ You can customize UglyFeed's behavior by modifying the configuration files or us
 
 ### Configuration Files
 
-- **`feeds.txt`**: Specify the source feeds.
-- **`config.yaml`**: Modify settings such as preprocessing, vectorization, similarity options, and API configurations.
+- **`config.yaml`**: Modify settings such as source feeds input file path, preprocessing, vectorization, similarity options, API, models, scheduler, deployments and final XML parameters.
 
 ### Configuration Options
+
+#### Source feeds
+Control the source feeds urls list to be retrieved for aggregation:
+
+- `input_feeds_path` (default: `input/feeds.txt`)
 
 #### Pre-processing
 
