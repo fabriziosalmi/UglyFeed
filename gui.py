@@ -12,21 +12,14 @@ from scheduling import start_scheduling, run_scripts_sequentially, job_stats_glo
 from script_runner import run_script
 from utils import get_local_ip, get_xml_stats, get_xml_item_count, get_new_item_count
 
-import streamlit as st
-from config import load_config, ensure_default_config, save_configuration
-
 # Load the configuration
 config = load_config("config.yaml")
-
-# Ensure defaults are set
-config = ensure_default_config(config)
 
 # Initialize logging
 logger = setup_logging()
 
 # Define helper functions to convert between lists and tuples
 def convert_list_to_tuple(data, keys):
-    """Convert specific list values to tuples for given keys in the dictionary."""
     if isinstance(data, dict):
         for key, value in data.items():
             if key in keys and isinstance(value, list):
@@ -39,7 +32,6 @@ def convert_list_to_tuple(data, keys):
     return data
 
 def convert_tuple_to_list(data, keys):
-    """Convert specific tuple values to lists for given keys in the dictionary."""
     if isinstance(data, dict):
         for key, value in data.items():
             if key in keys and isinstance(value, tuple):
@@ -53,12 +45,11 @@ def convert_tuple_to_list(data, keys):
 
 # Load configuration and convert necessary lists to tuples
 config_keys_with_tuples = ['ngram_range']
-config = load_config('config.yaml')
 config = convert_list_to_tuple(config, config_keys_with_tuples)
 
 # Initialize session state
 if 'config_data' not in st.session_state:
-    st.session_state.config_data = ensure_default_config(config)
+    st.session_state.config_data = config
 if 'server_thread' not in st.session_state:
     st.session_state.server_thread = None
 
@@ -103,7 +94,6 @@ st.sidebar.markdown("""
 
 # Pages based on the selected option
 if selected_option == "Introduction":
-    # Introduction Page content
     st.markdown("""
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
         <img src="https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed.png?raw=true"
@@ -131,9 +121,7 @@ if selected_option == "Introduction":
     """, unsafe_allow_html=True)
 
 elif selected_option == "Configuration":
-    # Configuration Page content
     st.header("Configuration")
-
     st.divider()
 
     st.subheader("Source RSS Feeds")
@@ -141,7 +129,6 @@ elif selected_option == "Configuration":
 
     st.divider()
 
-    # Preprocessing Options
     st.subheader("Preprocessing Options")
     st.session_state.config_data['preprocessing']['remove_html'] = st.checkbox("Remove HTML Tags", value=st.session_state.config_data['preprocessing']['remove_html'])
     st.session_state.config_data['preprocessing']['lowercase'] = st.checkbox("Convert to Lowercase", value=st.session_state.config_data['preprocessing']['lowercase'])
@@ -155,7 +142,6 @@ elif selected_option == "Configuration":
 
     st.divider()
 
-    # Vectorization Options
     st.subheader("Vectorization Options")
     vectorization_methods = ["tfidf", "count", "hashing"]
     selected_method = st.selectbox("Vectorization Method", vectorization_methods, index=vectorization_methods.index(st.session_state.config_data['vectorization']['method']))
@@ -184,7 +170,6 @@ elif selected_option == "Configuration":
     selected_api = st.selectbox("Select API", api_options, index=api_options.index(st.session_state.config_data['api_config']['selected_api']))
     st.session_state.config_data['api_config']['selected_api'] = selected_api
 
-    # Initialize default keys for selected API if not present
     if selected_api == "OpenAI":
         st.session_state.config_data['api_config'].setdefault('openai_api_url', '')
         st.session_state.config_data['api_config'].setdefault('openai_api_key', '')
@@ -263,13 +248,12 @@ elif selected_option == "Configuration":
     st.divider()
 
     if st.button("Save Configuration and Feeds"):
-        # Convert tuples back to lists before saving
         config_to_save = convert_tuple_to_list(st.session_state.config_data, config_keys_with_tuples)
         save_configuration(config_to_save, st.session_state.feeds)
         st.success("Configuration and feeds saved successfully!")
+        logger.info("Configuration and feeds have been saved successfully.")
 
 elif selected_option == "Run Scripts":
-    # Run Scripts Page content
     st.header("Run Scripts")
 
     st.markdown("""
@@ -299,12 +283,7 @@ elif selected_option == "Run Scripts":
 
             st.write("---")  # Separator between scripts
 
-
-
-
-
 elif selected_option == "View and Serve XML":
-    # View and Serve XML Page content
     st.header("View and Serve XML")
 
     xml_file_path = copy_xml_to_static()
@@ -337,7 +316,6 @@ elif selected_option == "View and Serve XML":
             st.info("Server is not running.")
 
 elif selected_option == "Deploy":
-    # Deploy Page content
     st.header("Deploy XML File")
 
     from deploy_xml import deploy_xml, load_config
@@ -372,7 +350,6 @@ elif selected_option == "Deploy":
         st.info("No previous deployments found.")
 
 elif selected_option == "Debug":
-    # Debug Page content
     st.header("Debug")
 
     st.subheader("Job Execution Logs")
