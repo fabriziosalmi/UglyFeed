@@ -20,31 +20,28 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - 🤖 Same codebase for all releases
 - 🛑 Simple post-filter moderation 
 
-**Requirements**
-- 🌎 Internet connection
-- 📲 [an RSS reader](https://github.com/topics/rss-reader) (to retrieve the final feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on laptop and [NetNewsWire](https://netnewswire.com/) on mobile)
-- ✨ a large language model via API
+## Get it now
 
+- 💾 [Source code](https://github.com/fabriziosalmi/UglyFeed/releases/latest)
+- 🐳 [Docker installable package](https://hub.docker.com/r/fabriziosalmi/uglyfeed)
+- 🐍 [Pip installable package](https://pypi.org/project/uglypy/)
+- ⚙️ [Github actions workflows](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
+  
+## Quick start
+
+### Prerequisites
+
+- 🌎 Internet connection
+- 🐳 Docker
+- ✨ LLM API
+- 📲 RSS reader
+  
 **Supported API and models**
 
 - OpenAI API (`gpt-3.5-turbo`, `gpt-4`, `gpt-4o`)
 - Ollama API (all models like `llama3`, `phi3`, `qwen2`)
 - Groq API (`llama3-8b-8192`, `llama3-70b-8192`, `gemma-7b-it`, `mixtral-8x7b-32768`)
 - Anthropic API (`claude-3-haiku-20240307`, `claude-3-sonnet-20240229`, `claude-3-opus-20240229`)
-  
-## Packages
-
-- 💾 [Source code](https://github.com/fabriziosalmi/UglyFeed/releases/latest)
-- 🐳 [Docker installable package](https://hub.docker.com/r/fabriziosalmi/uglyfeed)
-- 🐍 [Pip installable package](https://pypi.org/project/uglypy/)
-- ⚙️ [Github actions workflows](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
-
-## Quick start
-
-### Prerequisites
-
-- **Docker**: Ensure you have Docker installed on your system. You can download and install it from [Docker's official site](https://www.docker.com/get-started).
-- **Ollama** to run local models or an **OpenAI**, **Groq** or **Anthropic** API key.
 
 > You can use your own models by running a compatible OpenAI LLM server. You must change the OpenAI API url parameter.
  
