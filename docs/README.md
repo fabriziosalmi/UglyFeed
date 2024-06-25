@@ -154,6 +154,17 @@ Set the instructions for the LLM to process and rewrite content:
 
 - `content_prefix`: Instruction template for content rewriting.
 
+#### Content Moderation
+Replace words with ***** while generating final XML feed:
+
+```
+moderation:
+  enabled: false
+  words_file: 'moderation/IT.txt'
+```
+
+> English and Italian words lists are currently available in the `moderation` folder. You can easily change the words list to fit your needs.
+
 #### XML Feed
 
 Define the settings for the XML feed:
