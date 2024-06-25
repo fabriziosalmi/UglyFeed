@@ -96,7 +96,8 @@ copyright: "UglyFeed"
 moderation:
   enabled: false
   words_file: 'moderation/IT.txt'
-
+  allow_duplicates: false  # remove source links repetitions
+  
 ## scheduler
 scheduling_enabled: false
 scheduling_interval: 4
