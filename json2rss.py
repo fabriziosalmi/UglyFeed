@@ -123,8 +123,9 @@ def process_item(item, config, moderated_words):
     content = escape_xml_chars(replace_swear_words(content, moderated_words) if moderation_enabled else content)
 
     if 'links' in item:
+        unique_links = list(dict.fromkeys(item['links']))  # Remove duplicate links
         content += "<br/><br/><small><b>Sources</b></small><br/><ul>"
-        for link in item['links']:
+        for link in unique_links:
             content += f'<li><small><a href="{link}" target="_blank">{link}</a></small></li>'
         content += "</ul>"
 
