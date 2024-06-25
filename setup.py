@@ -53,7 +53,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'uglyfeed=uglyfeed.cli:main',  # Adjust to point to the CLI script for running Streamlit
+            'uglypy=uglypy.cli:main',
         ],
     },
     license='AGPL-3.0',  # Specify the license type
