@@ -23,7 +23,7 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 **Requirements**
 - 🌎 Internet connection
 - 📲 [an RSS reader](https://github.com/topics/rss-reader) (to retrieve the final feed I use [FluentReader](https://github.com/yang991178/fluent-reader) on laptop and [NetNewsWire](https://netnewswire.com/) on mobile)
-- 🤖 a large language model via API
+- ✨ a large language model via API
 
 **Supported API and models**
 
