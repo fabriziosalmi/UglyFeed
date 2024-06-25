@@ -4,6 +4,7 @@ import requests
 import logging
 import argparse
 import yaml
+import os
 import time
 from pathlib import Path
 from datetime import datetime
@@ -121,7 +122,6 @@ def call_ollama_api(api_url, combined_content, model):
             logger.error(f"Ollama API response content: {response.text}")
         return None
 
-
 def call_anthropic_api(api_url, combined_content, model, api_key):
     data = json.dumps({
         "model": model,
@@ -165,37 +165,6 @@ def call_anthropic_api(api_url, combined_content, model, api_key):
             logger.error(f"Anthropic API response content: {response.text}")
         return None
 
-
-
-
-def call_mistral_api(api_url, combined_content, model, api_key):
-    data = json.dumps({
-        "model": model,
-        "prompt": combined_content,
-        "max_tokens": MAX_TOKENS
-    })
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {api_key}'
-    }
-    logger.debug(f"Mistral API request data: {data}")
-    try:
-        response = requests_retry_session().post(api_url, data=data, headers=headers)
-        response.raise_for_status()
-        try:
-            response_json = response.json()
-            logger.debug(f"Mistral API response: {response_json}")
-            return response_json['choices'][0]['message']['content']
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON response from Mistral API: {e}")
-            logger.error(f"Response content: {response.text}")
-            return None
-    except requests.RequestException as e:
-        logger.error(f"Mistral API request failed: {e}")
-        if response is not None:
-            logger.error(f"Mistral API response content: {response.text}")
-        return None
-
 def parse_retry_after(response_json):
     try:
         message = response_json['error']['message']
@@ -215,6 +184,14 @@ def ensure_proper_punctuation(text):
         corrected_sentences.append(sentence)
 
     return ' '.join(corrected_sentences)
+
+def read_content_prefix(prefix_file_path):
+    try:
+        with open(prefix_file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+    except (IOError, FileNotFoundError) as e:
+        logger.error(f"Error reading content prefix file {prefix_file_path}: {e}")
+        return ""
 
 def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritten_folder, api_type):
     try:
@@ -241,8 +218,6 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
         rewritten_content = call_groq_api(api_url, combined_content, model, api_key)
     elif api_type == "anthropic":
         rewritten_content = call_anthropic_api(api_url, combined_content, model, api_key)
-    elif api_type == "mistral":
-        rewritten_content = call_mistral_api(api_url, combined_content, model, api_key)
     else:
         rewritten_content = call_ollama_api(api_url, combined_content, model)
 
@@ -290,16 +265,14 @@ def validate_config(api_config):
         required_keys = ['ollama_api_url', 'ollama_model']
     elif selected_api == "Anthropic":
         required_keys = ['anthropic_api_url', 'anthropic_api_key', 'anthropic_model']
-    elif selected_api == "Mistral":
-        required_keys = ['mistral_api_url', 'mistral_api_key', 'mistral_model']
     else:
-        raise ValueError("Invalid API selection. Please choose OpenAI, Groq, Ollama, Anthropic, or Mistral.")
+        raise ValueError("Invalid API selection. Please choose OpenAI, Groq, Ollama, or Anthropic.")
 
     missing_keys = [key for key in required_keys if not api_config.get(key)]
     if missing_keys:
         raise ValueError(f"The selected API configuration is incomplete. Missing keys: {', '.join(missing_keys)}")
 
-def main(config_path):
+def main(config_path, prompt_path=None, api=None, api_key=None, model=None, api_url=None, output_folder=None, rewritten_folder=None):
     try:
         with open(config_path, 'r', encoding='utf-8') as file:
             config = yaml.safe_load(file)
@@ -309,51 +282,43 @@ def main(config_path):
 
     api_config = config.get('api_config', {})
     folder_config = config.get('folders', {})
-    content_prefix = config.get('content_prefix', "")
+    prompt_file_path = prompt_path or config.get('prompt_file', "")
 
-    validate_config(api_config)
+    # Override with environment variables if present
+    selected_api = api or os.getenv('API_TYPE', api_config.get('selected_api'))
+    model = model or os.getenv('API_MODEL', api_config.get(f'{selected_api.lower()}_model'))
+    api_key = api_key or os.getenv('API_KEY', api_config.get(f'{selected_api.lower()}_api_key'))
+    api_url = api_url or os.getenv('API_URL', api_config.get(f'{selected_api.lower()}_api_url'))
+    output_folder = output_folder or os.getenv('OUTPUT_FOLDER', folder_config.get('output_folder', 'output'))
+    rewritten_folder = rewritten_folder or os.getenv('REWRITTEN_FOLDER', folder_config.get('rewritten_folder', 'rewritten'))
+    prompt_file_path = prompt_path or os.getenv('PROMPT_FILE', prompt_file_path)
+    content_prefix = read_content_prefix(prompt_file_path) if prompt_file_path else config.get('content_prefix', "")
 
-    selected_api = api_config['selected_api']
-
-    if selected_api == 'OpenAI':
-        api_url = api_config['openai_api_url']
-        model = api_config['openai_model']
-        api_key = api_config['openai_api_key']
-        api_type = 'openai'
-    elif selected_api == 'Groq':
-        api_url = api_config['groq_api_url']
-        model = api_config['groq_model']
-        api_key = api_config['groq_api_key']
-        api_type = 'groq'
-    elif selected_api == 'Ollama':
-        api_url = api_config['ollama_api_url']
-        model = api_config['ollama_model']
-        api_key = None  # Ollama does not need an API key
-        api_type = 'ollama'
-    elif selected_api == 'Anthropic':
-        api_url = api_config['anthropic_api_url']
-        model = api_config['anthropic_model']
-        api_key = api_config['anthropic_api_key']
-        api_type = 'anthropic'
-    elif selected_api == 'Mistral':
-        api_url = api_config['mistral_api_url']
-        model = api_config['mistral_model']
-        api_key = api_config['mistral_api_key']
-        api_type = 'mistral'
-
-    output_folder = folder_config.get('output_folder', 'output')
-    rewritten_folder = folder_config.get('rewritten_folder', 'rewritten')
+    validate_config({
+        'selected_api': selected_api,
+        f'{selected_api.lower()}_model': model,
+        f'{selected_api.lower()}_api_key': api_key,
+        f'{selected_api.lower()}_api_url': api_url
+    })
 
     Path(rewritten_folder).mkdir(parents=True, exist_ok=True)
 
     json_files = Path(output_folder).glob('*.json')
     for json_file in json_files:
-        process_json_file(json_file, api_url, model, api_key, content_prefix, rewritten_folder, api_type)
+        process_json_file(json_file, api_url, model, api_key, content_prefix, rewritten_folder, selected_api.lower())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process JSON files with LLM API')
     parser.add_argument('--config', type=str, default='config.yaml', help='Path to the configuration YAML file (default: config.yaml in current directory)')
+    parser.add_argument('--prompt', type=str, help='Path to the prompt file')
+    parser.add_argument('--api', type=str, help='API type (OpenAI, Groq, Ollama, Anthropic)')
+    parser.add_argument('--api_key', type=str, help='API key for the selected API')
+    parser.add_argument('--model', type=str, help='Model to use for the selected API')
+    parser.add_argument('--api_url', type=str, help='API URL for the selected API')
+    parser.add_argument('--output_folder', type=str, help='Output folder containing JSON files to process')
+    parser.add_argument('--rewritten_folder', type=str, help='Folder to save the rewritten JSON files')
+
     args = parser.parse_args()
 
     config_path = args.config if args.config else 'config.yaml'
-    main(config_path)
+    main(config_path, args.prompt, args.api, args.api_key, args.model, args.api_url, args.output_folder, args.rewritten_folder)
