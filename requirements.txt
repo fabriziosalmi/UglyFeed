@@ -10,7 +10,6 @@ nltk==3.8.1
 numpy==1.24.4
 openai==1.30.5
 pandas==2.2.2
-PyYAML==6.0.1
 psutil==5.9.8
 requests==2.32.3
 scikit_learn==1.4.2
@@ -25,3 +24,4 @@ schedule
 gtts
 pydub
 python-dotenv
+pyyaml
