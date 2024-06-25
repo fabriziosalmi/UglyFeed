@@ -92,6 +92,11 @@ author: "UglyFeed"
 category: "Technology"
 copyright: "UglyFeed"
 
+## Moderation (replace bad words listed on the words_file with *****)
+moderation:
+  enabled: true
+  words_file: 'bad_words.txt'
+
 ## scheduler
 scheduling_enabled: false
 scheduling_interval: 4

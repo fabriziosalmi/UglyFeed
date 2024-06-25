@@ -54,6 +54,21 @@ def read_json_files(directory):
                 logging.error(f"Error decoding JSON from file {filename}: {e}")
     return json_data
 
+def load_moderated_words(file_path):
+    """Load a list of moderated words from a file."""
+    try:
+        with open(file_path, 'r') as file:
+            return [line.strip() for line in file if line.strip()]
+    except FileNotFoundError:
+        logging.error(f"Moderated words file '{file_path}' not found.")
+        return []
+
+def replace_swear_words(text, moderated_words):
+    """Replace swear words in the text with asterisks."""
+    for word in moderated_words:
+        text = re.sub(r'\b' + re.escape(word) + r'\b', '*' * len(word), text, flags=re.IGNORECASE)
+    return text
+
 def create_rss_channel(config):
     """Create the base RSS channel element with proper namespaces and configuration."""
     rss = Element('rss', version='2.0')
@@ -93,15 +108,19 @@ def create_rss_channel(config):
 
     return rss, channel
 
-def process_item(item, config):
+def process_item(item, config, moderated_words):
     """Process individual JSON item to XML item element."""
     item_element = Element('item')
 
+    moderation_enabled = get_config_value(config, 'moderation', {}).get('enabled', False)
+
     item_title = SubElement(item_element, 'title')
-    item_title.text = escape_xml_chars(item.get('title', 'No Title'))
+    title_text = item.get('title', 'No Title')
+    item_title.text = escape_xml_chars(replace_swear_words(title_text, moderated_words) if moderation_enabled else title_text)
 
     item_description = SubElement(item_element, 'description')
-    content = escape_xml_chars(item.get('content', 'No Content'))
+    content = item.get('content', 'No Content')
+    content = escape_xml_chars(replace_swear_words(content, moderated_words) if moderation_enabled else content)
 
     if 'links' in item:
         content += "<br/><br/><small><b>Sources</b></small><br/><ul>"
@@ -130,6 +149,10 @@ def process_item(item, config):
 
 def create_rss_feed(json_data, output_path, config):
     """Create or update an RSS feed based on provided JSON data."""
+    moderation_enabled = get_config_value(config, 'moderation', {}).get('enabled', False)
+    moderated_words_file = get_config_value(config, 'moderation', {}).get('words_file', 'moderated.txt')
+    moderated_words = load_moderated_words(moderated_words_file) if moderation_enabled else []
+
     if os.path.exists(output_path):
         try:
             tree = parse(output_path)
@@ -144,7 +167,7 @@ def create_rss_feed(json_data, output_path, config):
     new_items = []
     cutoff_date = datetime.now() - timedelta(days=int(get_config_value(config, 'max_age_days', 30)))
     for item in json_data:
-        item_element = process_item(item, config)
+        item_element = process_item(item, config, moderated_words)
         processed_at = datetime.strptime(item_element.find('pubDate').text, get_config_value(config, 'datetime_format', '%a, %d %b %Y %H:%M:%S GMT'))
 
         if processed_at >= cutoff_date:
