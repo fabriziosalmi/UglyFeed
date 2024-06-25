@@ -31,12 +31,66 @@ Here the current available actions:
 
 ## 🐍 Installation (pip)
 
-UglyFeed can be installed via `pip` using the `uglypy` package. This integration allows users to incorporate UglyFeed features into existing pipelines easily. 
+UglyFeed can be installed via `pip`. This integration allows users to incorporate UglyFeed features into existing pipelines. 
 For more information, visit the [PyPI page for uglypy](https://pypi.org/project/uglypy/).
 
-```bash
+To install UglyPy from PyPI, use the following command:
+
+```sh
 pip install uglypy
 ```
+
+After installation, you can use the `uglypy` command to run various scripts provided by the package. Below are the available commands and examples of how to use them:
+
+#### General Help
+
+To see the help message and a list of available commands, use:
+
+```sh
+uglypy help
+```
+
+#### Running the GUI
+
+To run the Streamlit GUI application:
+
+```sh
+uglypy gui
+```
+
+You can also specify additional Streamlit arguments if needed. For example, to run the GUI on a specific server address:
+
+```sh
+uglypy gui --server.address 0.0.0.0
+```
+
+#### Running Other Scripts
+
+You can run other scripts provided by UglyPy by specifying the script name followed by any additional arguments required by the script. Here are some examples:
+
+- **Main Processing Script**:
+
+  ```sh
+  uglypy main --some-arg value
+  ```
+
+- **LLM Processor Script**:
+
+  ```sh
+  uglypy llm_processor --another-arg value
+  ```
+
+- **JSON to RSS Converter Script**:
+
+  ```sh
+  uglypy json2rss --yet-another-arg value
+  ```
+
+- **XML Deployment Script**:
+
+  ```sh
+  uglypy deploy_xml --arg value
+  ```
 
 ## 🖥️ Installation and Run (Without Docker)
 
