@@ -32,7 +32,7 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 
 **Supported API and models**
 
-- OpenAI API (`gpt-3.5-turbo`, `gpt4`, `gpt4o`)
+- OpenAI API (`gpt-3.5-turbo`, `gpt-4`, `gpt-4o`)
 - Ollama API (all models like `llama3`, `phi3`, `qwen2`)
 - Groq API (`llama3-8b-8192`, `llama3-70b-8192`, `gemma-7b-it`, `mixtral-8x7b-32768`)
 - Anthropic API (`claude-3-haiku-20240307`, `claude-3-sonnet-20240229`, `claude-3-opus-20240229`)
