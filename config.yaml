@@ -2,6 +2,9 @@
 # GitHub Repository: https://github.com/fabriziosalmi/UglyFeed
 # Documentation: https://github.com/fabriziosalmi/UglyFeed/docs
 
+# source feeds to process
+input_feeds_path: "input/feeds.txt"
+
 # Pre-processing source feeds
 similarity_threshold: 0.50  # Minimum similarity score to consider a match
 

@@ -53,15 +53,18 @@ def merge_configs(yaml_config, env_config, cli_config):
     """Merge configurations with priority: CLI > ENV > YAML."""
     final_config = yaml_config.copy()
 
-    # Update with environment variables if they are set
-    for key, value in env_config.items():
-        if value is not None:
-            final_config[key] = value
+    def update_recursive(d, u):
+        for k, v in u.items():
+            if isinstance(v, dict):
+                d[k] = update_recursive(d.get(k, {}), v)
+            elif v is not None:
+                d[k] = v
+        return d
 
+    # Update with environment variables if they are set
+    final_config = update_recursive(final_config, env_config)
     # Update with command-line arguments if they are set
-    for key, value in cli_config.items():
-        if value is not None:
-            final_config[key] = value
+    final_config = update_recursive(final_config, cli_config)
 
     return final_config
 
@@ -174,7 +177,7 @@ def cluster_texts(vectors: Any, config: Dict[str, Any]) -> np.ndarray:
 def aggregate_similar_articles(articles: List[Dict[str, str]], similarity_matrix: np.ndarray, threshold: float) -> List[List[Dict[str, str]]]:
     """Aggregate articles into groups based on similarity matrix and threshold."""
     clustering = AgglomerativeClustering(
-        metric='precomputed',  # Updated from 'affinity' to 'metric'
+        metric='precomputed',
         linkage='average',
         distance_threshold=threshold,
         n_clusters=None
@@ -202,10 +205,22 @@ def save_grouped_articles(grouped_articles: List[List[Dict]], output_dir: str) -
             except Exception as e:
                 logger.error(f"Error saving group {i} to JSON: {e}")
 
+def deduplicate_articles(articles: List[Dict[str, str]]) -> List[Dict[str, str]]:
+    """Remove duplicate articles based on content and link."""
+    seen = set()
+    unique_articles = []
+    for article in articles:
+        identifier = (article['content'], article['link'])
+        if identifier not in seen:
+            seen.add(identifier)
+            unique_articles.append(article)
+    logger.info(f"Total unique articles after deduplication: {len(unique_articles)}")
+    return unique_articles
+
 def main(config: dict):
     """Main function to process RSS feeds and group similar articles."""
     logger.info("Starting RSS feed processing...")
-    input_file_path = 'input/feeds.txt'
+    input_feeds_path = config.get('input_feeds_path', 'input/feeds.txt')
     output_directory = config.get('output', {}).get('output_dir', 'output')
     start_time = time.time()
 
@@ -214,8 +229,11 @@ def main(config: dict):
 
     try:
         logger.info("Fetching and parsing RSS feeds...")
-        articles = fetch_feeds_from_file(input_file_path)
+        articles = fetch_feeds_from_file(input_feeds_path)
         logger.info(f"Total articles fetched and parsed: {len(articles)}")
+
+        logger.info("Deduplicating articles...")
+        articles = deduplicate_articles(articles)
     except Exception as e:
         logger.error(f"Error fetching or parsing RSS feeds: {e}")
         return
@@ -242,6 +260,18 @@ def main(config: dict):
     elapsed_time = time.time() - start_time
     logger.info(f"RSS feed processing complete in {elapsed_time:.2f} seconds")
 
+def build_env_config(yaml_config):
+    """Build configuration from environment variables."""
+    env_config = {}
+    for key in yaml_config.keys():
+        if isinstance(yaml_config[key], dict):
+            env_config[key] = build_env_config(yaml_config[key])
+        else:
+            env_key = key.upper()
+            env_value = get_env_variable(env_key, yaml_config[key])
+            env_config[key] = type(yaml_config[key])(env_value) if env_value is not None else yaml_config[key]
+    return env_config
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Process RSS feeds and group similar articles based on a similarity threshold.'
@@ -262,38 +292,28 @@ if __name__ == "__main__":
     parser.add_argument(
         '--output_dir', type=str, help='Output directory for saving grouped articles.'
     )
+    parser.add_argument(
+        '--input_feeds_path', type=str, help='Path to the input file containing RSS feed URLs.'
+    )
     args = parser.parse_args()
 
     # Load default configuration from the YAML file
     yaml_config = load_config(args.config)
 
-    # Override with environment variables if they exist
-    env_config = {
-        'similarity_threshold': float(get_env_variable('SIMILARITY_THRESHOLD', yaml_config.get('similarity_threshold'))),
-        'min_samples': int(get_env_variable('MIN_SAMPLES', yaml_config.get('similarity_options', {}).get('min_samples', None))),
-        'eps': float(get_env_variable('EPS', yaml_config.get('similarity_options', {}).get('eps', None))),
-        'output_dir': get_env_variable('OUTPUT_DIR', yaml_config.get('output', {}).get('output_dir', 'output'))
-    }
+    # Build environment configuration based on environment variables
+    env_config = build_env_config(yaml_config)
 
     # Override with command-line arguments if provided
     cli_config = {
         'similarity_threshold': args.similarity_threshold,
         'min_samples': args.min_samples,
         'eps': args.eps,
-        'output_dir': args.output_dir
+        'output': {'output_dir': args.output_dir},
+        'input_feeds_path': args.input_feeds_path
     }
 
     # Merge all configurations with priority: CLI > ENV > YAML
     final_config = merge_configs(yaml_config, env_config, cli_config)
-
-    # Update config dictionary with merged options
-    if 'similarity_options' not in final_config:
-        final_config['similarity_options'] = {}
-    final_config['similarity_options']['min_samples'] = final_config.pop('min_samples', None)
-    final_config['similarity_options']['eps'] = final_config.pop('eps', None)
-    if 'output' not in final_config:
-        final_config['output'] = {}
-    final_config['output']['output_dir'] = final_config.pop('output_dir', 'output')
 
     # Run the main function with the final merged configuration
     main(final_config)

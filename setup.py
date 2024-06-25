@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='uglypy',  # The package name on PyPI
-    version='0.0.19',  # Initial version, update manually for major changes
+    version='0.0.20',  # Initial version, update manually for major changes
     author='Fabrizio Salmi',
     author_email='fabrizio.salmi@gmail.com',  # Replace with your email
     description='A Python package for aggregating and processing RSS feeds with LLM-enhanced content rewriting.',
