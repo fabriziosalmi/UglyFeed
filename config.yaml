@@ -94,8 +94,8 @@ copyright: "UglyFeed"
 
 ## Moderation (replace bad words listed on the words_file with *****)
 moderation:
-  enabled: true
-  words_file: 'bad_words.txt'
+  enabled: false
+  words_file: 'moderation/IT.txt'
 
 ## scheduler
 scheduling_enabled: false
