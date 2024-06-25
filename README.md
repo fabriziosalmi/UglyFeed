@@ -21,13 +21,9 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - 🌎 Deploy XML feed to GitHub or GitLab
 - 📈 Evaluate generated content
 - 🖥️ Web UI based on Streamlit
-- 🐳 [Docker installable package](https://hub.docker.com/r/fabriziosalmi/uglyfeed)
-- 🐍 [Pip installable package](https://pypi.org/project/uglypy/)
-- ⚙️ [Github actions workflows](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
 - 📰 [RSS test feeds available](https://github.com/fabriziosalmi/uglyfeed-cdn)
 - 🤖 Same codebase for all releases
 - 🛑 Simple post-filter moderation 
-
 
 **Requirements**
 - 🌎 Internet connection
@@ -41,6 +37,12 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - Groq API (`llama3-8b-8192`, `llama3-70b-8192`, `gemma-7b-it`, `mixtral-8x7b-32768`)
 - Anthropic API (`claude-3-haiku-20240307`, `claude-3-sonnet-20240229`, `claude-3-opus-20240229`)
   
+## Packages
+
+- 🐳 [Docker installable package](https://hub.docker.com/r/fabriziosalmi/uglyfeed)
+- 🐍 [Pip installable package](https://pypi.org/project/uglypy/)
+- ⚙️ [Github actions workflows](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
+
 ## Quick start
 
 ### Prerequisites
