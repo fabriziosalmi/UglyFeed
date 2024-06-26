@@ -218,9 +218,7 @@ Replace words with ***** while generating final XML feed and remove duplicates s
 ```
 moderation:
   enabled: false
-  words_file: 'moder
-
-ation/IT.txt'
+  words_file: 'moderation/IT.txt'
   allow_duplicates: false
 ```
 
