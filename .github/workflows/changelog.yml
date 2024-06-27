@@ -45,10 +45,10 @@ jobs:
           echo "Generating changelog from $PREV_COMMIT to HEAD"
 
           CHANGELOG="## Version $CURRENT_VERSION - $CURRENT_DATE\n"
-          MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/OWNER/REPO/commit/%H))" HEAD)
+          MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" HEAD)
           CHANGELOG+="$MAIN_CHANGE\n"
           
-          OTHER_CHANGES=$(git log $PREV_COMMIT..HEAD --pretty=format:"- %s ([%h](https://github.com/OWNER/REPO/commit/%H))" | tail -n +2)
+          OTHER_CHANGES=$(git log $PREV_COMMIT..HEAD --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" | tail -n +2)
           CHANGELOG+="$OTHER_CHANGES\n"
 
           echo -e "$CHANGELOG\n$(cat CHANGELOG.md)" > CHANGELOG.md
