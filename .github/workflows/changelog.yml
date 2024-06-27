@@ -66,7 +66,6 @@ jobs:
           done
 
           echo -e "$CHANGELOG\n$(cat CHANGELOG.md)" > CHANGELOG.md
-          echo "" >> CHANGELOG.md
           cat CHANGELOG.md
 
       - name: Commit and push changelog
