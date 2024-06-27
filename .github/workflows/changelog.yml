@@ -54,24 +54,23 @@ jobs:
 
             if [ $i -lt $((${#VERSIONS_ARRAY[@]} - 1)) ]; then
               PREV_COMMIT=${VERSIONS_ARRAY[$((i + 1))]##*:}
-              MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" $COMMIT)
-              CHANGELOG+="## Version $VERSION - $CURRENT_DATE\n"
-              CHANGELOG+="$MAIN_CHANGE\n"
-
-              # Include other commits between this and the previous setup.py commit
-              CHANGES=$(git log $PREV_COMMIT..$COMMIT --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))")
-              CHANGELOG+="$CHANGES\n"
             else
-              MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" $COMMIT)
-              CHANGELOG+="## Version $VERSION - $CURRENT_DATE\n"
-              CHANGELOG+="$MAIN_CHANGE\n"
-
-              # Include all commits down to the initial commit
-              CHANGES=$(git log $COMMIT --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))")
-              CHANGELOG+="$CHANGES\n"
+              PREV_COMMIT=""
             fi
 
-            CHANGELOG+="\n"
+            MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" $COMMIT)
+            CHANGELOG+="## Version $VERSION - $CURRENT_DATE\n"
+            CHANGELOG+="$MAIN_CHANGE\n"
+
+            if [ -n "$PREV_COMMIT" ]; then
+              # Include other commits between this and the previous setup.py commit
+              CHANGES=$(git log $PREV_COMMIT..$COMMIT --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" | tail -n +2)
+            else
+              # Include all commits down to the initial commit
+              CHANGES=$(git log $COMMIT --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))")
+            fi
+
+            CHANGELOG+="$CHANGES\n\n"
           done
 
           echo -e "$CHANGELOG\n$(cat CHANGELOG.md)" > CHANGELOG.md
