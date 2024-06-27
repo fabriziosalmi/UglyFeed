@@ -3,7 +3,7 @@ name: Changelog
 on:
   push:
     paths:
-      - 'setup_dis.py'  # Only trigger when setup.py is changed
+      - 'setup_.py'  # Only trigger when setup.py is changed
     branches:
       - main  # Adjust to the branches you want to trigger releases
   workflow_dispatch:
@@ -43,14 +43,14 @@ jobs:
           CURRENT_VERSION=${{ env.VERSION }}
           echo "Generating changelog from $PREV_COMMIT to HEAD"
           if [ -n "$PREV_COMMIT" ]; then
-            git log $PREV_COMMIT..HEAD --pretty=format:"- %s" > changelog.txt
+            echo "## Version $CURRENT_VERSION - $(date +'%Y-%m-%d')" > CHANGELOG.md
+            echo "- $(git log -1 --pretty=format:"%s" HEAD)" >> CHANGELOG.md
+            git log $PREV_COMMIT..HEAD --pretty=format:"- %s" | tail -n +2 >> CHANGELOG.md
           else
-            git log HEAD --pretty=format:"- %s" > changelog.txt
+            echo "## Version $CURRENT_VERSION - $(date +'%Y-%m-%d')" > CHANGELOG.md
+            git log HEAD --pretty=format:"- %s" >> CHANGELOG.md
           fi
-          echo "## Version $CURRENT_VERSION - $(date +'%Y-%m-%d')" > CHANGELOG.md
-          echo "- $(git log -1 --pretty=format:"%s")" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
-          cat changelog.txt >> CHANGELOG.md
           cat CHANGELOG.md
 
       - name: Commit and push changelog
