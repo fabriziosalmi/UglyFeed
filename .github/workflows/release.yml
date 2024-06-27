@@ -79,6 +79,19 @@ jobs:
         run: |
           twine upload dist/*
 
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          body: |
+            ## Changes in this Release
+            $(cat CHANGELOG.md)
+          draft: false
+          prerelease: false
+
       - name: Commit and push changelog
         run: |
           git config --global user.name 'github-actions'
