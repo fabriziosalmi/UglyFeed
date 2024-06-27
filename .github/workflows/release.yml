@@ -28,31 +28,25 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
         shell: bash
 
-      - name: Debug - Print setup.py
-        run: cat setup.py
-
-      - name: Get previous version
-        id: previous_version
+      - name: Get previous setup.py commit
+        id: previous_commit
         run: |
-          echo "Finding previous version..."
-          if git log -p -1 -- setup.py; then
-            PREV_VERSION=$(git log -p -1 -- setup.py | grep -oP '(?<=version=\").+?(?=\")')
-          fi
-          if [ -z "$PREV_VERSION" ]; then
-            echo "No previous version found, using initial commit"
-            PREV_VERSION=$(git rev-list --max-parents=0 HEAD)
-          fi
-          echo "PREV_VERSION=${PREV_VERSION}" >> $GITHUB_ENV
-          echo "Previous version: ${PREV_VERSION}"
-        shell: bash
+          echo "Finding previous setup.py commit..."
+          PREV_COMMIT=$(git log -2 --pretty=format:"%H" -- setup.py | tail -n 1)
+          echo "PREV_COMMIT=${PREV_COMMIT}" >> $GITHUB_ENV
+          echo "Previous setup.py commit: ${PREV_COMMIT}"
 
       - name: Generate changelog
         id: changelog
         run: |
-          PREV_VERSION=${{ env.PREVIOUS_VERSION }}
+          PREV_COMMIT=${{ env.PREV_COMMIT }}
           CURRENT_VERSION=${{ env.VERSION }}
-          echo "Generating changelog from $PREV_VERSION to $CURRENT_VERSION"
-          git log $PREV_VERSION..HEAD --pretty=format:"- %s" > changelog.txt
+          echo "Generating changelog from $PREV_COMMIT to HEAD"
+          if [ -n "$PREV_COMMIT" ]; then
+            git log $PREV_COMMIT..HEAD --pretty=format:"- %s" > changelog.txt
+          else
+            git log HEAD --pretty=format:"- %s" > changelog.txt
+          fi
           cat changelog.txt
 
       - name: Install dependencies
