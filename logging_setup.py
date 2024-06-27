@@ -30,7 +30,7 @@ LOGGING_CONFIG = {
             'class': 'logging.FileHandler',
             'level': 'DEBUG',
             'formatter': 'standard',
-            'filename': 'app.log',
+            'filename': 'uglyfeed.log',
             'mode': 'a',
         },
     },
