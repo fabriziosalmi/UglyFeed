@@ -1,16 +1,17 @@
-import requests
-import socket
-import psutil
-import streamlit as st
 import os
+import socket
 from pathlib import Path
+
+import psutil
+import requests
+import streamlit as st
 import yaml
-from config import load_config, ensure_default_config, save_configuration
+from config import load_config, save_configuration
 from logging_setup import setup_logging
-from server import toggle_server, copy_xml_to_static, uglyfeed_file
-from scheduling import start_scheduling, run_scripts_sequentially, job_stats_global
+from scheduling import start_scheduling, job_stats_global
 from script_runner import run_script
-from utils import get_local_ip, get_xml_stats, get_xml_item_count, get_new_item_count
+from server import toggle_server, copy_xml_to_static, uglyfeed_file
+from utils import get_local_ip, get_xml_stats
 
 # Load the configuration
 config = load_config("config.yaml")
@@ -69,7 +70,11 @@ os.makedirs(Path("uglyfeeds"), exist_ok=True)
 os.makedirs(Path(".streamlit") / "static" / "uglyfeeds", exist_ok=True)
 
 # Start scheduling if enabled in the config
-start_scheduling(st.session_state.config_data['scheduling_interval'], st.session_state.config_data['scheduling_period'], st.session_state)
+start_scheduling(
+    st.session_state.config_data['scheduling_interval'],
+    st.session_state.config_data['scheduling_period'],
+    st.session_state
+)
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
@@ -81,7 +86,7 @@ menu_options = [
     "Deploy",
     "Debug"
 ]
-selected_option = st.sidebar.selectbox("Select an option", menu_options)
+selected_option = st.sidebar.radio("Select an option", menu_options)
 
 # Ensure Font Awesome is included
 st.sidebar.markdown("""
@@ -126,42 +131,47 @@ elif selected_option == "Configuration":
 
     st.subheader("Source RSS Feeds")
     st.session_state.feeds = st.text_area("Enter one RSS feed URL per line:", st.session_state.feeds)
-
     st.divider()
 
     st.subheader("Preprocessing Options")
-    st.session_state.config_data['preprocessing']['remove_html'] = st.checkbox("Remove HTML Tags", value=st.session_state.config_data['preprocessing']['remove_html'])
-    st.session_state.config_data['preprocessing']['lowercase'] = st.checkbox("Convert to Lowercase", value=st.session_state.config_data['preprocessing']['lowercase'])
-    st.session_state.config_data['preprocessing']['remove_punctuation'] = st.checkbox("Remove Punctuation", value=st.session_state.config_data['preprocessing']['remove_punctuation'])
-    st.session_state.config_data['preprocessing']['lemmatization'] = st.checkbox("Apply Lemmatization", value=st.session_state.config_data['preprocessing']['lemmatization'])
-    st.session_state.config_data['preprocessing']['use_stemming'] = st.checkbox("Use Stemming", value=st.session_state.config_data['preprocessing']['use_stemming'])
+    preprocessing_options = st.session_state.config_data['preprocessing']
+    preprocessing_options['remove_html'] = st.checkbox("Remove HTML Tags", value=preprocessing_options['remove_html'])
+    preprocessing_options['lowercase'] = st.checkbox("Convert to Lowercase", value=preprocessing_options['lowercase'])
+    preprocessing_options['remove_punctuation'] = st.checkbox("Remove Punctuation", value=preprocessing_options['remove_punctuation'])
+    preprocessing_options['lemmatization'] = st.checkbox("Apply Lemmatization", value=preprocessing_options['lemmatization'])
+    preprocessing_options['use_stemming'] = st.checkbox("Use Stemming", value=preprocessing_options['use_stemming'])
 
-    additional_stopwords = ", ".join(st.session_state.config_data['preprocessing']['additional_stopwords'])
+    additional_stopwords = ", ".join(preprocessing_options['additional_stopwords'])
     additional_stopwords_input = st.text_input("Additional Stopwords (comma separated)", additional_stopwords).strip()
-    st.session_state.config_data['preprocessing']['additional_stopwords'] = [word.strip() for word in additional_stopwords_input.split(",") if word.strip()]
+    preprocessing_options['additional_stopwords'] = [word.strip() for word in additional_stopwords_input.split(",") if word.strip()]
 
     st.divider()
 
     st.subheader("Vectorization Options")
+    vectorization_options = st.session_state.config_data['vectorization']
     vectorization_methods = ["tfidf", "count", "hashing"]
-    selected_method = st.selectbox("Vectorization Method", vectorization_methods, index=vectorization_methods.index(st.session_state.config_data['vectorization']['method']))
-    st.session_state.config_data['vectorization']['method'] = selected_method
-    st.session_state.config_data['vectorization']['ngram_range'] = st.slider("N-Gram Range", 1, 3, st.session_state.config_data['vectorization']['ngram_range'])
-    st.session_state.config_data['vectorization']['max_df'] = st.slider("Max Document Frequency (max_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['max_df'])
-    st.session_state.config_data['vectorization']['min_df'] = st.slider("Min Document Frequency (min_df)", 0.0, 1.0, st.session_state.config_data['vectorization']['min_df'])
-    st.session_state.config_data['vectorization']['max_features'] = st.number_input("Max Features", min_value=1, value=st.session_state.config_data['vectorization']['max_features'])
+    selected_method = st.selectbox("Vectorization Method", vectorization_methods, index=vectorization_methods.index(vectorization_options['method']))
+    vectorization_options['method'] = selected_method
+    vectorization_options['ngram_range'] = st.slider("N-Gram Range", 1, 3, vectorization_options['ngram_range'])
+    vectorization_options['max_df'] = st.slider("Max Document Frequency (max_df)", 0.0, 1.0, vectorization_options['max_df'])
+    vectorization_options['min_df'] = st.slider("Min Document Frequency (min_df)", 0.0, 1.0, vectorization_options['min_df'])
+    vectorization_options['max_features'] = st.number_input("Max Features", min_value=1, value=vectorization_options['max_features'])
 
     st.divider()
 
     st.subheader("Similarity Options")
+    similarity_options = st.session_state.config_data['similarity_options']
     clustering_methods = ["dbscan", "kmeans", "agglomerative"]
-    selected_method = st.selectbox("Clustering Method", clustering_methods, index=clustering_methods.index(st.session_state.config_data['similarity_options']['method']))
-    st.session_state.config_data['similarity_options']['method'] = selected_method
+    selected_method = st.selectbox("Clustering Method", clustering_methods, index=clustering_methods.index(similarity_options['method']))
+    similarity_options['method'] = selected_method
     st.session_state.config_data['similarity_threshold'] = st.slider("Similarity Threshold", 0.0, 1.0, st.session_state.config_data['similarity_threshold'])
-    st.session_state.config_data['similarity_options']['eps'] = st.number_input("Epsilon (eps)", min_value=0.0, value=st.session_state.config_data['similarity_options']['eps'], step=0.01)
-    st.session_state.config_data['similarity_options']['min_samples'] = st.number_input("Minimum Samples", min_value=1, value=st.session_state.config_data['similarity_options']['min_samples'])
-    st.session_state.config_data['similarity_options']['n_clusters'] = st.number_input("Number of Clusters (n_clusters)", min_value=1, value=st.session_state.config_data['similarity_options']['n_clusters'])
-    st.session_state.config_data['similarity_options']['linkage'] = st.selectbox("Linkage Type", ["ward", "complete", "average", "single"], index=2)  # Default to 'average'
+    similarity_options['eps'] = st.number_input("Epsilon (eps)", min_value=0.0, value=similarity_options['eps'], step=0.01)
+    similarity_options['min_samples'] = st.number_input("Minimum Samples", min_value=1, value=similarity_options['min_samples'])
+    similarity_options['n_clusters'] = st.number_input("Number of Clusters (n_clusters)", min_value=1, value=similarity_options['n_clusters'])
+
+    linkage_types = ["ward", "complete", "average", "single"]
+    selected_linkage = st.selectbox("Linkage Type", linkage_types, index=linkage_types.index(similarity_options.get('linkage', 'average')))
+    similarity_options['linkage'] = selected_linkage
 
     st.divider()
 
@@ -170,37 +180,21 @@ elif selected_option == "Configuration":
     selected_api = st.selectbox("Select API", api_options, index=api_options.index(st.session_state.config_data['api_config']['selected_api']))
     st.session_state.config_data['api_config']['selected_api'] = selected_api
 
-    if selected_api == "OpenAI":
-        st.session_state.config_data['api_config'].setdefault('openai_api_url', '')
-        st.session_state.config_data['api_config'].setdefault('openai_api_key', '')
-        st.session_state.config_data['api_config'].setdefault('openai_model', '')
-        st.session_state.config_data['api_config']['openai_api_url'] = st.text_input("OpenAI API URL", st.session_state.config_data['api_config']['openai_api_url'])
-        st.session_state.config_data['api_config']['openai_api_key'] = st.text_input("OpenAI API Key", st.session_state.config_data['api_config']['openai_api_key'], type="password")
-        st.session_state.config_data['api_config']['openai_model'] = st.text_input("OpenAI Model", st.session_state.config_data['api_config']['openai_model'])
-    elif selected_api == "Groq":
-        st.session_state.config_data['api_config'].setdefault('groq_api_url', '')
-        st.session_state.config_data['api_config'].setdefault('groq_api_key', '')
-        st.session_state.config_data['api_config'].setdefault('groq_model', '')
-        st.session_state.config_data['api_config']['groq_api_url'] = st.text_input("Groq API URL", st.session_state.config_data['api_config']['groq_api_url'])
-        st.session_state.config_data['api_config']['groq_api_key'] = st.text_input("Groq API Key", st.session_state.config_data['api_config']['groq_api_key'], type="password")
-        st.session_state.config_data['api_config']['groq_model'] = st.text_input("Groq Model", st.session_state.config_data['api_config']['groq_model'])
-    elif selected_api == "Anthropic":
-        st.session_state.config_data['api_config'].setdefault('anthropic_api_url', '')
-        st.session_state.config_data['api_config'].setdefault('anthropic_api_key', '')
-        st.session_state.config_data['api_config'].setdefault('anthropic_model', '')
-        st.session_state.config_data['api_config']['anthropic_api_url'] = st.text_input("Anthropic API URL", st.session_state.config_data['api_config']['anthropic_api_url'])
-        st.session_state.config_data['api_config']['anthropic_api_key'] = st.text_input("Anthropic API Key", st.session_state.config_data['api_config']['anthropic_api_key'])
-        st.session_state.config_data['api_config']['anthropic_model'] = st.text_input("Anthropic Model", st.session_state.config_data['api_config']['anthropic_model'])
-    elif selected_api == "Ollama":
-        st.session_state.config_data['api_config'].setdefault('ollama_api_url', '')
-        st.session_state.config_data['api_config'].setdefault('ollama_model', '')
-        st.session_state.config_data['api_config']['ollama_api_url'] = st.text_input("Ollama API URL", st.session_state.config_data['api_config']['ollama_api_url'])
-        st.session_state.config_data['api_config']['ollama_model'] = st.text_input("Ollama Model", st.session_state.config_data['api_config']['ollama_model'])
+    api_configs = {
+        "OpenAI": ["openai_api_url", "openai_api_key", "openai_model"],
+        "Groq": ["groq_api_url", "groq_api_key", "groq_model"],
+        "Anthropic": ["anthropic_api_url", "anthropic_api_key", "anthropic_model"],
+        "Ollama": ["ollama_api_url", "ollama_model"]
+    }
+
+    for api_param in api_configs[selected_api]:
+        st.session_state.config_data['api_config'].setdefault(api_param, '')
+        st.session_state.config_data['api_config'][api_param] = st.text_input(api_param.replace("_", " ").title(), st.session_state.config_data['api_config'][api_param], type="password" if "key" in api_param else "default")
 
     st.divider()
 
-    st.subheader("Content Prefix")
-    st.session_state.config_data['content_prefix'] = st.text_area("Content Prefix", st.session_state.config_data['content_prefix'])
+    st.subheader("Prompt File")
+    st.session_state.config_data['prompt_file'] = st.text_input("Prompt File Path", st.session_state.config_data.get('prompt_file', 'prompt_IT.txt'))
 
     st.divider()
 
@@ -211,14 +205,9 @@ elif selected_option == "Configuration":
     st.divider()
 
     st.subheader("RSS Feed Details")
-    st.session_state.config_data['feed_title'] = st.text_input("Feed Title", st.session_state.config_data['feed_title'])
-    st.session_state.config_data['feed_link'] = st.text_input("Feed Link", st.session_state.config_data['feed_link'])
-    st.session_state.config_data['feed_description'] = st.text_input("Feed Description", st.session_state.config_data['feed_description'])
-    st.session_state.config_data['feed_language'] = st.text_input("Feed Language", st.session_state.config_data['feed_language'])
-    st.session_state.config_data['feed_self_link'] = st.text_input("Feed Self-Link", st.session_state.config_data['feed_self_link'])
-    st.session_state.config_data['author'] = st.text_input("Author", st.session_state.config_data['author'])
-    st.session_state.config_data['category'] = st.text_input("Category", st.session_state.config_data['category'])
-    st.session_state.config_data['copyright'] = st.text_input("Copyright", st.session_state.config_data['copyright'])
+    feed_details = ['feed_title', 'feed_link', 'feed_description', 'feed_language', 'feed_self_link', 'author', 'category', 'copyright']
+    for detail in feed_details:
+        st.session_state.config_data[detail] = st.text_input(detail.replace("_", " ").title(), st.session_state.config_data[detail])
 
     st.divider()
 
