@@ -54,20 +54,20 @@ jobs:
 
             if [ $i -lt $((${#VERSIONS_ARRAY[@]} - 1)) ]; then
               PREV_COMMIT=${VERSIONS_ARRAY[$((i + 1))]##*:}
-              MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/OWNER/REPO/commit/%H))" $COMMIT)
+              MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" $COMMIT)
               CHANGELOG+="## Version $VERSION - $CURRENT_DATE\n"
               CHANGELOG+="$MAIN_CHANGE\n"
 
               # Include other commits between this and the previous setup.py commit
-              CHANGES=$(git log $PREV_COMMIT..$COMMIT --pretty=format:"- %s ([%h](https://github.com/OWNER/REPO/commit/%H))")
+              CHANGES=$(git log $PREV_COMMIT..$COMMIT --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))")
               CHANGELOG+="$CHANGES\n"
             else
-              MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/OWNER/REPO/commit/%H))" $COMMIT)
+              MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" $COMMIT)
               CHANGELOG+="## Version $VERSION - $CURRENT_DATE\n"
               CHANGELOG+="$MAIN_CHANGE\n"
 
               # Include all commits down to the initial commit
-              CHANGES=$(git log $COMMIT --pretty=format:"- %s ([%h](https://github.com/OWNER/REPO/commit/%H))")
+              CHANGES=$(git log $COMMIT --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))")
               CHANGELOG+="$CHANGES\n"
             fi
 
