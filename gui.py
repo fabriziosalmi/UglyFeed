@@ -196,6 +196,22 @@ elif selected_option == "Configuration":
     st.subheader("Prompt File")
     st.session_state.config_data['prompt_file'] = st.text_input("Prompt File Path", st.session_state.config_data.get('prompt_file', 'prompt_IT.txt'))
 
+    # Load and display prompt file content
+    prompt_file_path = st.session_state.config_data['prompt_file']
+    if Path(prompt_file_path).exists():
+        with open(prompt_file_path, 'r') as f:
+            prompt_content = f.read()
+    else:
+        prompt_content = ""
+
+    st.subheader("Edit Prompt File")
+    new_prompt_content = st.text_area("Prompt File Content", prompt_content, height=200)
+
+    if st.button("Save Prompt"):
+        with open(prompt_file_path, 'w') as f:
+            f.write(new_prompt_content)
+        st.success("Prompt file saved successfully!")
+
     st.divider()
 
     st.subheader("RSS Retention Options")
