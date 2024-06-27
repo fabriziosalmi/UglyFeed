@@ -241,7 +241,7 @@ def main():
             else:
                 config[key] = value
 
-    logging.info(f"Configuration: {json.dumps(config, indent=4)}")
+    logging.debug(f"Configuration: {json.dumps(config, indent=4)}")
 
     rewritten_dir = config.get('rewritten_dir', 'rewritten')
     output_path = os.path.join(config.get('output_dir', 'uglyfeeds'), 'uglyfeed.xml')
