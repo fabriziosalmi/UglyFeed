@@ -54,10 +54,10 @@ jobs:
 
       - name: Commit and push changelog
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+          git config --global user.name 'fabriziosalmi'
+          git config --global user.email 'fabrizio.salmi@gmail.com'
           git add CHANGELOG.md
           git commit -m "Update changelog for version ${{ env.VERSION }}"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
