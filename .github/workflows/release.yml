@@ -35,8 +35,9 @@ jobs:
         id: previous_version
         run: |
           echo "Finding previous version..."
-          git log -p -1 -- setup.py || echo "git log command failed"
-          PREV_VERSION=$(git log -p -1 -- setup.py | grep -oP '(?<=version=\").+?(?=\")')
+          if git log -p -1 -- setup.py; then
+            PREV_VERSION=$(git log -p -1 -- setup.py | grep -oP '(?<=version=\").+?(?=\")')
+          fi
           if [ -z "$PREV_VERSION" ]; then
             echo "No previous version found, using initial commit"
             PREV_VERSION=$(git rev-list --max-parents=0 HEAD)
