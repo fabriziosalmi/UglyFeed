@@ -47,16 +47,16 @@ jobs:
 
           echo "Generating complete changelog"
 
-          for (( i=0; i<${#VERSIONS_ARRAY[@]}; i++ )); do
+          for (( i=${#VERSIONS_ARRAY[@]}-1; i>=0; i-- )); do
             VERSION_COMMIT=${VERSIONS_ARRAY[$i]}
             VERSION=${VERSION_COMMIT%%:*}
             COMMIT=${VERSION_COMMIT##*:}
 
-            if [ $i -lt $((${#VERSIONS_ARRAY[@]} - 1)) ]; then
-              PREV_COMMIT=${VERSIONS_ARRAY[$((i + 1))]##*:}
-              CHANGES=$(git log $PREV_COMMIT..$COMMIT --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" | tail -n +2)
+            if [ $i -gt 0 ]; then
+              PREV_COMMIT=${VERSIONS_ARRAY[$((i - 1))]##*:}
+              CHANGES=$(git log $PREV_COMMIT..$COMMIT --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" --reverse)
             else
-              CHANGES=$(git log $COMMIT..HEAD --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))")
+              CHANGES=$(git log $COMMIT..HEAD --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" --reverse)
             fi
 
             MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" $COMMIT)
