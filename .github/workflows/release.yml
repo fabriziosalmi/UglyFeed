@@ -32,7 +32,7 @@ jobs:
         id: previous_commit
         run: |
           echo "Finding previous setup.py commit..."
-          PREV_COMMIT=$(git log -2 --pretty=format:"%H" -- setup.py | tail -n 1)
+          PREV_COMMIT=$(git log --pretty=format:"%H" -- setup.py | tail -n 2 | head -n 1)
           echo "PREV_COMMIT=${PREV_COMMIT}" >> $GITHUB_ENV
           echo "Previous setup.py commit: ${PREV_COMMIT}"
 
@@ -47,11 +47,10 @@ jobs:
           else
             git log HEAD --pretty=format:"- %s" > changelog.txt
           fi
-          cat changelog.txt
-        shell: bash
-        env:
-          PREV_COMMIT: ${{ env.PREV_COMMIT }}
-          CURRENT_VERSION: ${{ env.VERSION }}
+          echo "## Version $CURRENT_VERSION - $(date +'%Y-%m-%d')" > CHANGELOG.md
+          cat changelog.txt >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          cat CHANGELOG.md
 
       - name: Install dependencies
         run: |
@@ -80,16 +79,15 @@ jobs:
         run: |
           twine upload dist/*
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
+      - name: Commit and push changelog
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add CHANGELOG.md
+          git commit -m "Update changelog for version ${{ env.VERSION }}"
+          git push
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
-          body_path: ./changelog.txt
-          draft: false
-          prerelease: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker_deploy:
     runs-on: ubuntu-latest
