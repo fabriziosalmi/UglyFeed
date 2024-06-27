@@ -28,10 +28,14 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
         shell: bash
 
+      - name: Debug - Print setup.py
+        run: cat setup.py
+
       - name: Get previous version
         id: previous_version
         run: |
-          # Try to find the previous version in the commit history
+          echo "Finding previous version..."
+          git log -p -1 -- setup.py || echo "git log command failed"
           PREV_VERSION=$(git log -p -1 -- setup.py | grep -oP '(?<=version=\").+?(?=\")')
           if [ -z "$PREV_VERSION" ]; then
             echo "No previous version found, using initial commit"
