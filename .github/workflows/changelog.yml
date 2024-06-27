@@ -32,7 +32,7 @@ jobs:
         id: previous_commit
         run: |
           echo "Finding previous setup.py commit..."
-          PREV_COMMIT=$(git log --pretty=format:"%H" -- setup.py | tail -n 1)
+          PREV_COMMIT=$(git log --pretty=format:"%H" -- setup.py | tail -n 2 | head -n 1)
           echo "PREV_COMMIT=${PREV_COMMIT}" >> $GITHUB_ENV
           echo "Previous setup.py commit: ${PREV_COMMIT}"
 
@@ -41,14 +41,17 @@ jobs:
         run: |
           PREV_COMMIT=${{ env.PREV_COMMIT }}
           CURRENT_VERSION=${{ env.VERSION }}
+          CURRENT_DATE=$(date +'%Y-%m-%d')
           echo "Generating changelog from $PREV_COMMIT to HEAD"
-          if [ -n "$PREV_COMMIT" ]; then
-            echo "## Version $CURRENT_VERSION - $(date +'%Y-%m-%d')" > CHANGELOG.md
-            git log $PREV_COMMIT..HEAD --pretty=format:"- %s" >> CHANGELOG.md
-          else
-            echo "## Version $CURRENT_VERSION - $(date +'%Y-%m-%d')" > CHANGELOG.md
-            git log HEAD --pretty=format:"- %s" >> CHANGELOG.md
-          fi
+
+          CHANGELOG="## Version $CURRENT_VERSION - $CURRENT_DATE\n"
+          MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/OWNER/REPO/commit/%H))" HEAD)
+          CHANGELOG+="$MAIN_CHANGE\n"
+          
+          OTHER_CHANGES=$(git log $PREV_COMMIT..HEAD --pretty=format:"- %s ([%h](https://github.com/OWNER/REPO/commit/%H))" | tail -n +2)
+          CHANGELOG+="$OTHER_CHANGES\n"
+
+          echo -e "$CHANGELOG\n$(cat CHANGELOG.md)" > CHANGELOG.md
           echo "" >> CHANGELOG.md
           cat CHANGELOG.md
 
