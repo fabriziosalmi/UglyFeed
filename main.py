@@ -16,7 +16,7 @@ import nltk
 from langdetect import detect
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.corpus import stopwords
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Tuple
 from logging_setup import setup_logging
 
 # Setup logging
@@ -26,14 +26,17 @@ logger = setup_logging()
 nltk.download('wordnet', quiet=True)
 nltk.download('stopwords', quiet=True)
 
-def load_config(config_path: str) -> dict:
+def load_config(config_path: str) -> Dict[str, Any]:
     """Load configuration from a YAML file."""
     try:
         with open(config_path, 'r') as file:
             logger.info(f"Loading configuration from {config_path}")
             return yaml.safe_load(file)
+    except yaml.YAMLError as e:
+        logger.error(f"YAML error loading configuration from {config_path}: {e}")
+        sys.exit(1)
     except Exception as e:
-        logger.error(f"Failed to load configuration from {config_path}: {e}")
+        logger.error(f"Error loading configuration from {config_path}: {e}")
         sys.exit(1)
 
 def ensure_directory_exists(directory: str) -> None:
@@ -42,18 +45,16 @@ def ensure_directory_exists(directory: str) -> None:
         logger.info(f"Creating missing directory: {directory}")
         os.makedirs(directory)
 
-def get_env_variable(key, default=None):
+def get_env_variable(key: str, default: Optional[str] = None) -> Optional[str]:
     """Retrieve environment variable or use default if not set."""
     value = os.getenv(key.upper(), default)
     if value is None:
         logger.info(f"Environment variable {key.upper()} is not set; using default value.")
     return value
 
-def merge_configs(yaml_config, env_config, cli_config):
+def merge_configs(yaml_config: Dict[str, Any], env_config: Dict[str, Any], cli_config: Dict[str, Any]) -> Dict[str, Any]:
     """Merge configurations with priority: CLI > ENV > YAML."""
-    final_config = yaml_config.copy()
-
-    def update_recursive(d, u):
+    def update_recursive(d: Dict[str, Any], u: Dict[str, Any]) -> Dict[str, Any]:
         for k, v in u.items():
             if isinstance(v, dict):
                 d[k] = update_recursive(d.get(k, {}), v)
@@ -61,14 +62,13 @@ def merge_configs(yaml_config, env_config, cli_config):
                 d[k] = v
         return d
 
-    # Update with environment variables if they are set
+    final_config = yaml_config.copy()
     final_config = update_recursive(final_config, env_config)
-    # Update with command-line arguments if they are set
     final_config = update_recursive(final_config, cli_config)
 
     return final_config
 
-def fetch_feeds_from_file(file_path: str) -> List[Dict]:
+def fetch_feeds_from_file(file_path: str) -> List[Dict[str, str]]:
     """Fetch and parse RSS feeds from a file containing URLs."""
     articles = []
     try:
@@ -85,6 +85,8 @@ def fetch_feeds_from_file(file_path: str) -> List[Dict]:
             } for entry in feed.entries])
 
         logger.info(f"Total articles fetched and parsed: {len(articles)}")
+    except FileNotFoundError as e:
+        logger.error(f"File not found: {e}")
     except Exception as e:
         logger.error(f"Error fetching feeds: {e}")
 
@@ -98,7 +100,7 @@ def detect_language(text: str) -> str:
         logger.warning(f"Language detection failed: {e}")
         return 'unknown'
 
-def preprocess_text(text: str, language: str, config: dict) -> str:
+def preprocess_text(text: str, language: str, config: Dict[str, Any]) -> str:
     """Preprocess the text based on the configuration settings and language."""
     lemmatizer = WordNetLemmatizer()
     stemmer = SnowballStemmer(language if language in SnowballStemmer.languages else 'english')
@@ -174,7 +176,7 @@ def cluster_texts(vectors: Any, config: Dict[str, Any]) -> np.ndarray:
 
     return labels
 
-def aggregate_similar_articles(articles: List[Dict[str, str]], similarity_matrix: np.ndarray, threshold: float) -> List[List[Dict[str, str]]]:
+def aggregate_similar_articles(articles: List[Dict[str, str]], similarity_matrix: np.ndarray, threshold: float) -> List[Tuple[List[Dict[str, str]], float]]:
     """Aggregate articles into groups based on similarity matrix and threshold."""
     clustering = AgglomerativeClustering(
         metric='precomputed',
@@ -184,26 +186,31 @@ def aggregate_similar_articles(articles: List[Dict[str, str]], similarity_matrix
     )
     labels = clustering.fit_predict(1 - similarity_matrix)
 
-    grouped_articles = []
+    grouped_articles_with_scores = []
     for label in set(labels):
         group = [articles[i] for i in range(len(articles)) if labels[i] == label]
-        grouped_articles.append(group)
+        group_similarities = [similarity_matrix[i][j] for i in range(len(articles)) for j in range(len(articles)) if labels[i] == label and labels[j] == label and i != j]
+        average_similarity = np.mean(group_similarities) if group_similarities else 0
+        grouped_articles_with_scores.append((group, average_similarity))
 
-    return grouped_articles
+    return grouped_articles_with_scores
 
-def save_grouped_articles(grouped_articles: List[List[Dict]], output_dir: str) -> None:
-    """Save grouped articles to JSON files."""
+def save_grouped_articles(grouped_articles_with_scores: List[Tuple[List[Dict[str, str]], float]], output_dir: str) -> int:
+    """Save grouped articles to JSON files and return the number of saved files."""
     ensure_directory_exists(output_dir)
-    for i, group in enumerate(grouped_articles):
+    saved_files_count = 0
+    for i, (group, avg_similarity) in enumerate(grouped_articles_with_scores):
         if len(group) > 1:  # Only save groups with more than one article
             filename = f"group_{i}.json"
             file_path = os.path.join(output_dir, filename)
             try:
                 with open(file_path, 'w', encoding='utf-8') as file:
-                    json.dump(group, file, ensure_ascii=False, indent=4)
-                logger.info(f"Saved group {i} with {len(group)} articles to {file_path}")
+                    json.dump({'articles': group, 'average_similarity': avg_similarity}, file, ensure_ascii=False, indent=4)
+                logger.info(f"Group {i}: Saved {len(group)} articles to {file_path}, Avg Similarity: {avg_similarity:.2f}")
+                saved_files_count += 1
             except Exception as e:
                 logger.error(f"Error saving group {i} to JSON: {e}")
+    return saved_files_count
 
 def deduplicate_articles(articles: List[Dict[str, str]]) -> List[Dict[str, str]]:
     """Remove duplicate articles based on content and link."""
@@ -217,7 +224,7 @@ def deduplicate_articles(articles: List[Dict[str, str]]) -> List[Dict[str, str]]
     logger.info(f"Total unique articles after deduplication: {len(unique_articles)}")
     return unique_articles
 
-def main(config: dict):
+def main(config: Dict[str, Any]) -> None:
     """Main function to process RSS feeds and group similar articles."""
     logger.info("Starting RSS feed processing...")
     input_feeds_path = config.get('input_feeds_path', 'input/feeds.txt')
@@ -252,24 +259,25 @@ def main(config: dict):
     similarity_matrix = cosine_similarity(vectors)
 
     logger.info("Clustering texts...")
-    grouped_articles = aggregate_similar_articles(articles, similarity_matrix, config.get('similarity_threshold', 0.66))
+    grouped_articles_with_scores = aggregate_similar_articles(articles, similarity_matrix, config.get('similarity_threshold', 0.66))
 
     logger.info("Saving grouped articles to JSON files...")
-    save_grouped_articles(grouped_articles, output_directory)
+    saved_files_count = save_grouped_articles(grouped_articles_with_scores, output_directory)
+    logger.info(f"Total number of JSON files generated: {saved_files_count}")
 
     elapsed_time = time.time() - start_time
     logger.info(f"RSS feed processing complete in {elapsed_time:.2f} seconds")
 
-def build_env_config(yaml_config):
+def build_env_config(yaml_config: Dict[str, Any]) -> Dict[str, Any]:
     """Build configuration from environment variables."""
     env_config = {}
-    for key in yaml_config.keys():
-        if isinstance(yaml_config[key], dict):
-            env_config[key] = build_env_config(yaml_config[key])
+    for key, value in yaml_config.items():
+        if isinstance(value, dict):
+            env_config[key] = build_env_config(value)
         else:
             env_key = key.upper()
-            env_value = get_env_variable(env_key, yaml_config[key])
-            env_config[key] = type(yaml_config[key])(env_value) if env_value is not None else yaml_config[key]
+            env_value = get_env_variable(env_key, value)
+            env_config[key] = type(value)(env_value) if env_value is not None else value
     return env_config
 
 if __name__ == "__main__":
