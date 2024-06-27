@@ -31,18 +31,21 @@ jobs:
       - name: Get previous version
         id: previous_version
         run: |
-          PREV_VERSION=$(git log -p -1 setup.py | grep -oP '(?<=version=\").+?(?=\")')
+          # Try to find the previous version in the commit history
+          PREV_VERSION=$(git log -p -1 -- setup.py | grep -oP '(?<=version=\").+?(?=\")')
+          if [ -z "$PREV_VERSION" ]; then
+            echo "No previous version found, using initial commit"
+            PREV_VERSION=$(git rev-list --max-parents=0 HEAD)
+          fi
           echo "PREV_VERSION=${PREV_VERSION}" >> $GITHUB_ENV
           echo "Previous version: ${PREV_VERSION}"
+        shell: bash
 
       - name: Generate changelog
         id: changelog
         run: |
           PREV_VERSION=${{ env.PREVIOUS_VERSION }}
           CURRENT_VERSION=${{ env.VERSION }}
-          if [ -z "$PREV_VERSION" ]; then
-            PREV_VERSION=$(git log -1 --format=%H)
-          fi
           echo "Generating changelog from $PREV_VERSION to $CURRENT_VERSION"
           git log $PREV_VERSION..HEAD --pretty=format:"- %s" > changelog.txt
           cat changelog.txt
@@ -83,7 +86,7 @@ jobs:
           release_name: Release ${{ env.VERSION }}
           body: |
             ## Changes in this Release
-            ${{ steps.changelog.outputs.changelog }}
+            $(cat changelog.txt)
           draft: false
           prerelease: false
 
