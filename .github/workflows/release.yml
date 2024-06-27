@@ -92,16 +92,6 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Commit and push changelog
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git add CHANGELOG.md
-          git commit -m "Update changelog for version ${{ env.VERSION }}"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   docker_deploy:
     runs-on: ubuntu-latest
     needs: release  # Ensures this job runs after the 'release' job
