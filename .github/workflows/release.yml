@@ -48,6 +48,10 @@ jobs:
             git log HEAD --pretty=format:"- %s" > changelog.txt
           fi
           cat changelog.txt
+        shell: bash
+        env:
+          PREV_COMMIT: ${{ env.PREV_COMMIT }}
+          CURRENT_VERSION: ${{ env.VERSION }}
 
       - name: Install dependencies
         run: |
@@ -83,9 +87,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           release_name: Release ${{ env.VERSION }}
-          body: |
-            ## Changes in this Release
-            $(cat changelog.txt)
+          body_path: ./changelog.txt
           draft: false
           prerelease: false
 
