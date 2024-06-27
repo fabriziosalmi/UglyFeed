@@ -52,6 +52,16 @@ jobs:
           echo "" >> CHANGELOG.md
           cat CHANGELOG.md
 
+      - name: Commit and push changelog
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add CHANGELOG.md
+          git commit -m "Update changelog for version ${{ env.VERSION }}"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
