@@ -21,35 +21,58 @@ jobs:
         with:
           python-version: '3.9'  # Use the Python version you are targeting
 
-      - name: Extract version from setup.py
-        id: extract_version
+      - name: Extract versions from setup.py commits
+        id: extract_versions
         run: |
-          VERSION=$(python -c "import re; version_line = next(line for line in open('setup.py') if line.strip().startswith('version=')); print(re.search(r'version=[\"\\']([^\"\\']+)[\"\\']', version_line).group(1))")
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-        shell: bash
+          echo "Extracting versions from setup.py commits..."
+          # Find all commits that modified setup.py
+          COMMITS=$(git log --pretty=format:"%H" -- setup.py)
+          echo "COMMITS=$COMMITS" >> $GITHUB_ENV
 
-      - name: Get previous setup.py commit
-        id: previous_commit
-        run: |
-          echo "Finding previous setup.py commit..."
-          PREV_COMMIT=$(git log --pretty=format:"%H" -- setup.py | tail -n 2 | head -n 1)
-          echo "PREV_COMMIT=${PREV_COMMIT}" >> $GITHUB_ENV
-          echo "Previous setup.py commit: ${PREV_COMMIT}"
+          # Extract versions from each commit
+          VERSIONS=()
+          for COMMIT in $COMMITS; do
+            VERSION=$(git show $COMMIT:setup.py | python -c "import re, sys; version_line = next(line for line in sys.stdin if line.strip().startswith('version=')); print(re.search(r'version=[\"\\']([^\"\\']+)[\"\\']', version_line).group(1))")
+            VERSIONS+=("$VERSION:$COMMIT")
+          done
+          echo "VERSIONS=$(IFS=,; echo "${VERSIONS[*]}")" >> $GITHUB_ENV
 
       - name: Generate changelog
         id: changelog
         run: |
-          PREV_COMMIT=${{ env.PREV_COMMIT }}
-          CURRENT_VERSION=${{ env.VERSION }}
           CURRENT_DATE=$(date +'%Y-%m-%d')
-          echo "Generating changelog from $PREV_COMMIT to HEAD"
+          VERSIONS=${{ env.VERSIONS }}
+          VERSIONS_ARRAY=(${VERSIONS//,/ })
+          CHANGELOG=""
 
-          CHANGELOG="## Version $CURRENT_VERSION - $CURRENT_DATE\n"
-          MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" HEAD)
-          CHANGELOG+="$MAIN_CHANGE\n"
-          
-          OTHER_CHANGES=$(git log $PREV_COMMIT..HEAD --pretty=format:"- %s ([%h](https://github.com/fabriziosalmi/UglyFeed/commit/%H))" | tail -n +2)
-          CHANGELOG+="$OTHER_CHANGES\n"
+          echo "Generating complete changelog"
+
+          for (( i=0; i<${#VERSIONS_ARRAY[@]}; i++ )); do
+            VERSION_COMMIT=${VERSIONS_ARRAY[$i]}
+            VERSION=${VERSION_COMMIT%%:*}
+            COMMIT=${VERSION_COMMIT##*:}
+
+            if [ $i -lt $((${#VERSIONS_ARRAY[@]} - 1)) ]; then
+              PREV_COMMIT=${VERSIONS_ARRAY[$((i + 1))]##*:}
+              MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/OWNER/REPO/commit/%H))" $COMMIT)
+              CHANGELOG+="## Version $VERSION - $CURRENT_DATE\n"
+              CHANGELOG+="$MAIN_CHANGE\n"
+
+              # Include other commits between this and the previous setup.py commit
+              CHANGES=$(git log $PREV_COMMIT..$COMMIT --pretty=format:"- %s ([%h](https://github.com/OWNER/REPO/commit/%H))")
+              CHANGELOG+="$CHANGES\n"
+            else
+              MAIN_CHANGE=$(git log -1 --pretty=format:"**%s** ([%h](https://github.com/OWNER/REPO/commit/%H))" $COMMIT)
+              CHANGELOG+="## Version $VERSION - $CURRENT_DATE\n"
+              CHANGELOG+="$MAIN_CHANGE\n"
+
+              # Include all commits down to the initial commit
+              CHANGES=$(git log $COMMIT --pretty=format:"- %s ([%h](https://github.com/OWNER/REPO/commit/%H))")
+              CHANGELOG+="$CHANGES\n"
+            fi
+
+            CHANGELOG+="\n"
+          done
 
           echo -e "$CHANGELOG\n$(cat CHANGELOG.md)" > CHANGELOG.md
           echo "" >> CHANGELOG.md
@@ -60,7 +83,7 @@ jobs:
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add CHANGELOG.md
-          git commit -m "Update changelog for version ${{ env.VERSION }}"
+          git commit -m "Update changelog"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
