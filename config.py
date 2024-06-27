@@ -8,7 +8,7 @@ def tuple_constructor(loader, node):
     """Constructor for !!python/tuple tag."""
     return tuple(loader.construct_sequence(node))
 
-# Add the constructor to PyYAML with SafeLoader replaced by the BaseLoader to handle tuples
+# Add the constructor to PyYAML with SafeLoader replaced by the FullLoader to handle tuples
 yaml.add_constructor('tag:yaml.org,2002:python/tuple', tuple_constructor, Loader=yaml.FullLoader)
 
 def load_config(config_file=config_path):
@@ -30,52 +30,53 @@ def load_config(config_file=config_path):
 def ensure_default_config(config_data):
     """Ensure all required keys are in the config_data with default values."""
     defaults = {
-        'similarity_threshold': 0.5,  # Updated to match the latest config
+        'input_feeds_path': "input/feeds.txt",
+        'similarity_threshold': 0.5,
         'preprocessing': {
             'remove_html': True,
             'lowercase': True,
             'remove_punctuation': True,
             'lemmatization': True,
             'use_stemming': False,
-            'stop_words': 'italian',  # Assuming Italian stop words as default
+            'stop_words': 'italian',
             'additional_stopwords': [],
-            'min_word_length': 2,  # Adding minimum word length as a common option
+            'min_word_length': 2,
         },
         'vectorization': {
-            'method': 'tfidf',  # Options: 'tfidf', 'count', 'hashing'
-            'ngram_range': (1, 3),  # Updated to reflect the tuple format in config.yaml
+            'method': 'tfidf',
+            'ngram_range': (1, 2),
             'max_df': 0.85,
             'min_df': 0.01,
             'max_features': 5000,
         },
         'similarity_options': {
-            'method': 'dbscan',  # Options: 'dbscan', 'kmeans', 'agglomerative'
-            'eps': 0.5,  # Only for DBSCAN
-            'min_samples': 2,  # Only for DBSCAN
-            'n_clusters': 5,  # Only for 'kmeans' and 'agglomerative'
-            'linkage': 'average'  # Only for 'agglomerative'
+            'method': 'dbscan',
+            'eps': 0.5,
+            'min_samples': 2,
+            'n_clusters': 5,
+            'linkage': 'average'
         },
         'api_config': {
-            'selected_api': "Groq",  # Default to Groq as per latest config
+            'selected_api': "Groq",
             'openai_api_url': "https://api.openai.com/v1/chat/completions",
             'openai_api_key': "",
             'openai_model': "gpt-3.5-turbo",
             'groq_api_url': "https://api.groq.com/openai/v1/chat/completions",
             'groq_api_key': "",
-            'groq_model': "llama3-8b-8192",  # Updated to the latest model
+            'groq_model': "llama3-8b-8192",
             'ollama_api_url': "http://localhost:11434/api/chat",
-            'ollama_model': "phi3"
+            'ollama_model': "phi3",
+            'anthropic_api_key': "your_anthropic_api_key",
+            'anthropic_api_url': "https://api.anthropic.com/v1/messages",
+            'anthropic_model': "claude-3-haiku-20240307"
         },
         'folders': {
             'output_folder': "output",
             'rewritten_folder': "rewritten"
         },
-        'content_prefix': "Sei un giornalista esperto quindi utilizza un tono professionale, preciso e dettagliato...",
+        'prompt_file': "prompt_IT.txt",
         'max_items': 50,
         'max_age_days': 10,
-        'scheduling_enabled': True,  # Updated to reflect enabled scheduling
-        'scheduling_interval': 4,  # Updated to the latest config
-        'scheduling_period': 'hours',  # Updated to match the latest config
         'feed_title': "UglyFeed RSS",
         'feed_link': "https://github.com/fabriziosalmi/UglyFeed",
         'feed_description': "A dynamically generated feed using UglyFeed.",
@@ -84,13 +85,28 @@ def ensure_default_config(config_data):
         'author': "UglyFeed",
         'category': "Technology",
         'copyright': "UglyFeed",
-        'http_server_port': 8001,  # Default server port
-        'enable_github': False,  # Updated to match the latest config
-        'enable_gitlab': False,  # Updated to match the latest config
+        'moderation': {
+            'enabled': False,
+            'words_file': 'moderation/IT.txt',
+            'allow_duplicates': False
+        },
+        'scheduling_enabled': False,
+        'scheduling_interval': 4,
+        'scheduling_period': 'hours',
+        'http_server_port': 8001,
+        'enable_github': False,
+        'enable_gitlab': False,
         'github_repo': 'your_github_username/uglyfeed-cdn',
         'github_token': 'your_github_token',
         'gitlab_repo': 'your_gitlab_username/uglyfeed-cdn',
         'gitlab_token': 'your_gitlab_token',
+        'tts': {
+            'input': "rewritten",
+            'output': "media",
+            'language': "it",
+            'speed_factor': 1.25,
+            'enable_tts': False
+        }
     }
 
     def recursive_update(d, u):
