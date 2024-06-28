@@ -150,7 +150,7 @@ def compare_json_files(output_file, rewritten_file):
     }
 
     aggregated_score = sum(weights[metric] * normalized_scores[metric] for metric in weights)
-    scores["Aggregated Score"] = aggregated_score
+    scores["Ugly Score"] = aggregated_score
 
     return scores
 
@@ -377,6 +377,9 @@ def f1_score(reference, candidate):
 
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
+
+    if precision + recall == 0:
+        return 0.0
 
     return 2 * (precision * recall) / (precision + recall)
 
