@@ -6,6 +6,9 @@ import psutil
 import requests
 import streamlit as st
 from streamlit_option_menu import option_menu
+import subprocess
+import json
+import pandas as pd
 
 import yaml
 from config import load_config, save_configuration
@@ -60,6 +63,31 @@ def render_readme():
     else:
         st.error("README.md file not found.")
 
+# Function to execute the evaluate_against_reference.py script
+def evaluate_script():
+    script_path = os.path.join(os.path.dirname(__file__), "evaluate_against_reference.py")
+    if os.path.exists(script_path):
+        result = subprocess.run(['python', script_path], capture_output=True, text=True)
+        if result.returncode == 0:
+            st.success("Script executed successfully!")
+            st.text(result.stdout)
+        else:
+            st.error("Script execution failed.")
+            st.text(result.stderr)
+    else:
+        st.error("evaluate_against_reference.py script not found.")
+
+# Function to display the evaluation report from JSON
+def display_report():
+    json_path = os.path.join(os.path.dirname(__file__), "reports", "evaluation_results.json")
+    if os.path.exists(json_path):
+        with open(json_path, "r") as file:
+            data = json.load(file)
+            df = pd.DataFrame(data)
+            st.dataframe(df)  # Display the DataFrame as a table
+    else:
+        st.error("Evaluation report not found.")
+
 # Initialize session state
 if 'config_data' not in st.session_state:
     st.session_state.config_data = config
@@ -92,8 +120,8 @@ start_scheduling(
 with st.sidebar:
     selected = option_menu(
         menu_title="UglyFeed",  # required
-        options=["Introduction", "Configuration", "Run Scripts", "View and Serve XML", "Deploy", "Debug", "Docs"],  # required
-        icons=["info", "gear", "play-circle", "file-code", "cloud-upload", "bug", "file-text"],  # optional, you can choose icons that make sense
+        options=["Introduction", "Configuration", "Run Scripts", "View and Serve XML", "Deploy", "Debug", "Docs", "Evaluate"],  # required
+        icons=["info", "gear", "play-circle", "file-code", "cloud-upload", "bug", "file-text", "play"],  # optional, you can choose icons that make sense
         menu_icon="",  # optional
         default_index=0,  # optional
     )
@@ -531,3 +559,11 @@ if selected == "Debug":
 
 if selected == "Docs":
     render_readme()
+
+# Evaluate Page to execute the evaluate_against_reference.py script
+if selected == "Evaluate":
+    st.title("Evaluate")
+    if st.button("Run Evaluation Script"):
+        evaluate_script()
+    st.write("Evaluation report:")
+    display_report()
