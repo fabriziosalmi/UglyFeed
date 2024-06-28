@@ -193,19 +193,29 @@ def read_content_prefix(prefix_file_path):
         logger.error(f"Error reading content prefix file {prefix_file_path}: {e}")
         return ""
 
+
+
 def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritten_folder, api_type):
     try:
         with open(filepath, 'r', encoding='utf-8') as file:
             json_data = json.load(file)
+            logger.debug(f"Type of json_data: {type(json_data)}")
+            if isinstance(json_data, dict):
+                # If json_data is a dictionary, convert it to a list of one dictionary
+                json_data = [json_data]
+                logger.warning(f"Converted dictionary to list. File: {filepath}")
+            elif isinstance(json_data, str):
+                logger.error(f"Expected list of dictionaries but got a string. File: {filepath}")
+                return
     except (json.JSONDecodeError, IOError) as e:
         logger.error(f"Error reading JSON from {filepath}: {e}")
         return
 
+    # Ensure 'content' key exists in each dictionary
     combined_content = content_prefix + "\n".join(
-        f"[source {idx + 1}] {item['content']}" for idx, item in enumerate(json_data))
+        f"[source {idx + 1}] {item.get('content', 'No content provided')}" for idx, item in enumerate(json_data))
 
     logger.info(f"Processing {filepath} - combined content prepared.")
-
     logger.debug(f"Combined content: {combined_content}")
 
     if estimate_token_count(combined_content) > MAX_TOKENS:
@@ -253,6 +263,12 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
     else:
         logger.error("Failed to get rewritten content from LLM API.")
         logger.debug(f"Rewritten content: {rewritten_content}")
+
+
+
+
+
+
 
 def validate_config(api_config):
     selected_api = api_config.get('selected_api')
