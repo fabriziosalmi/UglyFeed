@@ -214,6 +214,15 @@ elif selected_option == "Configuration":
 
     st.divider()
 
+    st.subheader("Moderation Settings")
+    moderation_settings = st.session_state.config_data.get('moderation', {})
+    moderation_settings['enabled'] = st.checkbox("Enable Moderation", value=moderation_settings.get('enabled', False))
+    moderation_settings['words_file'] = st.text_input("Words File", value=moderation_settings.get('words_file', 'moderation/IT.txt'))
+    moderation_settings['allow_duplicates'] = st.checkbox("Allow Duplicates", value=moderation_settings.get('allow_duplicates', False))
+    st.session_state.config_data['moderation'] = moderation_settings
+
+    st.divider()
+
     st.subheader("RSS Retention Options")
     st.session_state.config_data['max_items'] = st.number_input("Maximum Items", min_value=1, value=st.session_state.config_data['max_items'])
     st.session_state.config_data['max_age_days'] = st.number_input("Maximum Age (days)", min_value=1, value=st.session_state.config_data['max_age_days'])
@@ -416,7 +425,7 @@ elif selected_option == "Debug":
             st.experimental_rerun()
 
     st.subheader("Download Logs")
-    logs_path = Path('logs.txt')
+    logs_path = Path('uglyfeed.log')
     if logs_path.exists():
         with logs_path.open('r') as log_file:
             logs = log_file.read()
