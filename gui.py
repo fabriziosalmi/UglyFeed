@@ -48,6 +48,11 @@ def convert_tuple_to_list(data, keys):
 config_keys_with_tuples = ['ngram_range']
 config = convert_list_to_tuple(config, config_keys_with_tuples)
 
+# Streamlit wide layout
+st.set_page_config(
+    layout="wide"
+)
+
 # Initialize session state
 if 'config_data' not in st.session_state:
     st.session_state.config_data = config
