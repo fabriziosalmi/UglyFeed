@@ -5,6 +5,8 @@ import platform
 import psutil
 import requests
 import streamlit as st
+from streamlit_option_menu import option_menu
+
 import yaml
 from config import load_config, save_configuration
 from logging_setup import setup_logging
@@ -48,11 +50,6 @@ def convert_tuple_to_list(data, keys):
 config_keys_with_tuples = ['ngram_range']
 config = convert_list_to_tuple(config, config_keys_with_tuples)
 
-# Streamlit wide layout
-st.set_page_config(
-    layout="wide"
-)
-
 # Initialize session state
 if 'config_data' not in st.session_state:
     st.session_state.config_data = config
@@ -81,29 +78,26 @@ start_scheduling(
     st.session_state
 )
 
-# Sidebar navigation
-st.sidebar.title("Navigation")
-menu_options = [
-    "Introduction",
-    "Configuration",
-    "Run Scripts",
-    "View and Serve XML",
-    "Deploy",
-    "Debug"
-]
-selected_option = st.sidebar.radio("Select an option", menu_options)
+# Create a sidebar menu
+with st.sidebar:
+    selected = option_menu(
+        menu_title="UglyFeed",  # required
+        options=["Introduction", "Configuration", "Run Scripts", "View and Serve XML", "Deploy", "Debug"],  # required
+        icons=["info", "gear", "play-circle", "file-code", "cloud-upload", "bug"],  # optional, you can choose icons that make sense
+        menu_icon="",  # optional
+        default_index=0,  # optional
+    )
 
 # Ensure Font Awesome is included
 st.sidebar.markdown("""
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <hr>
     <a href="https://github.com/fabriziosalmi/UglyFeed" target="_blank">
-        <i class="fab fa-github" style="font-size: 32px;"></i>
+        <i class="fab fa-github" style="font-size: 32px; align-self: center;"></i>
     </a>
     """, unsafe_allow_html=True)
 
 # Pages based on the selected option
-if selected_option == "Introduction":
+if selected == "Introduction":
     st.markdown("""
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
         <img src="https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed.png?raw=true"
@@ -130,7 +124,7 @@ if selected_option == "Introduction":
     </p>
     """, unsafe_allow_html=True)
 
-elif selected_option == "Configuration":
+if selected == "Configuration":
     st.header("Configuration")
     st.divider()
 
@@ -272,7 +266,7 @@ elif selected_option == "Configuration":
         st.success("Configuration and feeds saved successfully!")
         logger.info("Configuration and feeds have been saved successfully.")
 
-elif selected_option == "Run Scripts":
+if selected == "Run Scripts":
     st.header("Run Scripts")
 
     st.markdown("""
@@ -302,11 +296,11 @@ elif selected_option == "Run Scripts":
 
             st.write("---")  # Separator between scripts
 
-elif selected_option == "View and Serve XML":
+if selected == "View and Serve XML":
     # dirty workaround..
     uglyfeeds_dir = 'uglyfeeds'  # Define the directory
     uglyfeed_file = 'uglyfeed.xml'  # Define the XML file name
-    
+
     st.header("View and Serve XML")
 
     xml_file_path = copy_xml_to_static()
@@ -346,14 +340,14 @@ def load_config_safe():
         st.error(f"An error occurred while loading the configuration: {e}")
         return None
 
-if selected_option == "Deploy":
+if selected == "Deploy":
     st.header("Deploy XML File")
 
     config = load_config_safe()
-    
+
     if config is not None:
         st.write("This section allows you to deploy the `uglyfeed.xml` file to GitHub and GitLab.")
-        
+
         # Hidden configuration
         if 'config_visible' not in st.session_state:
             st.session_state.config_visible = False
@@ -363,7 +357,7 @@ if selected_option == "Deploy":
 
         if st.session_state.config_visible:
             st.json(config)
-        
+
         if st.button("Deploy to GitHub and GitLab"):
             try:
                 from deploy_xml import deploy_xml
@@ -391,7 +385,7 @@ if selected_option == "Deploy":
     else:
         st.warning("Configuration could not be loaded. Please check the configuration file.")
 
-elif selected_option == "Debug":
+if selected == "Debug":
     st.header("Debug")
     st.divider()
 
@@ -518,7 +512,7 @@ elif selected_option == "Debug":
         system_info_list = ""
         for key, value in system_info:
             system_info_list += f"- **{key}**: `{value}`\n"
-        
+
         st.markdown(system_info_list)
 
     display_system_info()
