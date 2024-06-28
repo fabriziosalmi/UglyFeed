@@ -23,3 +23,5 @@ typer==0.9.0
 streamlit
 streamlit_option_menu
 schedule
+subprocess
+json
