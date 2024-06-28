@@ -28,40 +28,6 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
         shell: bash
 
-      - name: Get previous setup.py commit
-        id: previous_commit
-        run: |
-          echo "Finding previous setup.py commit..."
-          PREV_COMMIT=$(git log --pretty=format:"%H" -- setup.py | tail -n 2 | head -n 1)
-          echo "PREV_COMMIT=${PREV_COMMIT}" >> $GITHUB_ENV
-          echo "Previous setup.py commit: ${PREV_COMMIT}"
-
-      - name: Generate changelog
-        id: changelog
-        run: |
-          PREV_COMMIT=${{ env.PREV_COMMIT }}
-          CURRENT_VERSION=${{ env.VERSION }}
-          echo "Generating changelog from $PREV_COMMIT to HEAD"
-          if [ -n "$PREV_COMMIT" ]; then
-            git log $PREV_COMMIT..HEAD --pretty=format:"- %s" > changelog.txt
-          else
-            git log HEAD --pretty=format:"- %s" > changelog.txt
-          fi
-          echo "## Version $CURRENT_VERSION - $(date +'%Y-%m-%d')" > CHANGELOG.md
-          cat changelog.txt >> CHANGELOG.md
-          echo "" >> CHANGELOG.md
-          cat CHANGELOG.md
-
-      - name: Commit and push changelog
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git add CHANGELOG.md
-          git commit -m "Update changelog for version ${{ env.VERSION }}"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -98,7 +64,7 @@ jobs:
           release_name: Release ${{ env.VERSION }}
           body: |
             ## Changes in this Release
-            $(cat CHANGELOG.md)
+            - UI updated
           draft: false
           prerelease: false
 
