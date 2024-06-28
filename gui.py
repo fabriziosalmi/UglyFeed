@@ -1,7 +1,7 @@
 import os
 import socket
 from pathlib import Path
-
+import platform
 import psutil
 import requests
 import streamlit as st
@@ -298,6 +298,10 @@ elif selected_option == "Run Scripts":
             st.write("---")  # Separator between scripts
 
 elif selected_option == "View and Serve XML":
+    # dirty workaround..
+    uglyfeeds_dir = 'uglyfeeds'  # Define the directory
+    uglyfeed_file = 'uglyfeed.xml'  # Define the XML file name
+    
     st.header("View and Serve XML")
 
     xml_file_path = copy_xml_to_static()
@@ -329,42 +333,62 @@ elif selected_option == "View and Serve XML":
         else:
             st.info("Server is not running.")
 
-elif selected_option == "Deploy":
+def load_config_safe():
+    try:
+        from deploy_xml import load_config
+        return load_config()
+    except Exception as e:
+        st.error(f"An error occurred while loading the configuration: {e}")
+        return None
+
+if selected_option == "Deploy":
     st.header("Deploy XML File")
 
-    from deploy_xml import deploy_xml, load_config
+    config = load_config_safe()
+    
+    if config is not None:
+        st.write("This section allows you to deploy the `uglyfeed.xml` file to GitHub and GitLab.")
+        
+        # Hidden configuration
+        if 'config_visible' not in st.session_state:
+            st.session_state.config_visible = False
 
-    config = load_config()
-    st.write("This section allows you to deploy the `uglyfeed.xml` file to GitHub and GitLab.")
-    st.write("Current configuration:")
-    st.json(config)
+        if st.button("Show Configuration"):
+            st.session_state.config_visible = not st.session_state.config_visible
 
-    if st.button("Deploy to GitHub and GitLab"):
-        try:
-            with st.spinner("Deploying..."):
-                urls = deploy_xml('uglyfeeds/uglyfeed.xml', config)
-                if urls:
-                    st.success("Deployment successful!")
-                    st.write("File deployed to the following URLs:")
-                    for platform, url in urls.items():
-                        st.markdown(f"**{platform.capitalize()}**: [View]({url})")
+        if st.session_state.config_visible:
+            st.json(config)
+        
+        if st.button("Deploy to GitHub and GitLab"):
+            try:
+                from deploy_xml import deploy_xml
+                with st.spinner("Deploying..."):
+                    urls = deploy_xml('uglyfeeds/uglyfeed.xml', config)
+                    if urls:
+                        st.success("Deployment successful!")
+                        st.write("File deployed to the following URLs:")
+                        for platform, url in urls.items():
+                            st.markdown(f"**{platform.capitalize()}**: [View]({url})")
 
-                    st.session_state['urls'] = urls
-                else:
-                    st.warning("No deployments were made. Check if the configuration is correct.")
-        except Exception as e:
-            st.error(f"An error occurred during deployment: {e}")
+                        st.session_state['urls'] = urls
+                    else:
+                        st.warning("No deployments were made. Check if the configuration is correct.")
+            except Exception as e:
+                st.error(f"An error occurred during deployment: {e}")
 
-    st.subheader("Previous Deployment Status")
-    if 'urls' in st.session_state:
-        st.write("Last deployed to the following URLs:")
-        for platform, url in st.session_state['urls'].items():
-            st.markdown(f"**{platform.capitalize()}**: [View]({url})")
+        st.subheader("Previous Deployment Status")
+        if 'urls' in st.session_state:
+            st.write("Last deployed to the following URLs:")
+            for platform, url in st.session_state['urls'].items():
+                st.markdown(f"**{platform.capitalize()}**: [View]({url})")
+        else:
+            st.info("No previous deployments found.")
     else:
-        st.info("No previous deployments found.")
+        st.warning("Configuration could not be loaded. Please check the configuration file.")
 
 elif selected_option == "Debug":
     st.header("Debug")
+    st.divider()
 
     st.subheader("Job Execution Logs")
     if job_stats_global:
@@ -381,6 +405,8 @@ elif selected_option == "Debug":
     else:
         st.info("No job executions have been recorded yet.")
 
+    st.divider()
+
     st.subheader("XML File Stats")
     item_count, last_updated, xml_path = get_xml_stats()
     if item_count is not None:
@@ -390,6 +416,8 @@ elif selected_option == "Debug":
             st.write(f"**File Path:** `{xml_path}`")
     else:
         st.warning("No XML file found or file is empty. Please ensure the XML file is generated properly.")
+
+    st.divider()
 
     st.subheader("HTTP Server Status (Port 8001)")
     try:
@@ -401,16 +429,7 @@ elif selected_option == "Debug":
     except requests.ConnectionError:
         st.error("HTTP server on port 8001 is not running.")
 
-    st.subheader("System Information")
-    hostname = socket.gethostname()
-    ip_address = socket.gethostbyname(hostname)
-    cpu_usage = psutil.cpu_percent(interval=1)
-    memory_info = psutil.virtual_memory()
-
-    st.write(f"**Hostname:** `{hostname}`")
-    st.write(f"**IP Address:** `{ip_address}`")
-    st.write(f"**CPU Usage:** `{cpu_usage}%`")
-    st.write(f"**Memory Usage:** `{memory_info.percent}%` (Available: `{memory_info.available // (1024 ** 2)} MB`)")
+    st.divider()
 
     st.subheader("Current Configuration")
     with st.expander("View Config.yaml Content"):
@@ -418,11 +437,15 @@ elif selected_option == "Debug":
         if st.button("Refresh Configuration"):
             st.experimental_rerun()
 
+    st.divider()
+
     st.subheader("Loaded Feeds")
     with st.expander("View Feeds Content"):
         st.text_area("Feeds Content", st.session_state.feeds, height=200)
         if st.button("Refresh Feeds"):
             st.experimental_rerun()
+
+    st.divider()
 
     st.subheader("Download Logs")
     logs_path = Path('uglyfeed.log')
@@ -434,6 +457,8 @@ elif selected_option == "Debug":
     else:
         st.warning("No log file found. Please ensure logs are being recorded properly.")
 
+    st.divider()
+
     st.subheader("Adjust Log Level")
     log_level = st.select_slider(
         "Select log level",
@@ -442,3 +467,53 @@ elif selected_option == "Debug":
     )
     logger.setLevel(log_level)
     st.info(f"Current log level set to: {log_level}")
+
+    st.divider()
+
+    def get_system_info():
+        # Collecting system information
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        system = platform.system()
+        release = platform.release()
+        version = platform.version()
+        cpu_usage = psutil.cpu_percent()
+        memory_info = psutil.virtual_memory()
+        total_memory = memory_info.total // (1024 ** 2)
+        available_memory = memory_info.available // (1024 ** 2)
+        memory_usage = memory_info.percent
+        disk_info = psutil.disk_usage('/')
+        total_disk = disk_info.total // (1024 ** 3)
+        used_disk = disk_info.used // (1024 ** 3)
+        free_disk = disk_info.free // (1024 ** 3)
+        disk_usage = disk_info.percent
+
+        # Returning the collected information as a list of tuples
+        return [
+            ("💻 Hostname", hostname),
+            ("🌐 IP Address", ip_address),
+            ("🖥️ System", system),
+            ("🔧 Release", release),
+            ("📟 Version", version),
+            ("⚙️ CPU Usage", f"{cpu_usage}%"),
+            ("💾 Total Memory", f"{total_memory} MB"),
+            ("🆓 Available Memory", f"{available_memory} MB"),
+            ("📊 Memory Usage", f"{memory_usage}%"),
+            ("💽 Total Disk Space", f"{total_disk} GB"),
+            ("📂 Used Disk Space", f"{used_disk} GB"),
+            ("🗃️ Free Disk Space", f"{free_disk} GB"),
+            ("📈 Disk Usage", f"{disk_usage}%")
+        ]
+
+    def display_system_info():
+        st.subheader("System Information")
+        system_info = get_system_info()
+
+        # Formatting the system information as a bullet list with emojis
+        system_info_list = ""
+        for key, value in system_info:
+            system_info_list += f"- **{key}**: `{value}`\n"
+        
+        st.markdown(system_info_list)
+
+    display_system_info()
