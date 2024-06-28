@@ -205,7 +205,7 @@ elif selected_option == "Configuration":
         prompt_content = ""
 
     st.subheader("Edit Prompt File")
-    new_prompt_content = st.text_area("Prompt File Content", prompt_content, height=200)
+    new_prompt_content = st.text_area("Prompt File Content", prompt_content, height=200, key="prompt")
 
     if st.button("Save Prompt"):
         with open(prompt_file_path, 'w') as f:
@@ -280,11 +280,11 @@ elif selected_option == "Run Scripts":
 
             if output:
                 st.subheader("Output:")
-                st.text_area(label="", value=output, height=200)
+                st.text_area(label="", value=output, height=200, key=f"output_script_{script}")
 
             if errors:
                 st.subheader("Debug:")
-                st.text_area(label="", value=errors, height=100)
+                st.text_area(label="", value=errors, height=100, key=f"debug_script_{script}")
 
             st.write("---")  # Separator between scripts
 
