@@ -50,6 +50,16 @@ def convert_tuple_to_list(data, keys):
 config_keys_with_tuples = ['ngram_range']
 config = convert_list_to_tuple(config, config_keys_with_tuples)
 
+# Function to read and display the README.md file
+def render_readme():
+    readme_path = os.path.join(os.path.dirname(__file__), "docs", "README.md")
+    if os.path.exists(readme_path):
+        with open(readme_path, "r") as file:
+            readme_content = file.read()
+        st.markdown(readme_content)
+    else:
+        st.error("README.md file not found.")
+
 # Initialize session state
 if 'config_data' not in st.session_state:
     st.session_state.config_data = config
@@ -82,8 +92,8 @@ start_scheduling(
 with st.sidebar:
     selected = option_menu(
         menu_title="UglyFeed",  # required
-        options=["Introduction", "Configuration", "Run Scripts", "View and Serve XML", "Deploy", "Debug"],  # required
-        icons=["info", "gear", "play-circle", "file-code", "cloud-upload", "bug"],  # optional, you can choose icons that make sense
+        options=["Introduction", "Configuration", "Run Scripts", "View and Serve XML", "Deploy", "Debug", "Docs"],  # required
+        icons=["info", "gear", "play-circle", "file-code", "cloud-upload", "bug", "file-text"],  # optional, you can choose icons that make sense
         menu_icon="",  # optional
         default_index=0,  # optional
     )
@@ -516,3 +526,8 @@ if selected == "Debug":
         st.markdown(system_info_list)
 
     display_system_info()
+
+    st.divider()
+
+if selected == "Docs":
+    render_readme()
