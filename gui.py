@@ -9,7 +9,7 @@ from streamlit_option_menu import option_menu
 import subprocess
 import json
 import pandas as pd
-
+import glob
 import yaml
 from config import load_config, save_configuration
 from logging_setup import setup_logging
@@ -87,6 +87,44 @@ def display_report():
             st.dataframe(df)  # Display the DataFrame as a table
     else:
         st.error("Evaluation report not found.")
+
+# Function to execute the process_multiple_metrics.py script
+def process_multiple_metrics():
+    script_path = os.path.join(os.path.dirname(__file__), "process_multiple_metrics.py")
+    if os.path.exists(script_path):
+        result = subprocess.run(['python', script_path], capture_output=True, text=True)
+        if result.returncode == 0:
+            st.success("Script executed successfully!")
+            st.text(result.stdout)
+        else:
+            st.error("Script execution failed.")
+            st.text(result.stderr)
+    else:
+        st.error("process_multiple_metrics.py script not found.")
+
+# Function to display the process multiple metrics reports from JSON
+def display_multiple_metrics():
+    rewritten_dir = os.path.join(os.path.dirname(__file__), "rewritten")
+    json_files = glob.glob(os.path.join(rewritten_dir, "*_rewritten_metrics_merged.json"))
+
+    if not json_files:
+        st.error("No merged metrics JSON files found in the rewritten directory.")
+        return
+
+    for json_file in json_files:
+        with open(json_file, "r") as file:
+            data = json.load(file)
+            st.subheader(f"Metrics from {os.path.basename(json_file)}")
+
+            # Prepare data for display
+            metrics_data = []
+            for key, value in data.items():
+                if isinstance(value, dict):
+                    value = json.dumps(value)  # Convert dictionaries to strings
+                metrics_data.append({'Metric': key, 'Value': value})
+
+            df = pd.DataFrame(metrics_data)
+            st.dataframe(df)  # Display the DataFrame as a table
 
 # Initialize session state
 if 'config_data' not in st.session_state:
@@ -563,7 +601,15 @@ if selected == "Docs":
 # Evaluate Page to execute the evaluate_against_reference.py script
 if selected == "Evaluate":
     st.title("Evaluate")
-    if st.button("Run Evaluation Script"):
+    st.markdown("Evaluation metrics: You can generate metrics for comparison against reference and metrics for the generated content only.")
+    st.divider()
+    if st.button("Evaluate Against Reference"):
         evaluate_script()
     st.write("Evaluation report:")
     display_report()
+    st.divider()
+    if st.button("Process Multiple Metrics"):
+        process_multiple_metrics()
+
+    st.write("Multiple Metrics report:")
+    display_multiple_metrics()
