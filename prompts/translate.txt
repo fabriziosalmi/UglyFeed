@@ -1,0 +1,141 @@
+### Translation Prompts
+
+# Here the translation prompts. To make LLM translate any feed into another language, just uncomment your needed language. Translation accuracy is completely LLM dependant at the current status of the project.
+
+# example: translate in Italian
+[content] . Translate this into Italian.
+
+
+# [content] . Translate this into Arabic.
+# [content] . Translate this into Bengali.
+# [content] . Translate this into Chinese (Simplified).
+# [content] . Translate this into Chinese (Traditional).
+# [content] . Translate this into Czech.
+# [content] . Translate this into Danish.
+# [content] . Translate this into Dutch.
+# [content] . Translate this into English.
+# [content] . Translate this into Filipino.
+# [content] . Translate this into Finnish.
+# [content] . Translate this into French.
+# [content] . Translate this into German.
+# [content] . Translate this into Greek.
+# [content] . Translate this into Gujarati.
+# [content] . Translate this into Hebrew.
+# [content] . Translate this into Hindi.
+# [content] . Translate this into Hungarian.
+# [content] . Translate this into Indonesian.
+# [content] . Translate this into Italian.
+# [content] . Translate this into Japanese.
+# [content] . Translate this into Kannada.
+# [content] . Translate this into Korean.
+# [content] . Translate this into Malay.
+# [content] . Translate this into Marathi.
+# [content] . Translate this into Nepali.
+# [content] . Translate this into Norwegian.
+# [content] . Translate this into Persian (Farsi).
+# [content] . Translate this into Polish.
+# [content] . Translate this into Portuguese.
+# [content] . Translate this into Punjabi.
+# [content] . Translate this into Romanian.
+# [content] . Translate this into Russian.
+# [content] . Translate this into Serbian.
+# [content] . Translate this into Slovak.
+# [content] . Translate this into Slovenian.
+# [content] . Translate this into Spanish.
+# [content] . Translate this into Swedish.
+# [content] . Translate this into Tamil.
+# [content] . Translate this into Telugu.
+# [content] . Translate this into Thai.
+# [content] . Translate this into Turkish.
+# [content] . Translate this into Ukrainian.
+# [content] . Translate this into Urdu.
+# [content] . Translate this into Vietnamese.
+# [content] . Translate this into Yoruba.
+# [content] . Translate this into Zulu.
+# [content] . Translate this into Afrikaans.
+# [content] . Translate this into Albanian.
+# [content] . Translate this into Amharic.
+# [content] . Translate this into Azerbaijani.
+# [content] . Translate this into Basque.
+# [content] . Translate this into Belarusian.
+# [content] . Translate this into Bosnian.
+# [content] . Translate this into Bulgarian.
+# [content] . Translate this into Catalan.
+# [content] . Translate this into Croatian.
+# [content] . Translate this into Estonian.
+# [content] . Translate this into Georgian.
+# [content] . Translate this into Haitian Creole.
+# [content] . Translate this into Icelandic.
+# [content] . Translate this into Irish.
+# [content] . Translate this into Javanese.
+# [content] . Translate this into Kazakh.
+# [content] . Translate this into Khmer (Cambodian).
+# [content] . Translate this into Kurdish.
+# [content] . Translate this into Kyrgyz.
+# [content] . Translate this into Lao.
+# [content] . Translate this into Latvian.
+# [content] . Translate this into Lithuanian.
+# [content] . Translate this into Luxembourgish.
+# [content] . Translate this into Macedonian.
+# [content] . Translate this into Malagasy.
+# [content] . Translate this into Malayalam.
+# [content] . Translate this into Maltese.
+# [content] . Translate this into Maori.
+# [content] . Translate this into Mongolian.
+# [content] . Translate this into Pashto.
+# [content] . Translate this into Samoan.
+# [content] . Translate this into Scottish Gaelic.
+# [content] . Translate this into Shona.
+# [content] . Translate this into Sinhala (Sinhalese).
+# [content] . Translate this into Somali.
+# [content] . Translate this into Swahili.
+# [content] . Translate this into Tajik.
+# [content] . Translate this into Tibetan.
+# [content] . Translate this into Tongan.
+# [content] . Translate this into Turkmen.
+# [content] . Translate this into Uzbek.
+# [content] . Translate this into Welsh.
+# [content] . Translate this into Xhosa.
+# [content] . Translate this into Yiddish.
+# [content] . Translate this into Zhuang (Chuang).
+# [content] . Translate this into Assamese.
+# [content] . Translate this into Chichewa (Nyanja).
+# [content] . Translate this into Corsican.
+# [content] . Translate this into Dari.
+# [content] . Translate this into Fijian.
+# [content] . Translate this into Galician.
+# [content] . Translate this into Hawaiian.
+# [content] . Translate this into Inuktitut.
+# [content] . Translate this into Kinyarwanda.
+# [content] . Translate this into Kurdish (Kurmanji).
+# [content] . Translate this into Luxembourgish.
+# [content] . Translate this into Malagasy.
+# [content] . Translate this into Maltese.
+# [content] . Translate this into Maori.
+# [content] . Translate this into Mongolian.
+# [content] . Translate this into Navajo.
+# [content] . Translate this into Ndebele.
+# [content] . Translate this into Oromo.
+# [content] . Translate this into Papiamento.
+# [content] . Translate this into Quechua.
+# [content] . Translate this into Rohingya.
+# [content] . Translate this into Samoan.
+# [content] . Translate this into Scots Gaelic.
+# [content] . Translate this into Sesotho.
+# [content] . Translate this into Setswana.
+# [content] . Translate this into Shona.
+# [content] . Translate this into Sindhi.
+# [content] . Translate this into Sinhala.
+# [content] . Translate this into Somali.
+# [content] . Translate this into Sundanese.
+# [content] . Translate this into Swahili.
+# [content] . Translate this into Tajik.
+# [content] . Translate this into Tatar.
+# [content] . Translate this into Tswana.
+# [content] . Translate this into Tumbuka.
+# [content] . Translate this into Uighur.
+# [content] . Translate this into Valencian.
+# [content] . Translate this into Wolof.
+# [content] . Translate this into Xhosa.
+# [content] . Translate this into Yoruba.
+# [content] . Translate this into Zulu.
