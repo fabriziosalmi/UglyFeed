@@ -1,0 +1,138 @@
+### Translation Prompts
+
+# Example: summarise and translate into Italian
+[content] . Summarize and translate the content provided into Italian.
+
+# [content] . Summarize and translate the content provided into Arabic.
+# [content] . Summarize and translate the content provided into Bengali.
+# [content] . Summarize and translate the content provided into Chinese (Simplified).
+# [content] . Summarize and translate the content provided into Chinese (Traditional).
+# [content] . Summarize and translate the content provided into Czech.
+# [content] . Summarize and translate the content provided into Danish.
+# [content] . Summarize and translate the content provided into Dutch.
+# [content] . Summarize and translate the content provided into English.
+# [content] . Summarize and translate the content provided into Filipino.
+# [content] . Summarize and translate the content provided into Finnish.
+# [content] . Summarize and translate the content provided into French.
+# [content] . Summarize and translate the content provided into German.
+# [content] . Summarize and translate the content provided into Greek.
+# [content] . Summarize and translate the content provided into Gujarati.
+# [content] . Summarize and translate the content provided into Hebrew.
+# [content] . Summarize and translate the content provided into Hindi.
+# [content] . Summarize and translate the content provided into Hungarian.
+# [content] . Summarize and translate the content provided into Indonesian.
+# [content] . Summarize and translate the content provided into Italian.
+# [content] . Summarize and translate the content provided into Japanese.
+# [content] . Summarize and translate the content provided into Kannada.
+# [content] . Summarize and translate the content provided into Korean.
+# [content] . Summarize and translate the content provided into Malay.
+# [content] . Summarize and translate the content provided into Marathi.
+# [content] . Summarize and translate the content provided into Nepali.
+# [content] . Summarize and translate the content provided into Norwegian.
+# [content] . Summarize and translate the content provided into Persian (Farsi).
+# [content] . Summarize and translate the content provided into Polish.
+# [content] . Summarize and translate the content provided into Portuguese.
+# [content] . Summarize and translate the content provided into Punjabi.
+# [content] . Summarize and translate the content provided into Romanian.
+# [content] . Summarize and translate the content provided into Russian.
+# [content] . Summarize and translate the content provided into Serbian.
+# [content] . Summarize and translate the content provided into Slovak.
+# [content] . Summarize and translate the content provided into Slovenian.
+# [content] . Summarize and translate the content provided into Spanish.
+# [content] . Summarize and translate the content provided into Swedish.
+# [content] . Summarize and translate the content provided into Tamil.
+# [content] . Summarize and translate the content provided into Telugu.
+# [content] . Summarize and translate the content provided into Thai.
+# [content] . Summarize and translate the content provided into Turkish.
+# [content] . Summarize and translate the content provided into Ukrainian.
+# [content] . Summarize and translate the content provided into Urdu.
+# [content] . Summarize and translate the content provided into Vietnamese.
+# [content] . Summarize and translate the content provided into Yoruba.
+# [content] . Summarize and translate the content provided into Zulu.
+# [content] . Summarize and translate the content provided into Afrikaans.
+# [content] . Summarize and translate the content provided into Albanian.
+# [content] . Summarize and translate the content provided into Amharic.
+# [content] . Summarize and translate the content provided into Azerbaijani.
+# [content] . Summarize and translate the content provided into Basque.
+# [content] . Summarize and translate the content provided into Belarusian.
+# [content] . Summarize and translate the content provided into Bosnian.
+# [content] . Summarize and translate the content provided into Bulgarian.
+# [content] . Summarize and translate the content provided into Catalan.
+# [content] . Summarize and translate the content provided into Croatian.
+# [content] . Summarize and translate the content provided into Estonian.
+# [content] . Summarize and translate the content provided into Georgian.
+# [content] . Summarize and translate the content provided into Haitian Creole.
+# [content] . Summarize and translate the content provided into Icelandic.
+# [content] . Summarize and translate the content provided into Irish.
+# [content] . Summarize and translate the content provided into Javanese.
+# [content] . Summarize and translate the content provided into Kazakh.
+# [content] . Summarize and translate the content provided into Khmer (Cambodian).
+# [content] . Summarize and translate the content provided into Kurdish.
+# [content] . Summarize and translate the content provided into Kyrgyz.
+# [content] . Summarize and translate the content provided into Lao.
+# [content] . Summarize and translate the content provided into Latvian.
+# [content] . Summarize and translate the content provided into Lithuanian.
+# [content] . Summarize and translate the content provided into Luxembourgish.
+# [content] . Summarize and translate the content provided into Macedonian.
+# [content] . Summarize and translate the content provided into Malagasy.
+# [content] . Summarize and translate the content provided into Malayalam.
+# [content] . Summarize and translate the content provided into Maltese.
+# [content] . Summarize and translate the content provided into Maori.
+# [content] . Summarize and translate the content provided into Mongolian.
+# [content] . Summarize and translate the content provided into Pashto.
+# [content] . Summarize and translate the content provided into Samoan.
+# [content] . Summarize and translate the content provided into Scottish Gaelic.
+# [content] . Summarize and translate the content provided into Shona.
+# [content] . Summarize and translate the content provided into Sinhala (Sinhalese).
+# [content] . Summarize and translate the content provided into Somali.
+# [content] . Summarize and translate the content provided into Swahili.
+# [content] . Summarize and translate the content provided into Tajik.
+# [content] . Summarize and translate the content provided into Tibetan.
+# [content] . Summarize and translate the content provided into Tongan.
+# [content] . Summarize and translate the content provided into Turkmen.
+# [content] . Summarize and translate the content provided into Uzbek.
+# [content] . Summarize and translate the content provided into Welsh.
+# [content] . Summarize and translate the content provided into Xhosa.
+# [content] . Summarize and translate the content provided into Yiddish.
+# [content] . Summarize and translate the content provided into Zhuang (Chuang).
+# [content] . Summarize and translate the content provided into Assamese.
+# [content] . Summarize and translate the content provided into Chichewa (Nyanja).
+# [content] . Summarize and translate the content provided into Corsican.
+# [content] . Summarize and translate the content provided into Dari.
+# [content] . Summarize and translate the content provided into Fijian.
+# [content] . Summarize and translate the content provided into Galician.
+# [content] . Summarize and translate the content provided into Hawaiian.
+# [content] . Summarize and translate the content provided into Inuktitut.
+# [content] . Summarize and translate the content provided into Kinyarwanda.
+# [content] . Summarize and translate the content provided into Kurdish (Kurmanji).
+# [content] . Summarize and translate the content provided into Luxembourgish.
+# [content] . Summarize and translate the content provided into Malagasy.
+# [content] . Summarize and translate the content provided into Maltese.
+# [content] . Summarize and translate the content provided into Maori.
+# [content] . Summarize and translate the content provided into Mongolian.
+# [content] . Summarize and translate the content provided into Navajo.
+# [content] . Summarize and translate the content provided into Ndebele.
+# [content] . Summarize and translate the content provided into Oromo.
+# [content] . Summarize and translate the content provided into Papiamento.
+# [content] . Summarize and translate the content provided into Quechua.
+# [content] . Summarize and translate the content provided into Rohingya.
+# [content] . Summarize and translate the content provided into Samoan.
+# [content] . Summarize and translate the content provided into Scots Gaelic.
+# [content] . Summarize and translate the content provided into Sesotho.
+# [content] . Summarize and translate the content provided into Setswana.
+# [content] . Summarize and translate the content provided into Shona.
+# [content] . Summarize and translate the content provided into Sindhi.
+# [content] . Summarize and translate the content provided into Sinhala.
+# [content] . Summarize and translate the content provided into Somali.
+# [content] . Summarize and translate the content provided into Sundanese.
+# [content] . Summarize and translate the content provided into Swahili.
+# [content] . Summarize and translate the content provided into Tajik.
+# [content] . Summarize and translate the content provided into Tatar.
+# [content] . Summarize and translate the content provided into Tswana.
+# [content] . Summarize and translate the content provided into Tumbuka.
+# [content] . Summarize and translate the content provided into Uighur.
+# [content] . Summarize and translate the content provided into Valencian.
+# [content] . Summarize and translate the content provided into Wolof.
+# [content] . Summarize and translate the content provided into Xhosa.
+# [content] . Summarize and translate the content provided into Yoruba.
+# [content] . Summarize and translate the content provided into Zulu.
