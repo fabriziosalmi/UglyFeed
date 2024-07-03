@@ -21,7 +21,8 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - 📰 [RSS test feeds available](https://github.com/fabriziosalmi/uglyfeed-cdn)
 - 🤖 Same codebase for all releases
 - 🛑 Simple post-filter moderation
-- ➡️ Translate feeds into your own language
+- ➡️ [Translate feeds](https://github.com/fabriziosalmi/UglyFeed/blob/main/prompts/translate.txt) into your own language
+- 📝 Tons of [prompts](https://github.com/fabriziosalmi/UglyFeed/tree/main/prompts) ready to use
 
 ## Get it now
 
