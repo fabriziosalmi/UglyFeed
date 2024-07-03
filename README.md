@@ -20,7 +20,8 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - 🖥️ Web UI based on Streamlit
 - 📰 [RSS test feeds available](https://github.com/fabriziosalmi/uglyfeed-cdn)
 - 🤖 Same codebase for all releases
-- 🛑 Simple post-filter moderation 
+- 🛑 Simple post-filter moderation
+- ➡️ Translate feeds into your own language
 
 ## Get it now
 
