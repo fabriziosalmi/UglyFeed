@@ -1,1 +1,1 @@
-Please generate a concise summary that captures the essence of the [content], including key points and main ideas. The summary should be understandable and coherent, using natural language to convey the information effectively.
+[content] . Generate a concise and coherent summary that captures the main ideas and key points from the provided content. The summary should be clear and informative, using natural language to effectively convey the essential information.
