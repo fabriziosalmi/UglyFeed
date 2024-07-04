@@ -278,4 +278,4 @@ Configure deployment to GitHub or GitLab:
 
 > I need all source feeds translated into my own language
 
-  You can force language by setting the `language` parameter in the `config.yaml` file (this will add a simple "respond by using _such_ language" statement after the input content). You can also use one of the prompts available [here](https://github.com/fabriziosalmi/UglyFeed/blob/main/prompts/translate.txt) to have more control.
+  You can force language by using one of the prompts available [here](https://github.com/fabriziosalmi/UglyFeed/blob/main/prompts/translate.txt).
