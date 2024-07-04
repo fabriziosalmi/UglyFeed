@@ -269,3 +269,9 @@ Configure deployment to GitHub or GitLab:
 - **Run Scripts**: From the `Run scripts` page, aggregate feed items by similarity and rewrite them according to the LLM instructions. Logs are displayed for debugging.
 - **View and Serve XML**: View and download the generated XML, or enable the HTTP server to provide a valid XML URL for any RSS reader.
 - **Deploy**: Publish the XML feed to GitHub or GitLab. A public URL will be provided for use with any RSS reader.
+
+## 💡 Tips'n'tricks
+
+> I don't care aggregation by similarity, I just want to rewrite source feeds
+
+  Replace `if len(group) > 1:` with `if len(group) > 0:` in the `main.py` file, line `203`.
