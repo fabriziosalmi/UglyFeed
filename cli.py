@@ -1,22 +1,25 @@
-# uglypy/cli.py
+"""
+uglypy - Command-line interface for running various scripts.
+"""
+
 import subprocess
 import os
 import argparse
-from logging_setup import setup_logging, get_logger
+from logging_setup import setup_logging
 
 # Setup logging
 logger = setup_logging()
 
 def run_command(command):
     """Run a command with subprocess and log the outcome."""
-    logger.info(f"Running command: {' '.join(command)}")
+    logger.info("Running command: %s", ' '.join(command))
     try:
         subprocess.run(command, check=True)
-        logger.info(f"Command {' '.join(command)} executed successfully.")
+        logger.info("Command %s executed successfully.", ' '.join(command))
     except subprocess.CalledProcessError as e:
-        logger.error(f"Command {' '.join(command)} failed: {e}")
-    except Exception as e:
-        logger.error(f"An unexpected error occurred: {e}")
+        logger.error("Command %s failed: %s", ' '.join(command), e)
+    except Exception as e:  # pylint: disable=broad-except
+        logger.error("An unexpected error occurred: %s", e)
 
 def run_streamlit(extra_args):
     """Run the Streamlit application."""
@@ -28,7 +31,7 @@ def run_script(script_name, extra_args):
     script_path = os.path.join(os.getcwd(), script_name)
 
     if not os.path.isfile(script_path):
-        logger.error(f"Error: {script_name} not found.")
+        logger.error("Error: %s not found.", script_name)
         return
 
     command = ["python", script_path] + extra_args

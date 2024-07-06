@@ -1,20 +1,26 @@
+"""
+This script uploads XML files to GitHub and GitLab repositories.
+"""
+
 import os
-import yaml
-import requests
 import base64
 import logging
+import requests
+import yaml
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Function to load configuration from YAML or environment variables
 def load_config(config_path='config.yaml'):
-    logging.info(f"Loading configuration from {config_path} or environment variables...")
+    """
+    Load configuration from YAML or environment variables.
+    """
+    logging.info("Loading configuration from %s or environment variables...", config_path)
     if os.path.exists(config_path):
-        with open(config_path, 'r') as file:
+        with open(config_path, 'r', encoding='utf-8') as file:
             config = yaml.safe_load(file)
     else:
-        logging.warning(f"Configuration file {config_path} not found. Falling back to environment variables.")
+        logging.warning("Configuration file %s not found. Falling back to environment variables.", config_path)
         config = {}
 
     config['github_token'] = config.get('github_token', os.getenv('GITHUB_TOKEN'))
@@ -26,8 +32,10 @@ def load_config(config_path='config.yaml'):
 
     return config
 
-# Function to upload file to GitHub
 def upload_to_github(file_path, config):
+    """
+    Upload file to GitHub.
+    """
     logging.info("Uploading to GitHub...")
     repo_name = config['github_repo']
     token = config['github_token']
@@ -43,7 +51,7 @@ def upload_to_github(file_path, config):
         content = base64.b64encode(file.read()).decode('utf-8')
 
     # Check if the file exists in the repository
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
     if response.status_code == 200:
         # File exists, retrieve its SHA
         sha = response.json()['sha']
@@ -54,7 +62,7 @@ def upload_to_github(file_path, config):
             'branch': 'main'
         }
         method = requests.put
-        logging.info(f"File {file_name} exists in GitHub repo, updating it.")
+        logging.info("File %s exists in GitHub repo, updating it.", file_name)
     elif response.status_code == 404:
         # File does not exist, create it
         data = {
@@ -63,22 +71,24 @@ def upload_to_github(file_path, config):
             'branch': 'main'
         }
         method = requests.put
-        logging.info(f"File {file_name} does not exist in GitHub repo, creating it.")
+        logging.info("File %s does not exist in GitHub repo, creating it.", file_name)
     else:
-        logging.error(f"GitHub file check failed: {response.text}")
+        logging.error("GitHub file check failed: %s", response.text)
         raise Exception(f"GitHub file check failed: {response.text}")
 
     # Upload or update the file
-    response = method(url, json=data, headers=headers)
+    response = method(url, json=data, headers=headers, timeout=10)
     if response.status_code in (200, 201):
         download_url = response.json()['content']['download_url']
         return download_url
     else:
-        logging.error(f"GitHub upload failed: {response.text}")
+        logging.error("GitHub upload failed: %s", response.text)
         raise Exception(f"GitHub upload failed: {response.text}")
 
-# Function to upload file to GitLab
 def upload_to_gitlab(file_path, config):
+    """
+    Upload file to GitLab.
+    """
     logging.info("Uploading to GitLab...")
     repo_name = config['gitlab_repo']
     token = config['gitlab_token']
@@ -88,7 +98,7 @@ def upload_to_gitlab(file_path, config):
     file_name = os.path.basename(file_path)
     url = f'https://gitlab.com/api/v4/projects/{repo_name}/repository/files/{file_name}'
 
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
 
     data = {
@@ -97,26 +107,28 @@ def upload_to_gitlab(file_path, config):
         'commit_message': 'Add uglyfeed.xml'
     }
 
-    response = requests.post(url, json=data, headers=headers)
+    response = requests.post(url, json=data, headers=headers, timeout=10)
     if response.status_code == 201:
         download_url = f'https://gitlab.com/{repo_name}/-/raw/main/{file_name}'
         return download_url
     elif response.status_code == 400 and 'already exists' in response.text:
         # Update file if it already exists
         logging.info("File already exists on GitLab, attempting to update...")
-        response = requests.put(url, json=data, headers=headers)
+        response = requests.put(url, json=data, headers=headers, timeout=10)
         if response.status_code == 200:
             download_url = f'https://gitlab.com/{repo_name}/-/raw/main/{file_name}'
             return download_url
         else:
-            logging.error(f"GitLab update failed: {response.text}")
+            logging.error("GitLab update failed: %s", response.text)
             raise Exception(f"GitLab update failed: {response.text}")
     else:
-        logging.error(f"GitLab upload failed: {response.text}")
+        logging.error("GitLab upload failed: %s", response.text)
         raise Exception(f"GitLab upload failed: {response.text}")
 
-# Main function to deploy XML file
 def deploy_xml(file_path, config):
+    """
+    Deploy XML file to GitHub and GitLab based on the configuration.
+    """
     urls = {}
 
     if config.get('enable_github', False):
@@ -124,14 +136,14 @@ def deploy_xml(file_path, config):
             github_url = upload_to_github(file_path, config)
             urls['github'] = github_url
         except Exception as e:
-            logging.error(f"GitHub upload error: {e}")
+            logging.error("GitHub upload error: %s", e)
 
     if config.get('enable_gitlab', False):
         try:
             gitlab_url = upload_to_gitlab(file_path, config)
             urls['gitlab'] = gitlab_url
         except Exception as e:
-            logging.error(f"GitLab upload error: {e}")
+            logging.error("GitLab upload error: %s", e)
 
     return urls
 
@@ -140,10 +152,10 @@ if __name__ == '__main__':
     config = load_config()
 
     # File to deploy
-    xml_file_path = 'uglyfeeds/uglyfeed.xml'
+    XML_FILE_PATH = 'uglyfeeds/uglyfeed.xml'
 
     # Deploy the XML file
-    urls = deploy_xml(xml_file_path, config)
+    urls = deploy_xml(XML_FILE_PATH, config)
 
     # Print the URLs
     if urls:

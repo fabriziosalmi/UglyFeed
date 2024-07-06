@@ -1,4 +1,6 @@
-# logging_setup.py
+"""
+Logging setup for UglyFeed
+"""
 
 import logging
 import logging.config
@@ -48,6 +50,7 @@ LOGGING_CONFIG = {
 }
 
 def setup_logging() -> logging.Logger:
+    """Set up logging configuration and return the root logger."""
     try:
         logging.config.dictConfig(LOGGING_CONFIG)
 

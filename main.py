@@ -1,22 +1,27 @@
+"""
+This script processes RSS feeds and groups similar articles based on a similarity threshold.
+"""
+
 import os
 import argparse
 import time
-import yaml
-import logging
 import sys
-import feedparser
 import json
 import re
+
+
+from typing import List, Dict, Any, Optional, Tuple
+import yaml
+import feedparser
 import numpy as np
+import nltk
+from langdetect import detect
+
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, HashingVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import AgglomerativeClustering, DBSCAN, KMeans
-from tqdm import tqdm
-import nltk
-from langdetect import detect
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.corpus import stopwords
-from typing import List, Dict, Any, Optional, Tuple
 from logging_setup import setup_logging
 
 # Setup logging
@@ -26,34 +31,39 @@ logger = setup_logging()
 nltk.download('wordnet', quiet=True)
 nltk.download('stopwords', quiet=True)
 
+
 def load_config(config_path: str) -> Dict[str, Any]:
     """Load configuration from a YAML file."""
     try:
-        with open(config_path, 'r') as file:
-            logger.info(f"Loading configuration from {config_path}")
+        with open(config_path, 'r', encoding='utf-8') as file:
+            logger.info("Loading configuration from %s", config_path)
             return yaml.safe_load(file)
     except yaml.YAMLError as e:
-        logger.error(f"YAML error loading configuration from {config_path}: {e}")
+        logger.error("YAML error loading configuration from %s: %s", config_path, e)
         sys.exit(1)
     except Exception as e:
-        logger.error(f"Error loading configuration from {config_path}: {e}")
+        logger.error("Error loading configuration from %s: %s", config_path, e)
         sys.exit(1)
+
 
 def ensure_directory_exists(directory: str) -> None:
     """Ensure that a directory exists; if not, create it."""
     if not os.path.exists(directory):
-        logger.info(f"Creating missing directory: {directory}")
+        logger.info("Creating missing directory: %s", directory)
         os.makedirs(directory)
+
 
 def get_env_variable(key: str, default: Optional[str] = None) -> Optional[str]:
     """Retrieve environment variable or use default if not set."""
     value = os.getenv(key.upper(), default)
     if value is None:
-        logger.info(f"Environment variable {key.upper()} is not set; using default value.")
+        logger.info("Environment variable %s is not set; using default value.", key.upper())
     return value
 
-def merge_configs(yaml_config: Dict[str, Any], env_config: Dict[str, Any], cli_config: Dict[str, Any]) -> Dict[str, Any]:
+
+def merge_configs(yaml_cfg: Dict[str, Any], env_cfg: Dict[str, Any], cli_cfg: Dict[str, Any]) -> Dict[str, Any]:
     """Merge configurations with priority: CLI > ENV > YAML."""
+
     def update_recursive(d: Dict[str, Any], u: Dict[str, Any]) -> Dict[str, Any]:
         for k, v in u.items():
             if isinstance(v, dict):
@@ -62,11 +72,12 @@ def merge_configs(yaml_config: Dict[str, Any], env_config: Dict[str, Any], cli_c
                 d[k] = v
         return d
 
-    final_config = yaml_config.copy()
-    final_config = update_recursive(final_config, env_config)
-    final_config = update_recursive(final_config, cli_config)
+    final_config = yaml_cfg.copy()
+    final_config = update_recursive(final_config, env_cfg)
+    final_config = update_recursive(final_config, cli_cfg)
 
     return final_config
+
 
 def fetch_feeds_from_file(file_path: str) -> List[Dict[str, str]]:
     """Fetch and parse RSS feeds from a file containing URLs."""
@@ -76,7 +87,7 @@ def fetch_feeds_from_file(file_path: str) -> List[Dict[str, str]]:
             urls = [url.strip() for url in file.readlines()]
 
         for url in urls:
-            logger.info(f"Fetching feed from {url}")
+            logger.info("Fetching feed from %s", url)
             feed = feedparser.parse(url)
             articles.extend([{
                 'title': entry.title,
@@ -84,21 +95,23 @@ def fetch_feeds_from_file(file_path: str) -> List[Dict[str, str]]:
                 'link': entry.link
             } for entry in feed.entries])
 
-        logger.info(f"Total articles fetched and parsed: {len(articles)}")
+        logger.info("Total articles fetched and parsed: %d", len(articles))
     except FileNotFoundError as e:
-        logger.error(f"File not found: {e}")
+        logger.error("File not found: %s", e)
     except Exception as e:
-        logger.error(f"Error fetching feeds: {e}")
+        logger.error("Error fetching feeds: %s", e)
 
     return articles
+
 
 def detect_language(text: str) -> str:
     """Detect the language of a given text."""
     try:
         return detect(text)
     except Exception as e:
-        logger.warning(f"Language detection failed: {e}")
+        logger.warning("Language detection failed: %s", e)
         return 'unknown'
+
 
 def preprocess_text(text: str, language: str, config: Dict[str, Any]) -> str:
     """Preprocess the text based on the configuration settings and language."""
@@ -125,6 +138,7 @@ def preprocess_text(text: str, language: str, config: Dict[str, Any]) -> str:
     preprocessed_text = " ".join(tokens)
     return preprocessed_text
 
+
 def vectorize_texts(texts: List[str], config: Dict[str, Any]) -> Any:
     """Vectorize texts based on the specified method in the configuration."""
     vectorizer_params = {
@@ -146,6 +160,7 @@ def vectorize_texts(texts: List[str], config: Dict[str, Any]) -> Any:
 
     vectors = vectorizer.fit_transform(texts)
     return vectors
+
 
 def cluster_texts(vectors: Any, config: Dict[str, Any]) -> np.ndarray:
     """Cluster texts using the specified clustering method in the configuration."""
@@ -176,6 +191,7 @@ def cluster_texts(vectors: Any, config: Dict[str, Any]) -> np.ndarray:
 
     return labels
 
+
 def aggregate_similar_articles(articles: List[Dict[str, str]], similarity_matrix: np.ndarray, threshold: float) -> List[Tuple[List[Dict[str, str]], float]]:
     """Aggregate articles into groups based on similarity matrix and threshold."""
     clustering = AgglomerativeClustering(
@@ -195,6 +211,7 @@ def aggregate_similar_articles(articles: List[Dict[str, str]], similarity_matrix
 
     return grouped_articles_with_scores
 
+
 def save_grouped_articles(grouped_articles_with_scores: List[Tuple[List[Dict[str, str]], float]], output_dir: str) -> int:
     """Save grouped articles to JSON files and return the number of saved files."""
     ensure_directory_exists(output_dir)
@@ -206,11 +223,12 @@ def save_grouped_articles(grouped_articles_with_scores: List[Tuple[List[Dict[str
             try:
                 with open(file_path, 'w', encoding='utf-8') as file:
                     json.dump({'articles': group, 'average_similarity': avg_similarity}, file, ensure_ascii=False, indent=4)
-                logger.info(f"Group {i}: Saved {len(group)} articles to {file_path}, Avg Similarity: {avg_similarity:.2f}")
+                logger.info("Group %d: Saved %d articles to %s, Avg Similarity: %.2f", i, len(group), file_path, avg_similarity)
                 saved_files_count += 1
             except Exception as e:
-                logger.error(f"Error saving group {i} to JSON: {e}")
+                logger.error("Error saving group %d to JSON: %s", i, e)
     return saved_files_count
+
 
 def deduplicate_articles(articles: List[Dict[str, str]]) -> List[Dict[str, str]]:
     """Remove duplicate articles based on content and link."""
@@ -221,8 +239,9 @@ def deduplicate_articles(articles: List[Dict[str, str]]) -> List[Dict[str, str]]
         if identifier not in seen:
             seen.add(identifier)
             unique_articles.append(article)
-    logger.info(f"Total unique articles after deduplication: {len(unique_articles)}")
+    logger.info("Total unique articles after deduplication: %d", len(unique_articles))
     return unique_articles
+
 
 def main(config: Dict[str, Any]) -> None:
     """Main function to process RSS feeds and group similar articles."""
@@ -237,12 +256,15 @@ def main(config: Dict[str, Any]) -> None:
     try:
         logger.info("Fetching and parsing RSS feeds...")
         articles = fetch_feeds_from_file(input_feeds_path)
-        logger.info(f"Total articles fetched and parsed: {len(articles)}")
+        logger.info("Total articles fetched and parsed: %d", len(articles))
 
         logger.info("Deduplicating articles...")
         articles = deduplicate_articles(articles)
+    except FileNotFoundError as e:
+        logger.error("File not found: %s", e)
+        return
     except Exception as e:
-        logger.error(f"Error fetching or parsing RSS feeds: {e}")
+        logger.error("Error fetching or parsing RSS feeds: %s", e)
         return
 
     logger.info("Preprocessing texts...")
@@ -263,15 +285,16 @@ def main(config: Dict[str, Any]) -> None:
 
     logger.info("Saving grouped articles to JSON files...")
     saved_files_count = save_grouped_articles(grouped_articles_with_scores, output_directory)
-    logger.info(f"Total number of JSON files generated: {saved_files_count}")
+    logger.info("Total number of JSON files generated: %d", saved_files_count)
 
     elapsed_time = time.time() - start_time
-    logger.info(f"RSS feed processing complete in {elapsed_time:.2f} seconds")
+    logger.info("RSS feed processing complete in %.2f seconds", elapsed_time)
 
-def build_env_config(yaml_config: Dict[str, Any]) -> Dict[str, Any]:
+
+def build_env_config(yaml_cfg: Dict[str, Any]) -> Dict[str, Any]:
     """Build configuration from environment variables."""
     env_config = {}
-    for key, value in yaml_config.items():
+    for key, value in yaml_cfg.items():
         if isinstance(value, dict):
             env_config[key] = build_env_config(value)
         else:
@@ -279,6 +302,7 @@ def build_env_config(yaml_config: Dict[str, Any]) -> Dict[str, Any]:
             env_value = get_env_variable(env_key, value)
             env_config[key] = type(value)(env_value) if env_value is not None else value
     return env_config
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -306,13 +330,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Load default configuration from the YAML file
-    yaml_config = load_config(args.config)
+    yaml_cfg = load_config(args.config)
 
     # Build environment configuration based on environment variables
-    env_config = build_env_config(yaml_config)
+    env_cfg = build_env_config(yaml_cfg)
 
     # Override with command-line arguments if provided
-    cli_config = {
+    cli_cfg = {
         'similarity_threshold': args.similarity_threshold,
         'min_samples': args.min_samples,
         'eps': args.eps,
@@ -321,7 +345,7 @@ if __name__ == "__main__":
     }
 
     # Merge all configurations with priority: CLI > ENV > YAML
-    final_config = merge_configs(yaml_config, env_config, cli_config)
+    final_cfg = merge_configs(yaml_cfg, env_cfg, cli_cfg)
 
     # Run the main function with the final merged configuration
-    main(final_config)
+    main(final_cfg)

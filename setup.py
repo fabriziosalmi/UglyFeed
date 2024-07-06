@@ -1,3 +1,7 @@
+"""
+Setup script for the uglypy package.
+"""
+
 from setuptools import setup, find_packages
 
 # Reading the long description from the README file
@@ -6,7 +10,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='uglypy',  # The package name on PyPI
-    version='0.0.47',  # Initial version, update manually for major changes
+    version='0.0.48',  # Version number, update manually for major changes
     author='Fabrizio Salmi',
     author_email='fabrizio.salmi@gmail.com',  # Replace with your email
     description='A Python package for aggregating and processing RSS feeds with LLM-enhanced content rewriting.',
@@ -56,5 +60,5 @@ setup(
             'uglypy=uglypy.cli:main',
         ],
     },
-    license='AGPL-3.0',  
+    license='AGPL-3.0',  # License for the package
 )

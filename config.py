@@ -1,31 +1,34 @@
-import yaml
-from pathlib import Path
+"""
+Configuration Management for UglyFeed
+"""
 
-config_path = Path("config.yaml")
-feeds_path = Path("input/feeds.txt")
+from pathlib import Path
+import yaml
+
+CONFIG_PATH = Path("config.yaml")
+FEEDS_PATH = Path("input/feeds.txt")
 
 def tuple_constructor(loader, node):
     """Constructor for !!python/tuple tag."""
     return tuple(loader.construct_sequence(node))
 
-# Add the constructor to PyYAML with SafeLoader replaced by the FullLoader to handle tuples
+# Add the constructor to PyYAML with FullLoader to handle tuples
 yaml.add_constructor('tag:yaml.org,2002:python/tuple', tuple_constructor, Loader=yaml.FullLoader)
 
-def load_config(config_file=config_path):
+def load_config(config_file=CONFIG_PATH):
     """Load the configuration from the specified YAML file."""
     if isinstance(config_file, str):
         config_file = Path(config_file)
 
     try:
         if config_file.exists():
-            with open(config_file, "r") as f:
+            with open(config_file, "r", encoding='utf-8') as f:
                 return yaml.load(f, Loader=yaml.FullLoader)  # Use yaml.FullLoader to support custom constructors
-        else:
-            return {}
+        return {}
     except yaml.YAMLError as e:
-        raise Exception(f"Error loading YAML configuration: {e}")
+        raise Exception(f"Error loading YAML configuration: {e}") from e
     except Exception as e:
-        raise Exception(f"Failed to load configuration from {config_file}: {e}")
+        raise Exception(f"Failed to load configuration from {config_file}: {e}") from e
 
 def ensure_default_config(config_data):
     """Ensure all required keys are in the config_data with default values."""
@@ -123,12 +126,12 @@ def ensure_default_config(config_data):
 def save_configuration(config_data, feeds):
     """Save configuration and feeds to file."""
     try:
-        with open(config_path, "w") as f:
+        with open(CONFIG_PATH, "w", encoding='utf-8') as f:
             yaml.dump(config_data, f)
-        with open(feeds_path, "w") as f:
+        with open(FEEDS_PATH, "w", encoding='utf-8') as f:
             f.write(feeds)
     except Exception as e:
-        raise Exception(f"Failed to save configuration: {e}")
+        raise Exception(f"Failed to save configuration: {e}") from e
 
 # Usage example
 if __name__ == "__main__":

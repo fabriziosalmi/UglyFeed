@@ -1,10 +1,15 @@
+"""
+This script provides utility functions for handling socket operations and XML file statistics.
+"""
+
 import socket
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-uglyfeeds_dir = Path("uglyfeeds")
-uglyfeed_file = "uglyfeed.xml"
+# Define directory paths and filenames
+UGLYFEEDS_DIR = Path("uglyfeeds")
+UGLYFEED_FILE = "uglyfeed.xml"
 
 def get_local_ip():
     """Get the local IP address."""
@@ -29,9 +34,9 @@ def find_available_port(base_port):
 
 def get_xml_item_count():
     """Get the current count of items in the XML."""
-    if not (uglyfeeds_dir / uglyfeed_file).exists():
+    if not (UGLYFEEDS_DIR / UGLYFEED_FILE).exists():
         return 0
-    tree = ET.parse(uglyfeeds_dir / uglyfeed_file)
+    tree = ET.parse(UGLYFEEDS_DIR / UGLYFEED_FILE)
     root = tree.getroot()
     items = root.findall(".//item")
     return len(items)
@@ -45,11 +50,11 @@ def get_new_item_count(old_count):
 
 def get_xml_stats():
     """Get quick stats from the XML file."""
-    if not (uglyfeeds_dir / uglyfeed_file).exists():
+    if not (UGLYFEEDS_DIR / UGLYFEED_FILE).exists():
         return None, None, None
-    tree = ET.parse(uglyfeeds_dir / uglyfeed_file)
+    tree = ET.parse(UGLYFEEDS_DIR / UGLYFEED_FILE)
     root = tree.getroot()
     items = root.findall(".//item")
     item_count = len(items)
     last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    return item_count, last_updated, uglyfeeds_dir / uglyfeed_file
+    return item_count, last_updated, UGLYFEEDS_DIR / UGLYFEED_FILE

@@ -1,15 +1,20 @@
-import schedule
+"""
+Scheduling script for UglyFeed
+"""
+
 import time
 from datetime import datetime
 import threading
 import logging
+import schedule
 from script_runner import run_script  # Import run_script to use for script execution
 
 # Initialize the logger
 logger = logging.getLogger(__name__)
 
-# Using a class to encapsulate the scheduling logic
 class UglyFeedScheduler:
+    """Class to encapsulate scheduling logic for UglyFeed."""
+
     def __init__(self):
         self.job_stats = []
 
@@ -28,14 +33,14 @@ class UglyFeedScheduler:
                 else:
                     output, errors = run_script(script)
 
-                logger.info(f"Output of {script}:\n{output}")
+                logger.info("Output of %s:\n%s", script, output)
                 if errors.strip() and errors != "No errors":
-                    logger.error(f"Errors or logs of {script}:\n{errors}")
+                    logger.error("Errors or logs of %s:\n%s", script, errors)
                     if st:
                         st.text_area(f"Errors of {script}", errors, height=200)
 
             except Exception as e:
-                logger.error(f"Failed to execute {script}: {e}")
+                logger.error("Failed to execute %s: %s", script, e)
                 self.job_stats.append({
                     'script': script,
                     'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -68,7 +73,7 @@ class UglyFeedScheduler:
                     'time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'status': f'Failed with error: {e}'
                 })
-                logger.error(f"Scheduled job failed with error: {e}")
+                logger.error("Scheduled job failed with error: %s", e)
 
         # Scheduling based on the specified period
         if period == 'minutes':
@@ -78,7 +83,7 @@ class UglyFeedScheduler:
         elif period == 'days':
             schedule.every(interval).days.do(job)
         else:
-            logger.error(f"Unsupported period: {period}")
+            logger.error("Unsupported period: %s", period)
             return
 
         while True:
@@ -101,7 +106,7 @@ class UglyFeedScheduler:
                 daemon=True
             )
             scheduling_thread.start()
-            logger.info(f"Scheduling started with interval: {interval} {period}")
+            logger.info("Scheduling started with interval: %d %s", interval, period)
         else:
             logger.info("Scheduling is disabled in the configuration.")
 

@@ -1,6 +1,9 @@
+"""
+This script processes JSON files using various LLM APIs and saves the rewritten content.
+"""
+
 import re
 import json
-import requests
 import logging
 import argparse
 import yaml
@@ -8,6 +11,7 @@ import os
 import time
 from pathlib import Path
 from datetime import datetime
+import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from openai import OpenAI
@@ -20,6 +24,7 @@ logger = logging.getLogger(__name__)
 MAX_TOKENS = 32768
 
 def requests_retry_session(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504), session=None):
+    """Create a requests session with retry logic."""
     session = session or requests.Session()
     retry = Retry(
         total=retries,
@@ -34,10 +39,11 @@ def requests_retry_session(retries=3, backoff_factor=0.3, status_forcelist=(500,
     return session
 
 def estimate_token_count(text):
-    # Simple estimation: one token per 4 characters
+    """Estimate the number of tokens in a text."""
     return len(text) / 4
 
 def truncate_content(content, max_tokens):
+    """Truncate the content to fit within the maximum token limit."""
     tokens = content.split()
     truncated_content = []
     current_tokens = 0
@@ -51,6 +57,7 @@ def truncate_content(content, max_tokens):
     return ' '.join(truncated_content)
 
 def call_openai_api(api_url, combined_content, model, api_key):
+    """Call the OpenAI API with the given parameters."""
     client = OpenAI(api_key=api_key)
     try:
         response = client.chat.completions.create(
@@ -62,10 +69,11 @@ def call_openai_api(api_url, combined_content, model, api_key):
         )
         return response.choices[0].message.content
     except Exception as e:
-        logger.error(f"OpenAI API request failed: {e}")
+        logger.error("OpenAI API request failed: %s", e)
         return None
 
 def call_groq_api(api_url, combined_content, model, api_key):
+    """Call the Groq API with the given parameters."""
     data = json.dumps({
         "model": model,
         "messages": [{"role": "user", "content": combined_content}],
@@ -75,54 +83,56 @@ def call_groq_api(api_url, combined_content, model, api_key):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {api_key}'
     }
-    logger.debug(f"Groq API request data: {data}")
+    logger.debug("Groq API request data: %s", data)
     try:
         response = requests_retry_session().post(api_url, data=data, headers=headers)
         response.raise_for_status()
         try:
             response_json = response.json()
-            logger.debug(f"Groq API response: {response_json}")
+            logger.debug("Groq API response: %s", response_json)
             return response_json['choices'][0]['message']['content']
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON response from Groq API: {e}")
-            logger.error(f"Response content: {response.text}")
+            logger.error("Failed to parse JSON response from Groq API: %s", e)
+            logger.error("Response content: %s", response.text)
             return None
     except requests.RequestException as e:
-        logger.error(f"Groq API request failed: {e}")
+        logger.error("Groq API request failed: %s", e)
         if response is not None:
-            logger.error(f"Groq API response content: {response.text}")
+            logger.error("Groq API response content: %s", response.text)
             if 'rate_limit_exceeded' in response.text:
                 retry_after = parse_retry_after(response.json())
-                logger.info(f"Rate limit exceeded. Retrying after {retry_after} seconds.")
+                logger.info("Rate limit exceeded. Retrying after %s seconds.", retry_after)
                 time.sleep(retry_after)
                 return call_groq_api(api_url, combined_content, model, api_key)
         return None
 
 def call_ollama_api(api_url, combined_content, model):
+    """Call the Ollama API with the given parameters."""
     data = json.dumps({
         "model": model,
         "messages": [{"role": "user", "content": combined_content}],
         "stream": False
     })
-    logger.debug(f"Ollama API request data: {data}")
+    logger.debug("Ollama API request data: %s", data)
     try:
         response = requests_retry_session().post(api_url, data=data, headers={'Content-Type': 'application/json'})
         response.raise_for_status()
         try:
             response_json = response.json()
-            logger.debug(f"Ollama API response: {response_json}")
+            logger.debug("Ollama API response: %s", response_json)
             return response_json['message']['content']
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON response from Ollama API: {e}")
-            logger.error(f"Response content: {response.text}")
+            logger.error("Failed to parse JSON response from Ollama API: %s", e)
+            logger.error("Response content: %s", response.text)
             return None
     except requests.RequestException as e:
-        logger.error(f"Ollama API request failed: {e}")
+        logger.error("Ollama API request failed: %s", e)
         if response is not None:
-            logger.error(f"Ollama API response content: {response.text}")
+            logger.error("Ollama API response content: %s", response.text)
         return None
 
 def call_anthropic_api(api_url, combined_content, model, api_key):
+    """Call the Anthropic API with the given parameters."""
     data = json.dumps({
         "model": model,
         "messages": [
@@ -135,13 +145,13 @@ def call_anthropic_api(api_url, combined_content, model, api_key):
         'x-api-key': api_key,
         'anthropic-version': '2023-06-01'
     }
-    logger.debug(f"Anthropic API request data: {data}")
+    logger.debug("Anthropic API request data: %s", data)
     try:
         response = requests_retry_session().post(api_url, data=data, headers=headers)
         response.raise_for_status()
         try:
             response_json = response.json()
-            logger.debug(f"Anthropic API response: {response_json}")
+            logger.debug("Anthropic API response: %s", response_json)
 
             # Print the full response for debugging purposes
             print("Anthropic API response:", response_json)
@@ -153,19 +163,20 @@ def call_anthropic_api(api_url, combined_content, model, api_key):
                 text_content = " ".join(item['text'] for item in content_items if 'text' in item)
                 return text_content
             else:
-                logger.error(f"Expected 'content' key with list structure not found in response: {response_json}")
+                logger.error("Expected 'content' key with list structure not found in response: %s", response_json)
                 return None
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON response from Anthropic API: {e}")
-            logger.error(f"Response content: {response.text}")
+            logger.error("Failed to parse JSON response from Anthropic API: %s", e)
+            logger.error("Response content: %s", response.text)
             return None
     except requests.RequestException as e:
-        logger.error(f"Anthropic API request failed: {e}")
+        logger.error("Anthropic API request failed: %s", e)
         if response is not None:
-            logger.error(f"Anthropic API response content: {response.text}")
+            logger.error("Anthropic API response content: %s", response.text)
         return None
 
 def parse_retry_after(response_json):
+    """Parse the retry-after duration from the response."""
     try:
         message = response_json['error']['message']
         retry_after = float(re.search(r"try again in (\d+\.?\d*)s", message).group(1))
@@ -174,6 +185,7 @@ def parse_retry_after(response_json):
         return 60  # Default retry after 60 seconds if parsing fails
 
 def ensure_proper_punctuation(text):
+    """Ensure proper punctuation in the text."""
     sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
     corrected_sentences = []
 
@@ -186,40 +198,40 @@ def ensure_proper_punctuation(text):
     return ' '.join(corrected_sentences)
 
 def read_content_prefix(prefix_file_path):
+    """Read content prefix from a file."""
     try:
         with open(prefix_file_path, 'r', encoding='utf-8') as file:
             return file.read()
     except (IOError, FileNotFoundError) as e:
-        logger.error(f"Error reading content prefix file {prefix_file_path}: {e}")
+        logger.error("Error reading content prefix file %s: %s", prefix_file_path, e)
         return ""
 
-
-
 def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritten_folder, api_type):
+    """Process a JSON file using the specified API."""
     try:
         with open(filepath, 'r', encoding='utf-8') as file:
             json_data = json.load(file)
-            logger.debug(f"Type of json_data: {type(json_data)}")
+            logger.debug("Type of json_data: %s", type(json_data))
             if isinstance(json_data, dict):
                 # If json_data is a dictionary, convert it to a list of one dictionary
                 json_data = [json_data]
-                logger.warning(f"Converted dictionary to list. File: {filepath}")
+                logger.warning("Converted dictionary to list. File: %s", filepath)
             elif isinstance(json_data, str):
-                logger.error(f"Expected list of dictionaries but got a string. File: {filepath}")
+                logger.error("Expected list of dictionaries but got a string. File: %s", filepath)
                 return
     except (json.JSONDecodeError, IOError) as e:
-        logger.error(f"Error reading JSON from {filepath}: {e}")
+        logger.error("Error reading JSON from %s: %s", filepath, e)
         return
 
     # Ensure 'content' key exists in each dictionary
     combined_content = content_prefix + "\n".join(
         f"[source {idx + 1}] {item.get('content', 'No content provided')}" for idx, item in enumerate(json_data))
 
-    logger.info(f"Processing {filepath} - combined content prepared.")
-    logger.debug(f"Combined content: {combined_content}")
+    logger.info("Processing %s - combined content prepared.", filepath)
+    logger.debug("Combined content: %s", combined_content)
 
     if estimate_token_count(combined_content) > MAX_TOKENS:
-        logger.info(f"Truncating content to fit within {MAX_TOKENS} tokens.")
+        logger.info("Truncating content to fit within %s tokens.", MAX_TOKENS)
         combined_content = truncate_content(combined_content, MAX_TOKENS)
 
     if api_type == "openai":
@@ -257,20 +269,15 @@ def process_json_file(filepath, api_url, model, api_key, content_prefix, rewritt
             with open(new_filename, 'w', encoding='utf-8') as outfile:
                 json.dump(new_data, outfile, ensure_ascii=False, indent=4)
             print(f"Rewritten file saved to {new_filename}")
-            logger.info(f"Rewritten file saved to {new_filename}")
+            logger.info("Rewritten file saved to %s", new_filename)
         except IOError as e:
-            logger.error(f"Error writing to {new_filename}: {e}")
+            logger.error("Error writing to %s: %s", new_filename, e)
     else:
         logger.error("Failed to get rewritten content from LLM API.")
-        logger.debug(f"Rewritten content: {rewritten_content}")
-
-
-
-
-
-
+        logger.debug("Rewritten content: %s", rewritten_content)
 
 def validate_config(api_config):
+    """Validate the configuration for the selected API."""
     selected_api = api_config.get('selected_api')
 
     if selected_api == "OpenAI":
@@ -289,11 +296,12 @@ def validate_config(api_config):
         raise ValueError(f"The selected API configuration is incomplete. Missing keys: {', '.join(missing_keys)}")
 
 def main(config_path, prompt_path=None, api=None, api_key=None, model=None, api_url=None, output_folder=None, rewritten_folder=None):
+    """Main function to process JSON files with LLM API."""
     try:
         with open(config_path, 'r', encoding='utf-8') as file:
             config = yaml.safe_load(file)
     except (yaml.YAMLError, IOError) as e:
-        logger.error(f"Error reading config file {config_path}: {e}")
+        logger.error("Error reading config file %s: %s", config_path, e)
         return
 
     api_config = config.get('api_config', {})

@@ -4,7 +4,6 @@ import glob
 import subprocess
 import logging
 import re
-import sys
 from pathlib import Path
 
 # Suppress NLTK log messages
@@ -34,13 +33,18 @@ EVALUATION_SCRIPTS = [
     'evaluate_structural_metrics.py'
 ]
 
+
 def run_evaluation_scripts(input_file, all_aggregated_scores):
-    """Run evaluation scripts on the given input file and extract aggregated scores."""
+    """
+    Run evaluation scripts on the given input file and extract aggregated scores.
+    """
     base_name = os.path.basename(input_file).replace('.json', '')
     for script in EVALUATION_SCRIPTS:
         script_path = TOOLS_DIR / script
         logger.info("Running %s on %s", script_path, input_file)
-        result = subprocess.run(['python', str(script_path), input_file], capture_output=True, text=True)
+        result = subprocess.run(
+            ['python', str(script_path), input_file], capture_output=True, text=True, check=False
+        )
         if result.returncode != 0:
             logger.error("Error running %s on %s", script_path, input_file)
             logger.error(result.stderr)
@@ -59,13 +63,18 @@ def run_evaluation_scripts(input_file, all_aggregated_scores):
                 with open(metric_file, 'r') as file:
                     data = json.load(file)
                     extracted_scores = extract_aggregated_scores(data)
-                    logger.info("Extracted aggregated scores from %s: %s", metric_file, extracted_scores)
+                    logger.info(
+                        "Extracted aggregated scores from %s: %s", metric_file, extracted_scores
+                    )
                     all_aggregated_scores.extend(extracted_scores)
             else:
                 logger.warning("Metric file %s does not exist", metric_file)
 
+
 def extract_aggregated_scores(data):
-    """Extract aggregated scores from the given JSON data."""
+    """
+    Extract aggregated scores from the given JSON data.
+    """
     aggregated_scores = []
     if isinstance(data, dict):
         for key, value in data.items():
@@ -79,8 +88,11 @@ def extract_aggregated_scores(data):
             aggregated_scores.extend(extract_aggregated_scores(item))
     return aggregated_scores
 
+
 def calculate_average_aggregated_score(aggregated_scores):
-    """Calculate the average of the aggregated scores."""
+    """
+    Calculate the average of the aggregated scores.
+    """
     if aggregated_scores:
         scores = [score for _, score in aggregated_scores]
         logger.debug("Calculating average of aggregated scores: %s", scores)
@@ -88,8 +100,11 @@ def calculate_average_aggregated_score(aggregated_scores):
     logger.debug("No aggregated scores found")
     return None
 
+
 def merge_metrics_files(input_file, all_aggregated_scores):
-    """Merge metrics files for the given input JSON file."""
+    """
+    Merge metrics files for the given input JSON file.
+    """
     base_name = os.path.basename(input_file).replace('.json', '')
     pattern = REWRITTEN_DIR / f'{base_name}_metrics_*.json'
 
@@ -130,8 +145,11 @@ def merge_metrics_files(input_file, all_aggregated_scores):
 
     logger.info("Merged metrics written to %s", output_file_path)
 
+
 def main():
-    """Main script execution."""
+    """
+    Main script execution.
+    """
     input_files = glob.glob(str(REWRITTEN_DIR / '*_rewritten.json'))
 
     if not input_files:
@@ -143,6 +161,7 @@ def main():
         all_aggregated_scores = []
         run_evaluation_scripts(input_file, all_aggregated_scores)
         merge_metrics_files(input_file, all_aggregated_scores)
+
 
 if __name__ == '__main__':
     main()
