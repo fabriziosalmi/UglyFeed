@@ -38,7 +38,7 @@ setup(
         'joblib==1.4.0',
         'langdetect==1.0.9',
         'lexical_diversity==0.1.1',
-        'nltk==3.8.1',
+        'nltk==3.9',
         'numpy==1.24.4',
         'openai==1.30.5',
         'pandas==2.2.2',
