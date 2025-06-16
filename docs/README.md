@@ -1,6 +1,12 @@
 # Documentation
 Welcome to the UglyFeed documentation. This guide provides detailed information on how to run UglyFeed.
 
+## Quick Links
+- [🚨 Troubleshooting Guide](troubleshooting.md) - Fix common issues like "No Title" and empty content
+- [❓ FAQ](faq.md) - Frequently asked questions
+- [🛠️ Tools](../tools/README.md) - Diagnostic and utility tools
+
+## Installation Guides
 - [Installation and Automated Runs](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-automated-runs-github-actions)
 - [Installation (Pip)](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#-installation-pip)
 - [Installation and run (without Docker)](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/README.md#%EF%B8%8F-installation-and-run-without-docker)

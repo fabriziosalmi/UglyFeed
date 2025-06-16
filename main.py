@@ -80,22 +80,64 @@ def merge_configs(yaml_cfg: Dict[str, Any], env_cfg: Dict[str, Any], cli_cfg: Di
 
 
 def fetch_feeds_from_file(file_path: str) -> List[Dict[str, str]]:
-    """Fetch and parse RSS feeds from a file containing URLs."""
+    """Fetch and parse RSS feeds from a file containing URLs with enhanced error handling."""
     articles = []
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
-            urls = [url.strip() for url in file.readlines()]
+            urls = [url.strip() for url in file.readlines() if url.strip()]
 
-        for url in urls:
-            logger.info("Fetching feed from %s", url)
-            feed = feedparser.parse(url)
-            articles.extend([{
-                'title': entry.title,
-                'content': entry.description if hasattr(entry, 'description') else '',
-                'link': entry.link
-            } for entry in feed.entries])
+        if not urls:
+            logger.warning("No URLs found in %s", file_path)
+            return articles
+
+        logger.info("Found %d URLs to process", len(urls))
+
+        for i, url in enumerate(urls, 1):
+            logger.info("Fetching feed %d/%d from %s", i, len(urls), url)
+            try:
+                feed = feedparser.parse(url)
+                
+                # Check if feed parsing was successful
+                if feed.bozo:
+                    logger.warning("Feed %s has parsing warnings: %s", url, feed.bozo_exception)
+                
+                if not feed.entries:
+                    logger.warning("No entries found in feed: %s", url)
+                    continue
+                
+                # Extract articles with better error handling
+                feed_articles = []
+                for entry in feed.entries:
+                    title = getattr(entry, 'title', '')
+                    description = getattr(entry, 'description', '') or getattr(entry, 'summary', '')
+                    link = getattr(entry, 'link', '')
+                    
+                    # Skip entries with missing critical data
+                    if not title and not description:
+                        logger.warning("Skipping entry with no title or description from %s", url)
+                        continue
+                    
+                    # Use fallback values for missing data
+                    article = {
+                        'title': title or 'No Title',
+                        'content': description or 'No Content',
+                        'link': link or url
+                    }
+                    feed_articles.append(article)
+                
+                articles.extend(feed_articles)
+                logger.info("Successfully fetched %d articles from %s", len(feed_articles), url)
+                
+            except Exception as e:
+                logger.error("Failed to fetch feed from %s: %s", url, e)
+                continue
 
         logger.info("Total articles fetched and parsed: %d", len(articles))
+        
+        if len(articles) == 0:
+            logger.error("CRITICAL: No articles were fetched from any feeds! This will cause 'No Title' issues.")
+            logger.error("Please check your RSS feed URLs using: python tools/rss_debug.py %s", file_path)
+            
     except FileNotFoundError as e:
         logger.error("File not found: %s", e)
     except Exception as e:
