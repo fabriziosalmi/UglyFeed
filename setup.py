@@ -44,7 +44,7 @@ setup(
         'pandas==2.2.2',
         'psutil==5.9.8',
         'PyYAML==6.0.1',
-        'requests==2.32.3',
+        'requests==2.32.4',
         'scikit_learn==1.4.2',
         'sentence_transformers==2.7.0',
         'spacy==3.7.0',

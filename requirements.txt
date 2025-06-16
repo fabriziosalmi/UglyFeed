@@ -12,7 +12,7 @@ openai==1.30.5
 pandas==2.2.2
 PyYAML==6.0.1
 psutil==5.9.8
-requests==2.32.3
+requests==2.32.4
 scikit_learn==1.5.0
 sentence_transformers==2.7.0
 spacy==3.7.0
