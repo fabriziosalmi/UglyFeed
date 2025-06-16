@@ -263,8 +263,40 @@ if selected == "Configuration":
         "Gemini": ["gemini_api_url", "gemini_api_key", "gemini_model"]
     }
 
+    # Set default values for each API when selected
+    api_defaults = {
+        "OpenAI": {
+            "openai_api_url": "https://api.openai.com/v1/chat/completions",
+            "openai_api_key": "your_openai_api_key",
+            "openai_model": "gpt-3.5-turbo"
+        },
+        "Groq": {
+            "groq_api_url": "https://api.groq.com/openai/v1/chat/completions",
+            "groq_api_key": "your_groq_api_key",
+            "groq_model": "llama3-8b-8192"
+        },
+        "Anthropic": {
+            "anthropic_api_url": "https://api.anthropic.com/v1/messages",
+            "anthropic_api_key": "your_anthropic_api_key",
+            "anthropic_model": "claude-3-haiku-20240307"
+        },
+        "Ollama": {
+            "ollama_api_url": "http://localhost:11434/api/chat",
+            "ollama_model": "phi3"
+        },
+        "Gemini": {
+            "gemini_api_url": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+            "gemini_api_key": "your_gemini_api_key",
+            "gemini_model": "gemini-2.0-flash-exp"
+        }
+    }
+
     for api_param in api_configs[selected_api]:
-        st.session_state.config_data['api_config'].setdefault(api_param, '')
+        # Use the default value if the field is empty or doesn't exist
+        default_value = api_defaults[selected_api].get(api_param, '')
+        current_value = st.session_state.config_data['api_config'].get(api_param, '')
+        if not current_value or current_value.startswith('your_'):
+            st.session_state.config_data['api_config'][api_param] = default_value
         st.session_state.config_data['api_config'][api_param] = st.text_input(api_param.replace("_", " ").title(), st.session_state.config_data['api_config'][api_param], type="password" if "key" in api_param else "default")
 
     st.divider()

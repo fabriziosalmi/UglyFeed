@@ -57,10 +57,10 @@ api_config:
   # ollama_model: "phi3"
 
   # Google Gemini API configuration (Free tier models available)
-  # gemini_api_url: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-  # gemini_api_key: "your_gemini_api_key"
-  # gemini_model: "gemini-2.0-flash"  # Free tier available - recommended
-  # Other free models: "gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-flash-8b", "gemma-3", "gemma-3n"
+  gemini_api_url: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+  gemini_api_key: "your_gemini_api_key"
+  gemini_model: "gemini-2.0-flash-exp"  # Latest experimental model
+  # Other available models: "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-8b", "gemma-2-2b-it", "gemma-2-9b-it"
 
 # Folder configuration settings
 folders:

@@ -1,19 +1,4 @@
-# Google Gemini Int### 3. Supported Models (Free Tier Available!)
-
-#### Free Tier Models (No cost!)
-- **`gemini-2.0-flash`** ⭐ **RECOMMENDED** - Latest and most balanced model with excellent performance
-- **`gemini-2.0-flash-lite`** - Smaller, faster model for high-volume processing
-- **`gemini-1.5-flash`** - Proven fast model with 1M token context window
-- **`gemini-1.5-flash-8b`** - Smallest model for simple tasks
-- **`gemma-3`** - Open source model, completely free
-- **`gemma-3n`** - Efficient model for edge devices
-
-#### Paid Tier Models
-- `gemini-2.5-flash-preview` - Preview model with reasoning capabilities
-- `gemini-2.5-pro-preview` - Highest intelligence model
-- `gemini-1.5-pro` - High intelligence with 2M token context
-
-> **💡 Tip**: Start with `gemini-2.0-flash` - it's completely free and offers excellent performance!tion for UglyFeed
+# Google Gemini Integration for UglyFeed
 
 ## Overview
 Google Gemini AI support has been successfully added to UglyFeed, providing access to Google's advanced language models for content processing and rewriting.
@@ -32,6 +17,22 @@ Google Gemini AI support has been successfully added to UglyFeed, providing acce
 - **Environment variable support**: Can be configured via environment variables
 - **CLI support**: Command-line interface supports Gemini parameters
 
+### 3. Supported Models (Free Tier Available!)
+
+#### Free Tier Models (No cost!)
+- **`gemini-2.0-flash-exp`** ⭐ **RECOMMENDED** - Latest experimental model with enhanced capabilities
+- **`gemini-2.0-flash`** - Latest stable model with excellent performance
+- **`gemini-1.5-flash`** - Proven fast model with 1M token context window
+- **`gemini-1.5-flash-8b`** - Smallest model for simple tasks
+- **`gemma-2-2b-it`** - Open source instruction-tuned model
+- **`gemma-2-9b-it`** - Larger open source model
+
+#### Paid Tier Models
+- `gemini-1.5-pro` - High intelligence with 2M token context
+- `gemini-2.0-flash-thinking-exp` - Advanced reasoning capabilities
+
+> **💡 Tip**: Start with `gemini-2.0-flash-exp` - it's free and offers the latest capabilities!
+
 ## Configuration
 
 ### Via config.yaml
@@ -40,14 +41,14 @@ api_config:
   selected_api: "Gemini"
   gemini_api_url: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
   gemini_api_key: "your_gemini_api_key"
-  gemini_model: "gemini-2.0-flash"  # Free tier model!
+  gemini_model: "gemini-2.0-flash-exp"  # Latest experimental model
 ```
 
 ### Via Environment Variables
 ```bash
 export API_TYPE="gemini"
 export API_KEY="your_gemini_api_key"
-export API_MODEL="gemini-2.0-flash"
+export API_MODEL="gemini-2.0-flash-exp"
 export API_URL="https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 ```
 
