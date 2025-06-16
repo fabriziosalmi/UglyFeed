@@ -1,0 +1,26 @@
+# Development Docker Compose - builds locally and includes dev tools
+services:
+  uglyfeed-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development # We'll add this stage to Dockerfile
+    ports:
+      - "8001:8001"
+      - "8501:8501"
+    volumes:
+      - .:/app # Mount entire source code for development
+      - /app/__pycache__ # Exclude pycache
+    environment:
+      - PYTHONPATH=/app
+      - FLASK_ENV=development
+      - STREAMLIT_SERVER_ENABLE_STATIC_SERVING=true
+    container_name: uglyfeed-dev
+    networks:
+      - uglyfeed_network
+    command: streamlit run gui.py --server.address 0.0.0.0 --server.port 8501
+
+networks:
+  uglyfeed_network:
+    name: uglyfeed_network
+    driver: bridge

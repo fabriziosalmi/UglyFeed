@@ -25,6 +25,8 @@ Here the current available actions:
 - [Groq and llama3-70b-8192](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-llama3-70b-8192.yml)
 - [Groq and gemma-7b-it](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-gemma-7b-it.yml)
 - [Groq and mixtral-8x7b-32768](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Groq-mixtral-8x7b-32768.yml)
+- [Google Gemini and gemini-2.0-flash (Free Tier)](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Gemini-gemini-2.0-flash.yml)
+- [Google Gemma 3 (100% Free)](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-Gemini-gemma-3.yml)
 - [OpenAI and gpt-3.5-turbo](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-OpenAI-gpt-3.5-turbo.yml)
 - [OpenAI and gpt-4](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-OpenAI-gpt-4.yml)
 - [OpenAI and gpt-4o](https://github.com/fabriziosalmi/UglyFeed/blob/main/docs/UglyFeed-GitHub-Action-OpenAI-gpt-4o.yml)
@@ -206,6 +208,12 @@ Specify the API for processing:
 
 - `ollama_api_url`: Ollama API endpoint.
 - `ollama_model`: Ollama model to use.
+
+##### Google Gemini API
+
+- `gemini_api_url` (default: `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`): Google Gemini API endpoint.
+- `gemini_api_key`: Google Gemini API key.
+- `gemini_model`: Gemini model to use. **Free tier models available**: `gemini-2.0-flash` (recommended), `gemini-2.0-flash-lite`, `gemini-1.5-flash`, `gemini-1.5-flash-8b`, `gemma-3`, `gemma-3n`
 
 #### Content Generation
 

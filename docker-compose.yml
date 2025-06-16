@@ -1,14 +1,19 @@
-version: '3.8' # Specifies the Docker Compose file format version. '3.8' is compatible with newer Docker Compose features.
-
 services:
   uglyfeed: # Defines a service named 'uglyfeed'.
-    image: fabriziosalmi/uglyfeed:latest # The Docker image to use for this service, tagged with 'latest'.
+    build:
+      context: . # Build from current directory
+      dockerfile: Dockerfile # Use the Dockerfile in current directory
+    # image: fabriziosalmi/uglyfeed:latest # Commented out - using local build instead
     ports:
       - "8001:8001" # Maps port 8001 on the host to port 8001 in the container.
       - "8501:8501" # Maps port 8501 on the host to port 8501 in the container.
     volumes:
-      - /path/to/local/feeds.txt:/app/input/feeds.txt # Mounts the local file 'feeds.txt' to '/app/input/feeds.txt' in the container.
-      - /path/to/local/config.yaml:/app/config.yaml # Mounts the local file 'config.yaml' to '/app/config.yaml' in the container.
+      - ./input/feeds.txt:/app/input/feeds.txt # Mounts the local file 'feeds.txt' to '/app/input/feeds.txt' in the container.
+      - ./config.yaml:/app/config.yaml # Mounts the local file 'config.yaml' to '/app/config.yaml' in the container.
+      - ./output:/app/output # Mount output directory
+      - ./rewritten:/app/rewritten # Mount rewritten directory
+    environment:
+      - PYTHONPATH=/app
     container_name: uglyfeed # Sets the container's name to 'uglyfeed' for easier identification and management.
     networks:
       - uglyfeed_network # Connects the service to the specified network 'uglyfeed_network'.
@@ -16,5 +21,5 @@ services:
 # Defines networks to be used by the services.
 networks:
   uglyfeed_network: # This network will be used by the 'uglyfeed' service.
-    external:
-      name: uglyfeed # Specifies that the network named 'uglyfeed' is external, meaning it should already exist and not be managed by this Compose file.
+    name: uglyfeed_network
+    driver: bridge # Use bridge driver for local development

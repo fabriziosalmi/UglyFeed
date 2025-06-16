@@ -76,7 +76,7 @@ Welcome to the UglyFeed Q&A. This document answers common questions about UglyFe
 ## API Integration and Advanced Features
 
 - **Q:** Which APIs can UglyFeed integrate with for content processing?
-- **A:** UglyFeed supports integration with OpenAI, Groq, Ollama, and Anthropic APIs to leverage advanced language models for content enhancement and rewriting.
+- **A:** UglyFeed supports integration with OpenAI, Groq, Ollama, Anthropic, and Google Gemini APIs to leverage advanced language models for content enhancement and rewriting.
 
 - **Q:** How can I switch between different language model APIs in UglyFeed?
 - **A:** You can select the desired API in the `api_config` section of the `config.yaml` file, customizing the processing according to your preferred service.

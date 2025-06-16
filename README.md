@@ -46,6 +46,7 @@ UglyFeed is a **simple** application designed to **retrieve**, **aggregate**, **
 - Ollama API (all models like `llama3`, `phi3`, `qwen2`)
 - Groq API (`llama3-8b-8192`, `llama3-70b-8192`, `gemma-7b-it`, `mixtral-8x7b-32768`)
 - Anthropic API (`claude-3-haiku-20240307`, `claude-3-sonnet-20240229`, `claude-3-opus-20240229`)
+- Google Gemini API (Free tier: `gemini-2.0-flash`, `gemini-2.0-flash-lite`, `gemini-1.5-flash`, `gemini-1.5-flash-8b`, `gemma-3`, `gemma-3n`)
 
 > You can use your own models by running a compatible OpenAI LLM server. You must change the OpenAI API url parameter.
  

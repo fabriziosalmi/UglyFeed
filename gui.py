@@ -251,7 +251,7 @@ if selected == "Configuration":
     st.divider()
 
     st.subheader("API and LLM Options")
-    api_options = ["OpenAI", "Groq", "Ollama", "Anthropic"]
+    api_options = ["OpenAI", "Groq", "Ollama", "Anthropic", "Gemini"]
     selected_api = st.selectbox("Select API", api_options, index=api_options.index(st.session_state.config_data['api_config']['selected_api']))
     st.session_state.config_data['api_config']['selected_api'] = selected_api
 
@@ -259,7 +259,8 @@ if selected == "Configuration":
         "OpenAI": ["openai_api_url", "openai_api_key", "openai_model"],
         "Groq": ["groq_api_url", "groq_api_key", "groq_model"],
         "Anthropic": ["anthropic_api_url", "anthropic_api_key", "anthropic_model"],
-        "Ollama": ["ollama_api_url", "ollama_model"]
+        "Ollama": ["ollama_api_url", "ollama_model"],
+        "Gemini": ["gemini_api_url", "gemini_api_key", "gemini_model"]
     }
 
     for api_param in api_configs[selected_api]:

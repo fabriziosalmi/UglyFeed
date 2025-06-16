@@ -33,7 +33,7 @@ similarity_options:
 # API configuration settings (llm_processor.py)
 # Only one API configuration should be active at any time.
 api_config:
-  selected_api: "Groq"  # Active API: "OpenAI", "Groq", "Anthropic", "Ollama"
+  selected_api: "Groq"  # Active API: "OpenAI", "Groq", "Anthropic", "Ollama", "Gemini"
 
   # Example configurations for different APIs:
 
@@ -55,6 +55,12 @@ api_config:
   # Ollama API configuration
   # ollama_api_url: "http://localhost:11434/api/chat"
   # ollama_model: "phi3"
+
+  # Google Gemini API configuration (Free tier models available)
+  # gemini_api_url: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+  # gemini_api_key: "your_gemini_api_key"
+  # gemini_model: "gemini-2.0-flash"  # Free tier available - recommended
+  # Other free models: "gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-flash-8b", "gemma-3", "gemma-3n"
 
 # Folder configuration settings
 folders:

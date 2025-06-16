@@ -9,12 +9,13 @@ import logging
 import argparse
 import yaml
 import os
+import sys
 import time
 from pathlib import Path
 from datetime import datetime
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 from openai import OpenAI
 from typing import Optional, Dict, Any, Union, List
 
@@ -38,7 +39,8 @@ class APIClientFactory:
             'groq': GroqClient,
             'ollama': OllamaClient,
             'together': TogetherAIClient,
-            'mistral': MistralAIClient
+            'mistral': MistralAIClient,
+            'gemini': GeminiClient
         }
         
         client_class = providers.get(provider.lower())
@@ -227,6 +229,84 @@ class OllamaClient(BaseAPIClient):
             logger.error(f"Error parsing Ollama response: {e}")
             return None
 
+class GeminiClient(BaseAPIClient):
+    """Client for Google Gemini API."""
+    
+    def _get_default_api_url(self) -> str:
+        return "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        
+    def get_headers(self) -> Dict[str, str]:
+        return {
+            'Content-Type': 'application/json'
+        }
+    
+    def format_messages(self, content: str) -> Dict[str, Any]:
+        """Format messages for Gemini API request."""
+        return {
+            "contents": [{
+                "parts": [{
+                    "text": f"You are a professional assistant, skilled in composing detailed and accurate news articles from multiple sources.\n\n{content}"
+                }]
+            }],
+            "generationConfig": {
+                "temperature": 0.7,
+                "maxOutputTokens": 4096,
+                "topP": 0.95,
+                "topK": 64
+            }
+        }
+    
+    def call_api(self, content: str, model: str) -> Optional[str]:
+        """Make API call to Gemini and return processed response."""
+        try:
+            # Truncate content if it's too long
+            truncated_content = truncate_content(content, MAX_TOKENS)
+            
+            # Format URL with model and API key
+            url = self.api_url.format(model=model)
+            if '?' in url:
+                url += f"&key={self.api_key}"
+            else:
+                url += f"?key={self.api_key}"
+            
+            data = self.format_messages(truncated_content)
+            
+            response = self.session.post(
+                url,
+                headers=self.get_headers(),
+                json=data
+            )
+            
+            if response.status_code == 429:  # Rate limit exceeded
+                retry_after = self.handle_rate_limit(response)
+                if retry_after:
+                    logger.info(f"Rate limit exceeded. Retrying after {retry_after} seconds.")
+                    time.sleep(retry_after)
+                    return self.call_api(content, model)
+                    
+            response.raise_for_status()
+            return self.parse_response(response.json())
+            
+        except Exception as e:
+            logger.error(f"Gemini API request failed: {str(e)}")
+            if 'response' in locals():
+                logger.error(f"Response content: {response.text}")
+            return None
+    
+    def parse_response(self, response: Dict[str, Any]) -> Optional[str]:
+        """Parse Gemini API response and extract content."""
+        try:
+            candidates = response.get('candidates', [])
+            if candidates:
+                content = candidates[0].get('content', {})
+                parts = content.get('parts', [])
+                if parts:
+                    return parts[0].get('text', '')
+            return None
+        except (KeyError, IndexError, AttributeError) as e:
+            logger.error(f"Error parsing Gemini response: {e}")
+            return None
+
 def estimate_token_count(text: str) -> int:
     """Estimate the number of tokens in a text."""
     return len(text) // 4
@@ -341,11 +421,82 @@ def save_rewritten_content(content: str, original_data: List[Dict], filepath: st
 
 def validate_config(api_config: Dict[str, Any]) -> None:
     """Validate the API configuration."""
-    required_keys = ['provider', 'api_key', 'model']
-    missing_keys = [key for key in required_keys if key not in api_config]
+    provider = api_config.get('provider', '').lower()
+    
+    # Check required keys based on provider
+    if provider == 'ollama':
+        # Ollama doesn't require API key
+        required_keys = ['provider', 'model']
+    else:
+        # All other providers require API key
+        required_keys = ['provider', 'api_key', 'model']
+    
+    missing_keys = [key for key in required_keys if not api_config.get(key)]
     
     if missing_keys:
-        raise ValueError(f"Missing required configuration keys: {', '.join(missing_keys)}")
+        raise ValueError(f"Missing required configuration keys for {provider}: {', '.join(missing_keys)}")
+    
+    # Additional validation for specific providers
+    if provider == 'gemini' and not api_config.get('api_key'):
+        raise ValueError("Gemini API requires an API key")
+    
+    if provider == 'anthropic' and not api_config.get('api_key'):
+        raise ValueError("Anthropic API requires an API key")
+        
+    if provider == 'openai' and not api_config.get('api_key'):
+        raise ValueError("OpenAI API requires an API key")
+        
+    if provider == 'groq' and not api_config.get('api_key'):
+        raise ValueError("Groq API requires an API key")
+
+def map_api_config(config_api_config: Dict[str, Any]) -> Dict[str, Any]:
+    """Map configuration from GUI format to processor format."""
+    selected_api = config_api_config.get('selected_api', '').lower()
+    
+    # Mapping from GUI selected_api to internal provider names and their config keys
+    api_mappings = {
+        'openai': {
+            'provider': 'openai',
+            'api_key': config_api_config.get('openai_api_key'),
+            'model': config_api_config.get('openai_model'),
+            'api_url': config_api_config.get('openai_api_url')
+        },
+        'groq': {
+            'provider': 'groq',
+            'api_key': config_api_config.get('groq_api_key'),
+            'model': config_api_config.get('groq_model'),
+            'api_url': config_api_config.get('groq_api_url')
+        },
+        'anthropic': {
+            'provider': 'anthropic',
+            'api_key': config_api_config.get('anthropic_api_key'),
+            'model': config_api_config.get('anthropic_model'),
+            'api_url': config_api_config.get('anthropic_api_url')
+        },
+        'ollama': {
+            'provider': 'ollama',
+            'api_key': '',  # Ollama doesn't need API key
+            'model': config_api_config.get('ollama_model'),
+            'api_url': config_api_config.get('ollama_api_url')
+        },
+        'gemini': {
+            'provider': 'gemini',
+            'api_key': config_api_config.get('gemini_api_key'),
+            'model': config_api_config.get('gemini_model'),
+            'api_url': config_api_config.get('gemini_api_url')
+        }
+    }
+    
+    if selected_api in api_mappings:
+        return api_mappings[selected_api]
+    else:
+        # Fallback for legacy configs or direct provider specification
+        return {
+            'provider': config_api_config.get('provider', selected_api),
+            'api_key': config_api_config.get('api_key', ''),
+            'model': config_api_config.get('model', ''),
+            'api_url': config_api_config.get('api_url')
+        }
 
 
 def main(config_path: str, prompt_path: Optional[str] = None, api: Optional[str] = None,
@@ -364,12 +515,15 @@ def main(config_path: str, prompt_path: Optional[str] = None, api: Optional[str]
     folder_config = config.get('folders', {})
     prompt_file_path = prompt_path or config.get('prompt_file', "")
 
+    # Map API configuration from GUI format to processor format
+    mapped_api_config = map_api_config(api_config)
+
     # Override with environment variables and CLI arguments
-    api_config.update({
-        'provider': api or os.getenv('API_TYPE', api_config.get('provider')),
-        'api_key': api_key or os.getenv('API_KEY', api_config.get('api_key')),
-        'model': model or os.getenv('API_MODEL', api_config.get('model')),
-        'api_url': api_url or os.getenv('API_URL', api_config.get('api_url'))
+    mapped_api_config.update({
+        'provider': api or os.getenv('API_TYPE', mapped_api_config.get('provider')),
+        'api_key': api_key or os.getenv('API_KEY', mapped_api_config.get('api_key')),
+        'model': model or os.getenv('API_MODEL', mapped_api_config.get('model')),
+        'api_url': api_url or os.getenv('API_URL', mapped_api_config.get('api_url'))
     })
 
     # Set up folders
@@ -382,7 +536,7 @@ def main(config_path: str, prompt_path: Optional[str] = None, api: Optional[str]
 
     try:
         # Validate configuration
-        validate_config(api_config)
+        validate_config(mapped_api_config)
 
         # Create rewritten folder if it doesn't exist
         Path(rewritten_folder).mkdir(parents=True, exist_ok=True)
@@ -397,7 +551,7 @@ def main(config_path: str, prompt_path: Optional[str] = None, api: Optional[str]
             logger.info(f"Processing file: {json_file}")
             process_json_file(
                 filepath=str(json_file),
-                api_config=api_config,
+                api_config=mapped_api_config,
                 content_prefix=content_prefix,
                 rewritten_folder=rewritten_folder
             )
@@ -413,7 +567,7 @@ if __name__ == "__main__":
     parser.add_argument('--prompt', type=str,
                       help='Path to the prompt file')
     parser.add_argument('--api', type=str,
-                      help='API provider (OpenAI, Azure, Anthropic, Groq, Ollama, Together, Mistral)')
+                      help='API provider (OpenAI, Azure, Anthropic, Groq, Ollama, Together, Mistral, Gemini)')
     parser.add_argument('--api_key', type=str,
                       help='API key for the selected provider')
     parser.add_argument('--model', type=str,
