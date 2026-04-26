@@ -38,6 +38,7 @@ COPY moderation/ ./moderation/
 COPY prompts/ ./prompts/
 COPY tools/ ./tools/
 COPY config.yaml ./
+COPY *.txt ./
 
 # Create directories for output
 RUN mkdir -p output rewritten reports

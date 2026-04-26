@@ -31,20 +31,27 @@ class CustomXMLHandler(SimpleHTTPRequestHandler):
 
     def _serve_xml_file(self):
         """Serve an XML file with appropriate headers."""
-        file_path = STATIC_DIR / self.path.lstrip('/')
+        # Resolve to absolute path and guard against path traversal
+        requested = (STATIC_DIR / self.path.lstrip('/')).resolve()
+        static_root = STATIC_DIR.resolve()
 
-        if file_path.exists() and file_path.is_file():
+        if not str(requested).startswith(str(static_root)):
+            self.send_error(403, "Forbidden")
+            server_logger.warning("Path traversal attempt blocked: %s", self.path)
+            return
+
+        if requested.exists() and requested.is_file():
             self.send_response(200)
             self.send_header("Content-Type", "application/xml")
             self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0")
             self.end_headers()
 
-            with open(file_path, 'rb') as file:
+            with open(requested, 'rb') as file:
                 self.wfile.write(file.read())
-            server_logger.info("Served XML file: %s", file_path)
+            server_logger.info("Served XML file: %s", requested)
         else:
             self.send_error(404, "File not found")
-            server_logger.warning("XML file not found: %s", file_path)
+            server_logger.warning("XML file not found: %s", requested)
 
 def start_http_server(port):
     """Start the HTTP server to serve XML files."""

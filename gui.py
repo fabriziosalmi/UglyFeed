@@ -543,7 +543,7 @@ if selected == "Debug":
     with st.expander("View Config.yaml Content"):
         st.text_area("Config.yaml Content", yaml.dump(st.session_state.config_data), height=300)
         if st.button("Refresh Configuration"):
-            st.experimental_rerun()
+            st.rerun()
 
     st.divider()
 
@@ -551,7 +551,7 @@ if selected == "Debug":
     with st.expander("View Feeds Content"):
         st.text_area("Feeds Content", st.session_state.feeds, height=200)
         if st.button("Refresh Feeds"):
-            st.experimental_rerun()
+            st.rerun()
 
     st.divider()
 

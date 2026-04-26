@@ -1,1 +1,107 @@
-__pycache__/rss_reader.cpython-312.pyc
+# ──────────────────────────────────────────────────
+#  Python
+# ──────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyo
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+*.whl
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# ──────────────────────────────────────────────────
+#  IDE / Editor
+# ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ──────────────────────────────────────────────────
+#  OS artifacts
+# ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+._*
+
+# ──────────────────────────────────────────────────
+#  Secrets / credentials
+# ──────────────────────────────────────────────────
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# ──────────────────────────────────────────────────
+#  Logs
+# ──────────────────────────────────────────────────
+*.log
+logs/
+uglyfeed.log
+
+# ──────────────────────────────────────────────────
+#  Runtime output (mounted as volumes in Docker)
+# ──────────────────────────────────────────────────
+output/
+rewritten/
+uglyfeeds/
+media/
+reports/*.json
+reports/*.html
+
+# ──────────────────────────────────────────────────
+#  Temporary files
+# ──────────────────────────────────────────────────
+tmp/
+temp/
+.tmp/
+temp_output.mp3
+
+# ──────────────────────────────────────────────────
+#  Node (if any)
+# ──────────────────────────────────────────────────
+node_modules/
+
+# ──────────────────────────────────────────────────
+#  Testing / coverage
+# ──────────────────────────────────────────────────
+htmlcov/
+.coverage
+.coverage.*
+.pytest_cache/
+.tox/
+.nox/
+
+# ──────────────────────────────────────────────────
+#  Streamlit
+# ──────────────────────────────────────────────────
+.streamlit/

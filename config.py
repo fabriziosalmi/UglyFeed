@@ -8,12 +8,7 @@ import yaml
 CONFIG_PATH = Path("config.yaml")
 FEEDS_PATH = Path("input/feeds.txt")
 
-def tuple_constructor(loader, node):
-    """Constructor for !!python/tuple tag."""
-    return tuple(loader.construct_sequence(node))
 
-# Add the constructor to PyYAML with FullLoader to handle tuples
-yaml.add_constructor('tag:yaml.org,2002:python/tuple', tuple_constructor, Loader=yaml.FullLoader)
 
 def load_config(config_file=CONFIG_PATH):
     """Load the configuration from the specified YAML file."""
@@ -23,7 +18,7 @@ def load_config(config_file=CONFIG_PATH):
     try:
         if config_file.exists():
             with open(config_file, "r", encoding='utf-8') as f:
-                return yaml.load(f, Loader=yaml.FullLoader)  # Use yaml.FullLoader to support custom constructors
+                return yaml.safe_load(f)
         return {}
     except yaml.YAMLError as e:
         raise Exception(f"Error loading YAML configuration: {e}") from e
