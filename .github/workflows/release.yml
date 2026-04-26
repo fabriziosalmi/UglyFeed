@@ -28,7 +28,8 @@ jobs:
       - name: Extract version from setup.py
         id: extract_version
         run: |
-          VERSION=$(python -c "import re; version_line = next(line for line in open('setup.py') if line.strip().startswith('version=')); print(re.search(r'version=[\"\\']([^\"\\']+ )[\"\\']', version_line).group(1))")
+          VERSION=$(grep -oP "version=['\"]\K[^'\"]+" setup.py)
+          echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
         shell: bash
 
@@ -83,7 +84,8 @@ jobs:
       - name: Extract version from setup.py
         id: extract_version
         run: |
-          VERSION=$(python -c "import re; version_line = next(line for line in open('setup.py') if line.strip().startswith('version=')); print(re.search(r'version=[\"\\']([^\"\\']+ )[\"\\']', version_line).group(1))")
+          VERSION=$(grep -oP "version=['\"]\K[^'\"]+" setup.py)
+          echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
         shell: bash
 
