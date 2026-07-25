@@ -41,6 +41,8 @@ def extract_rss_urls_from_opml(opml_content):
     :param opml_content: OPML content as a string.
     :return: List of RSS feed URLs.
     """
+    if not opml_content or not opml_content.strip():
+        return []
     try:
         root = ET.fromstring(opml_content)
         rss_urls = set()  # Use a set to avoid duplicates
