@@ -35,7 +35,10 @@ class CustomXMLHandler(SimpleHTTPRequestHandler):
         requested = (STATIC_DIR / self.path.lstrip('/')).resolve()
         static_root = STATIC_DIR.resolve()
 
-        if not str(requested).startswith(str(static_root)):
+        # Ensure requested path is strictly inside static_root
+        try:
+            requested.relative_to(static_root)
+        except ValueError:
             self.send_error(403, "Forbidden")
             server_logger.warning("Path traversal attempt blocked: %s", self.path)
             return
