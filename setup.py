@@ -45,7 +45,7 @@ setup(
         'psutil==5.9.8',
         'PyYAML==6.0.1',
         'requests==2.32.4',
-        'scikit_learn==1.4.2',
+        'scikit_learn==1.5.0',
         'sentence_transformers==2.7.0',
         'spacy==3.7.0',
         'textblob==0.18.0.post0',
