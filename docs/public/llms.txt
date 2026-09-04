@@ -1,0 +1,33 @@
+# UglyFeed
+
+> Retrieve, aggregate, filter, evaluate, rewrite and serve RSS feeds using Large Language Models.
+
+UglyFeed is an open-source intelligence and RSS aggregation platform by Fabrizio Salmi. It ingests multi-source RSS feeds, strips low-value duplicates using vector embeddings and cosine similarity, enhances and rewrites articles using LLMs (Google Gemini, OpenAI, Groq, Ollama), and publishes clean RSS 2.0 feeds.
+
+## Documentation Index
+
+### Getting Started
+- [Introduction](https://fabriziosalmi.github.io/UglyFeed/guide/introduction): Architecture, highlights, and comparison with traditional RSS readers.
+- [Installation & Quickstart](https://fabriziosalmi.github.io/UglyFeed/guide/installation): pip install uglypy, local git run, Docker, and GitHub Actions serverless mode.
+- [Docker & Compose](https://fabriziosalmi.github.io/UglyFeed/docker): Container ports, volume mappings, and Portainer deployment.
+- [Troubleshooting](https://fabriziosalmi.github.io/UglyFeed/troubleshooting): Resolution for "No Title", empty responses, and rate limits.
+- [FAQ](https://fabriziosalmi.github.io/UglyFeed/faq): Frequently asked questions and common configuration adjustments.
+
+### AI & LLM Processing
+- [Free Gemini Setup](https://fabriziosalmi.github.io/UglyFeed/free-gemini-setup): Step-by-step guide to acquiring and configuring free Google AI Studio keys.
+- [Gemini Integration](https://fabriziosalmi.github.io/UglyFeed/gemini-integration): Deep technical details of Gemini 2.0 Flash and Gemma 3 integration.
+- [Feed Sources](https://fabriziosalmi.github.io/UglyFeed/sources): Best practices for managing feeds.txt input sources.
+- [Prompt Tuning](https://fabriziosalmi.github.io/UglyFeed/tuning): Customizing rewrite prompts, tone, length, and system instructions.
+
+### Core Modules
+- [main.py](https://fabriziosalmi.github.io/UglyFeed/main.py): Pipeline orchestrator and scheduler.
+- [llm_processor.py](https://fabriziosalmi.github.io/UglyFeed/llm_processor.py): Multi-model inference handler.
+- [rss_reader.py](https://fabriziosalmi.github.io/UglyFeed/rss_reader.py): Asynchronous feed fetcher and parser.
+- [similarity_checker.py](https://fabriziosalmi.github.io/UglyFeed/similarity_checker.py): TF-IDF and vector semantic deduplication.
+- [json_manager.py](https://fabriziosalmi.github.io/UglyFeed/json_manager.py): State, caching, and JSON storage manager.
+- [json2rss.py](https://fabriziosalmi.github.io/UglyFeed/json2rss.py): RSS 2.0 XML generator with CDATA and standard enclosures.
+
+### Metrics & Evaluation
+- [Metrics System](https://fabriziosalmi.github.io/UglyFeed/metrics): Evaluation criteria and hallucination checks.
+- [Batch Metrics](https://fabriziosalmi.github.io/UglyFeed/process_multiple_metrics.py): Automated evaluation runs.
+- [Reference Evaluation](https://fabriziosalmi.github.io/UglyFeed/evaluate_against_reference.py): Comparing model outputs against gold-standard references.
