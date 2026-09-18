@@ -39,7 +39,7 @@ setup(
         'langdetect==1.0.9',
         'lexical_diversity==0.1.1',
         'nltk==3.9',
-        'numpy==1.24.4',
+        'numpy==2.2.6',
         'openai==1.30.5',
         'pandas==2.2.2',
         'psutil==5.9.8',
