@@ -28,7 +28,7 @@ setup(
         'License :: OSI Approved :: GNU Affero General Public License v3',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.7',  # Ensure compatibility with Python 3.7 and above
+    python_requires='>=3.10',  # nltk >= 3.9.3 (security fixes) requires Python 3.10
     install_requires=[
         'beautifulsoup4==4.12.3',
         'EbookLib==0.18',
