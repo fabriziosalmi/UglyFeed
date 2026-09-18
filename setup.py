@@ -42,7 +42,7 @@ setup(
         'numpy==1.24.4',
         'openai==1.30.5',
         'pandas==2.2.2',
-        'psutil==5.9.8',
+        'psutil==7.2.2',
         'PyYAML==6.0.1',
         'requests==2.32.4',
         'scikit_learn==1.4.2',
