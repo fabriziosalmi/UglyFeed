@@ -95,18 +95,40 @@ jobs:
       # installava da un indice che non ha le dipendenze reali del progetto, e
       # senza vincolare la versione poteva dire "ok" su una qualunque.
       # L'attesa serve perche' l'indice di PyPI non e' immediato.
-      - name: Verify the published version installs from PyPI
+      # Due verifiche, e servono entrambe: la prima dice che il rilascio
+      # esiste, la seconda che si puo' installare.
+      #
+      # I metadati di PyPI si aggiornano subito dopo l'upload, l'indice che pip
+      # legge no: passa da una CDN e ci mette qualche minuto a propagarsi su
+      # tutti i nodi. Nel rilascio di v0.0.52 questa differenza ha fatto
+      # fallire il passo mentre il pacchetto era regolarmente pubblicato
+      # (l'API JSON rispondeva 200 e pip elencava ancora solo fino alla 0.0.51).
+      - name: The release exists on PyPI
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          for i in $(seq 1 10); do
-            if pip download --no-deps --dest /tmp/verify "uglypy==${VERSION}" >/dev/null 2>&1; then
-              echo "uglypy==${VERSION} scaricabile da PyPI"
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/uglypy/${VERSION}/json")
+          if [ "$code" != "200" ]; then
+            echo "PyPI non conosce uglypy ${VERSION} (HTTP $code)" >&2
+            exit 1
+          fi
+          echo "PyPI conosce uglypy ${VERSION}"
+        shell: bash
+
+      # --no-cache-dir perche' la cache HTTP di pip puo' servire un indice
+      # vecchio e far sembrare assente una versione che c'e'. E dieci minuti di
+      # pazienza invece di due e mezzo, che per la CDN non bastavano.
+      - name: The published version installs from PyPI
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          for i in $(seq 1 40); do
+            if pip download --no-cache-dir --no-deps --dest /tmp/verify "uglypy==${VERSION}" >/dev/null 2>&1; then
+              echo "uglypy==${VERSION} scaricabile da PyPI al tentativo $i"
               exit 0
             fi
-            echo "non ancora indicizzata, riprovo ($i/10)"
+            echo "indice non ancora propagato, riprovo ($i/40)"
             sleep 15
           done
-          echo "uglypy==${VERSION} non risulta su PyPI dopo 150s" >&2
+          echo "uglypy==${VERSION} non installabile dopo 10 minuti" >&2
           exit 1
         shell: bash
 
