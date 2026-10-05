@@ -64,26 +64,54 @@ jobs:
       - name: Build package
         run: python setup.py sdist bdist_wheel
 
-      - name: Publish to Test PyPI
+      # `twine check` stava dentro il passo di Test PyPI. Rendere quel passo
+      # non bloccante lo avrebbe spento in silenzio, quindi vive qui: e' un
+      # controllo sugli artefatti, e deve fermare il rilascio.
+      - name: Check the built artifacts
+        run: twine check dist/*
+
+      # Test PyPI e' una prova, non un cancello. Era un cancello per sbaglio, e
+      # ha bloccato ogni rilascio dal 26/04/2026: ricaricava la stessa 0.0.51 e
+      # Test PyPI rifiutava il duplicato con "400 File already exists", quindi
+      # il job moriva qui e la pubblicazione su PyPI risultava `skipped`.
+      # --skip-existing rende innocuo un duplicato, e continue-on-error dice
+      # esplicitamente che questo passo non decide del rilascio.
+      - name: Smoke test on Test PyPI (non blocking)
+        if: startsWith(github.ref, 'refs/tags/')
+        continue-on-error: true
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
-        run: |
-          twine check dist/*
-          twine upload --repository-url https://test.pypi.org/legacy/ dist/* --verbose
-
-      - name: Verify installation from Test PyPI
-        run: |
-          pip install --index-url https://test.pypi.org/simple/ uglypy --extra-index-url https://pypi.org/simple
+        run: twine upload --skip-existing --repository-url https://test.pypi.org/legacy/ dist/* --verbose
 
       - name: Publish package to PyPI
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: twine upload --skip-existing dist/*
+
+      # La verifica vera e' da PyPI, non da Test PyPI: il vecchio passo
+      # installava da un indice che non ha le dipendenze reali del progetto, e
+      # senza vincolare la versione poteva dire "ok" su una qualunque.
+      # L'attesa serve perche' l'indice di PyPI non e' immediato.
+      - name: Verify the published version installs from PyPI
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
-          twine upload dist/*
+          for i in $(seq 1 10); do
+            if pip download --no-deps --dest /tmp/verify "uglypy==${VERSION}" >/dev/null 2>&1; then
+              echo "uglypy==${VERSION} scaricabile da PyPI"
+              exit 0
+            fi
+            echo "non ancora indicizzata, riprovo ($i/10)"
+            sleep 15
+          done
+          echo "uglypy==${VERSION} non risulta su PyPI dopo 150s" >&2
+          exit 1
+        shell: bash
 
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v3
         continue-on-error: true
         with:
@@ -101,6 +129,12 @@ jobs:
 
   docker_deploy:
     runs-on: ubuntu-latest
+    # Dipende dal rilascio su PyPI, e non e' un dettaglio di ordine: finche' i
+    # due job erano indipendenti, `release` poteva fallire e questo pubblicava
+    # comunque. E' andata cosi' il 18 e 19/09/2026, e il risultato e' che
+    # Docker Hub 0.0.51 e' stato riscritto il 19/09 mentre su PyPI 0.0.51 e'
+    # del 26/04: lo stesso numero di versione per due codici diversi.
+    needs: release
 
     steps:
       - name: Check out code
@@ -114,6 +148,30 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
         shell: bash
 
+      # Un tag di versione non si sovrascrive. Prima si poteva, ed e' cosi' che
+      # Docker Hub 0.0.51 e' finito a descrivere un codice diverso da quello
+      # che PyPI pubblica con lo stesso numero. Se il tag esiste gia', il job
+      # si ferma e dice di alzare la versione.
+      - name: Il tag di versione non esiste ancora su Docker Hub
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          IMAGE: fabriziosalmi/uglyfeed
+        run: |
+          code=$(curl -sS -o /tmp/hubresp -w '%{http_code}' \
+            "https://hub.docker.com/v2/repositories/${IMAGE}/tags/${VERSION}/")
+          case "$code" in
+            404) echo "ok: ${IMAGE}:${VERSION} non esiste ancora" ;;
+            200)
+              digest=$(python3 -c "import json;print(json.load(open('/tmp/hubresp')).get('digest','?'))")
+              echo "RIFIUTO: ${IMAGE}:${VERSION} esiste gia' (digest ${digest})." >&2
+              echo "Un tag di versione non si sovrascrive: alza la versione in setup.py e ritagga." >&2
+              exit 1 ;;
+            *)
+              echo "RIFIUTO: Docker Hub ha risposto $code, non posso verificare se il tag esiste." >&2
+              exit 1 ;;
+          esac
+        shell: bash
+
       # ── Multi-arch build infrastructure ────────────────────────
 
       - name: Set up QEMU (cross-platform emulation)
@@ -125,12 +183,14 @@ jobs:
       # ── Registry logins ────────────────────────────────────────
 
       - name: Log in to Docker Hub
+        if: startsWith(github.ref, 'refs/tags/')
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Log in to GitHub Container Registry
+        if: startsWith(github.ref, 'refs/tags/')
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
@@ -146,10 +206,22 @@ jobs:
           images: |
             fabriziosalmi/uglyfeed
             ghcr.io/${{ github.repository_owner }}/uglyfeed
+          # Derivati dal tag git, non da setup.py. Con la guardia che impone
+          # tag == setup.py, PyPI e Docker finiscono per costruzione sullo
+          # stesso numero: prima erano due letture indipendenti dello stesso
+          # file, e bastava un avvio manuale per farle divergere.
+          #
+          # `type=sha,prefix=` e' stato tolto: produceva i tag per commit
+          # (3e80998, df203f3 sono i suoi, lasciati dai due run involontari di
+          # settembre) che sporcano Docker Hub senza che nessuno li usi.
+          #
+          # `type=ref,event=branch` serve solo all'avvio manuale, che non
+          # pubblica: senza almeno un tag la build non partirebbe.
           tags: |
-            type=raw,value=latest
-            type=raw,value=${{ env.VERSION }}
-            type=sha,prefix=
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=ref,event=branch
 
       # ── Multi-arch build & push ─────────────────────────────────
 
@@ -160,7 +232,10 @@ jobs:
           file: ./Dockerfile
           target: production
           platforms: linux/amd64,linux/arm64
-          push: true
+          # Solo i tag pubblicano. Un workflow_dispatch costruisce e verifica
+          # che il Dockerfile regga, senza spingere niente: era l'ultima
+          # superficie da cui si poteva pubblicare senza taggare.
+          push: ${{ startsWith(github.ref, 'refs/tags/') }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
