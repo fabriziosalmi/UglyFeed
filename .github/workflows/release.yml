@@ -1,11 +1,20 @@
 name: Publish to PyPI and Docker Hub
 
+# Il rilascio parte da un tag, non da una modifica a un file.
+#
+# Prima il trigger era `push` su main con `paths: ['setup.py']`: qualunque
+# commit che toccasse setup.py pubblicava. Il 18/09/2026 e' andata esattamente
+# cosi': il merge di una PR di dependabot che aggiornava le dipendenze ha
+# pubblicato su Docker Hub `0.0.51` e `latest` da un commit che aveva ancora
+# nltk 3.9, vulnerabile. Nessuno aveva chiesto un rilascio, e annullare il run
+# non e' servito: la build multi-arch dura circa mezz'ora e il push era gia'
+# avvenuto, mentre lo stato del run diceva "cancelled".
+#
+# Con i tag, pubblicare e' un gesto esplicito: `git tag v0.0.52 && git push --tags`.
 on:
   push:
-    paths:
-      - 'setup.py'
-    branches:
-      - main
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
 
 permissions:
@@ -31,6 +40,20 @@ jobs:
           VERSION=$(grep -oP "version=['\"]\K[^'\"]+" setup.py)
           echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+        shell: bash
+
+      # Il tag e setup.py devono dire la stessa cosa. Senza questo controllo si
+      # pubblica un pacchetto la cui versione non corrisponde al tag da cui
+      # dice di venire, e su PyPI quel numero non si puo' riusare.
+      - name: Il tag corrisponde alla versione in setup.py
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "Il tag dice $TAG, setup.py dice $VERSION: allineali prima di rilasciare." >&2
+            exit 1
+          fi
+          echo "tag $TAG == setup.py $VERSION"
         shell: bash
 
       - name: Install dependencies
@@ -66,11 +89,11 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           name: Release ${{ env.VERSION }}
-          body: |
-            ## Changes in this Release
-            - Multi-arch Docker images (amd64 + arm64)
-            - Security fixes (path traversal, YAML deserialization)
-            - Comprehensive .gitignore
+          # Erano tre righe scritte a mano, identiche a ogni rilascio: dicevano
+          # "Security fixes (path traversal, YAML deserialization)" anche a chi
+          # installava una versione che non le conteneva. Meglio le note
+          # generate da GitHub, che almeno descrivono i commit veri.
+          generate_release_notes: true
           draft: false
           prerelease: false
         env:
