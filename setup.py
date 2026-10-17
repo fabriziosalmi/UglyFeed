@@ -46,7 +46,7 @@ setup(
         'PyYAML==6.0.3',
         'requests==2.34.2',
         'scikit_learn==1.7.2',
-        'sentence_transformers==2.7.0',
+        'sentence_transformers==6.1.0',
         'spacy==3.8.16',
         'textblob==0.20.1',
         'textstat==0.7.13',
