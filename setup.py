@@ -41,7 +41,7 @@ setup(
         'nltk==3.10.3',
         'numpy==1.24.4',
         'openai==1.30.5',
-        'pandas==2.2.2',
+        'pandas==2.3.3',
         'psutil==5.9.8',
         'PyYAML==6.0.3',
         'requests==2.34.2',
