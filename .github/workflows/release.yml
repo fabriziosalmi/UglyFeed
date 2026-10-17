@@ -197,10 +197,10 @@ jobs:
       # ── Multi-arch build infrastructure ────────────────────────
 
       - name: Set up QEMU (cross-platform emulation)
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       # ── Registry logins ────────────────────────────────────────
 
@@ -248,7 +248,7 @@ jobs:
       # ── Multi-arch build & push ─────────────────────────────────
 
       - name: Build and push multi-arch image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
