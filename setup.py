@@ -51,7 +51,7 @@ setup(
         'textblob==0.20.1',
         'textstat==0.7.13',
         'tqdm==4.70.1',
-        'typer==0.27.2',
+        'typer==0.27.3',
         'streamlit',  # No specific version required, latest will be installed
         'schedule',
     ],

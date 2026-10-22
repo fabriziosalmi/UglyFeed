@@ -19,7 +19,7 @@ spacy==3.8.16
 textblob==0.20.1
 textstat==0.7.13
 tqdm==4.70.1
-typer==0.27.2
+typer==0.27.3
 streamlit
 streamlit_option_menu
 schedule
