@@ -34,7 +34,7 @@ setup(
         'EbookLib==0.20',
         'feedgen==1.0.0',
         'feedparser==6.0.14',
-        'jiwer==3.0.4',
+        'jiwer==4.0.0',
         'joblib==1.6.0',
         'langdetect==1.0.9',
         'lexical_diversity==0.1.1',
