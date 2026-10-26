@@ -208,7 +208,7 @@ Specify the API for processing:
 
 - `anthropic_api_url` (default: `https://api.anthropic.com/v1/messages`): Anthropic API endpoint.
 - `anthropic_api_key`: Anthropic API key.
-- `anthropic_model`:  Anthropic model to use (e.g., `claude-3-haiku-20240307`, `claude-3-sonnet-20240229`, `claude-3-opus-20240229`)
+- `anthropic_model`:  Anthropic model to use (e.g., `claude-haiku-4-5-20251001`, `claude-sonnet-5-5`, `claude-opus-4-8`)
 
 ##### Ollama API
 
