@@ -56,10 +56,10 @@ def ensure_default_config(config_data):
         },
         'api_config': {
             'selected_api': "Groq",
-            'openai_api_url': "https://api.openai.com/v1/chat/completions",
+            'openai_api_url': "https://api.openai.com/v1",
             'openai_api_key': "",
             'openai_model': "gpt-3.5-turbo",
-            'groq_api_url': "https://api.groq.com/openai/v1/chat/completions",
+            'groq_api_url': "https://api.groq.com/openai/v1",
             'groq_api_key': "",
             'groq_model': "llama3-8b-8192",
             'ollama_api_url': "http://localhost:11434/api/chat",

@@ -30,7 +30,8 @@ class APIClientFactory:
     """Factory class to create appropriate API clients based on provider type."""
     
     @staticmethod
-    def create_client(provider: str, api_key: str, api_url: Optional[str] = None) -> 'BaseAPIClient':
+    def create_client(provider: str, api_key: str, api_url: Optional[str] = None,
+                      temperature: Optional[float] = None) -> 'BaseAPIClient':
         """Create and return appropriate API client based on provider."""
         providers = {
             'openai': OpenAICompatibleClient,
@@ -47,14 +48,19 @@ class APIClientFactory:
         if not client_class:
             raise ValueError(f"Unsupported provider: {provider}")
             
-        return client_class(api_key, api_url)
+        return client_class(api_key, api_url, temperature)
 
 class BaseAPIClient:
     """Base class for API clients."""
-    
-    def __init__(self, api_key: str, api_url: Optional[str] = None):
+
+    # Sampling temperature sent when none is configured; None means "do not send".
+    default_temperature: Optional[float] = 0.7
+
+    def __init__(self, api_key: str, api_url: Optional[str] = None,
+                 temperature: Optional[float] = None):
         self.api_key = api_key
         self.api_url = api_url or self._get_default_api_url()
+        self.temperature = temperature if temperature is not None else self.default_temperature
         self.session = self._create_session()
 
     def _get_default_api_url(self) -> str:
@@ -105,16 +111,23 @@ class BaseAPIClient:
                 return 60.0  # Default retry after 60 seconds
         return None
 
+    def build_payload(self, content: str, model: str) -> Dict[str, Any]:
+        """Build the JSON request body."""
+        data = {
+            "model": model,
+            "messages": self.format_messages(content),
+            "max_tokens": 4096,
+        }
+        if self.temperature is not None:
+            data["temperature"] = self.temperature
+        return data
+
     def call_api(self, content: str, model: str) -> Optional[str]:
         """Make API call and return processed response."""
+        response = None
         try:
-            data = {
-                "model": model,
-                "messages": self.format_messages(content),
-                "max_tokens": 4096,
-                "temperature": 0.7
-            }
-            
+            data = self.build_payload(content, model)
+
             response = self.session.post(
                 self.api_url,
                 headers=self.get_headers(),
@@ -138,10 +151,20 @@ class BaseAPIClient:
             return None
 
 class OpenAICompatibleClient(BaseAPIClient):
-    """Client for OpenAI and compatible APIs."""
-    
+    """Client for OpenAI and compatible APIs.
+
+    The OpenAI SDK takes a base URL and appends /chat/completions itself, so
+    api_url is a base URL such as https://api.openai.com/v1. A full endpoint
+    URL from an older config is accepted and trimmed to its base.
+    """
+
+    def __init__(self, api_key: str, api_url: Optional[str] = None,
+                 temperature: Optional[float] = None):
+        super().__init__(api_key, api_url, temperature)
+        self.api_url = normalize_openai_base_url(self.api_url)
+
     def _get_default_api_url(self) -> str:
-        return "https://api.openai.com/v1/chat/completions"
+        return "https://api.openai.com/v1"
 
     def call_api(self, content: str, model: str) -> Optional[str]:
         """Call API using the official OpenAI client."""
@@ -151,7 +174,7 @@ class OpenAICompatibleClient(BaseAPIClient):
                 model=model,
                 messages=self.format_messages(content),
                 max_tokens=4096,
-                temperature=0.7
+                temperature=self.temperature
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -175,8 +198,29 @@ class AzureOpenAIClient(OpenAICompatibleClient):
         }
 
 class AnthropicClient(BaseAPIClient):
-    """Client for Anthropic API."""
-    
+    """Client for the Anthropic Messages API (POST /v1/messages).
+
+    The system prompt goes in the top-level "system" field: the Messages API
+    rejects a "system" role inside "messages". Temperature is sent only when
+    configured, because current Claude models reject non-default sampling
+    parameters.
+    """
+
+    default_temperature = None
+
+    def build_payload(self, content: str, model: str) -> Dict[str, Any]:
+        messages = self.format_messages(content)
+        system = "\n\n".join(m["content"] for m in messages if m["role"] == "system")
+        data = {
+            "model": model,
+            "system": system,
+            "messages": [m for m in messages if m["role"] != "system"],
+            "max_tokens": 4096,
+        }
+        if self.temperature is not None:
+            data["temperature"] = self.temperature
+        return data
+
     def _get_default_api_url(self) -> str:
         return "https://api.anthropic.com/v1/messages"
         
@@ -199,19 +243,19 @@ class GroqClient(OpenAICompatibleClient):
     """Client for Groq API."""
     
     def _get_default_api_url(self) -> str:
-        return "https://api.groq.com/openai/v1/chat/completions"
+        return "https://api.groq.com/openai/v1"
 
 class TogetherAIClient(OpenAICompatibleClient):
     """Client for Together.ai API."""
     
     def _get_default_api_url(self) -> str:
-        return "https://api.together.xyz/v1/chat/completions"
+        return "https://api.together.xyz/v1"
 
 class MistralAIClient(OpenAICompatibleClient):
     """Client for Mistral AI API."""
     
     def _get_default_api_url(self) -> str:
-        return "https://api.mistral.ai/v1/chat/completions"
+        return "https://api.mistral.ai/v1"
 
 class OllamaClient(BaseAPIClient):
     """Client for Ollama API."""
@@ -307,6 +351,19 @@ class GeminiClient(BaseAPIClient):
             logger.error(f"Error parsing Gemini response: {e}")
             return None
 
+def normalize_openai_base_url(url: str) -> str:
+    """Return the base URL the OpenAI SDK expects.
+
+    Strips a trailing /chat/completions (and slashes) so that a full endpoint
+    URL such as https://api.openai.com/v1/chat/completions becomes
+    https://api.openai.com/v1.
+    """
+    base = url.rstrip('/')
+    suffix = '/chat/completions'
+    if base.endswith(suffix):
+        base = base[:-len(suffix)].rstrip('/')
+    return base
+
 def estimate_token_count(text: str) -> int:
     """Estimate the number of tokens in a text."""
     return len(text) // 4
@@ -372,7 +429,8 @@ def process_json_file(filepath: str, api_config: Dict[str, Any], content_prefix:
         client = APIClientFactory.create_client(
             provider=api_config['provider'],
             api_key=api_config['api_key'],
-            api_url=api_config.get('api_url')
+            api_url=api_config.get('api_url'),
+            temperature=api_config.get('temperature')
         )
 
         rewritten_content = client.call_api(combined_content, api_config['model'])
@@ -471,7 +529,9 @@ def map_api_config(config_api_config: Dict[str, Any]) -> Dict[str, Any]:
             'provider': 'anthropic',
             'api_key': config_api_config.get('anthropic_api_key'),
             'model': config_api_config.get('anthropic_model'),
-            'api_url': config_api_config.get('anthropic_api_url')
+            'api_url': config_api_config.get('anthropic_api_url'),
+            # Optional: only sent to the API when set.
+            'temperature': config_api_config.get('anthropic_temperature')
         },
         'ollama': {
             'provider': 'ollama',
