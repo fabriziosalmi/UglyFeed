@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.9'  # Use the Python version you are targeting
+          python-version: '3.10'  # matches python_requires in setup.py; 3.9 is EOL and absent from ubuntu-latest (26.04)
 
       - name: Extract versions from setup.py commits
         id: extract_versions
