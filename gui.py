@@ -266,12 +266,12 @@ if selected == "Configuration":
     # Set default values for each API when selected
     api_defaults = {
         "OpenAI": {
-            "openai_api_url": "https://api.openai.com/v1/chat/completions",
+            "openai_api_url": "https://api.openai.com/v1",
             "openai_api_key": "your_openai_api_key",
             "openai_model": "gpt-3.5-turbo"
         },
         "Groq": {
-            "groq_api_url": "https://api.groq.com/openai/v1/chat/completions",
+            "groq_api_url": "https://api.groq.com/openai/v1",
             "groq_api_key": "your_groq_api_key",
             "groq_model": "llama3-8b-8192"
         },

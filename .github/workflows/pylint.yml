@@ -1,6 +1,11 @@
 name: Pylint
 
-on: [push]
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -19,6 +24,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint
         pip install -r requirements.txt
+    - name: Run unit tests
+      run: |
+        python -m unittest discover -s tests -v
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py') > pylint_report.txt 2>&1 || true
