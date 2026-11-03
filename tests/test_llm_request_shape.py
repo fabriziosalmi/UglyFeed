@@ -11,6 +11,7 @@ import sys
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import parse_qs, urlsplit
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -49,12 +50,14 @@ class _Recorder(BaseHTTPRequestHandler):
     def do_POST(self):  # pylint: disable=invalid-name
         length = int(self.headers.get("Content-Length", 0))
         raw = self.rfile.read(length)
+        url = urlsplit(self.path)
         self.server.requests.append({
-            "path": self.path,
+            "path": url.path,
+            "query": parse_qs(url.query),
             "headers": {k.lower(): v for k, v in self.headers.items()},
             "body": json.loads(raw) if raw else None,
         })
-        reply = ANTHROPIC_REPLY if self.path.endswith("/messages") else OPENAI_REPLY
+        reply = ANTHROPIC_REPLY if url.path.endswith("/messages") else OPENAI_REPLY
         payload = json.dumps(reply).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
@@ -94,6 +97,7 @@ class OpenAIRequestTest(MockServerTestCase):
 
     def assert_openai_request(self, req):
         self.assertEqual(req["path"], "/v1/chat/completions")
+        self.assertEqual(req["query"], {})
         self.assertEqual(req["headers"]["authorization"], "Bearer test-key")
         self.assertEqual(req["body"]["model"], "gpt-test")
         self.assertEqual(req["body"]["messages"], [
@@ -132,6 +136,67 @@ class OpenAIDefaultURLTest(unittest.TestCase):
         ]:
             client = llm_processor.APIClientFactory.create_client(provider, "k")
             self.assertEqual(client.api_url, expected, provider)
+
+
+class AzureRequestTest(MockServerTestCase):
+    """Azure OpenAI: deployment in the path, api-version query, api-key header."""
+
+    def _call(self, api_url, model="my-deployment", api_version=None):
+        client = llm_processor.APIClientFactory.create_client(
+            "azure", "test-key", api_url, api_version=api_version)
+        return client.call_api("hello", model)
+
+    def assert_azure_request(self, req, deployment="my-deployment",
+                             api_version=llm_processor.AZURE_DEFAULT_API_VERSION):
+        self.assertEqual(req["path"],
+                         f"/openai/deployments/{deployment}/chat/completions")
+        self.assertEqual(req["query"], {"api-version": [api_version]})
+        self.assertEqual(req["headers"]["api-key"], "test-key")
+        self.assertNotIn("authorization", req["headers"])
+        self.assertEqual(req["body"]["messages"], [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": "hello"},
+        ])
+        self.assertEqual(req["body"]["max_tokens"], 4096)
+
+    def test_endpoint_and_deployment(self):
+        self.assertEqual(self._call(self.base), "openai ok")
+        self.assert_azure_request(self.only_request())
+
+    def test_configured_api_version(self):
+        self.assertEqual(self._call(f"{self.base}/", api_version="2025-04-01-preview"),
+                         "openai ok")
+        self.assert_azure_request(self.only_request(), api_version="2025-04-01-preview")
+
+    def test_full_deployment_url_is_split(self):
+        # An older config may hold the whole deployment URL.
+        url = (f"{self.base}/openai/deployments/url-deployment/chat/completions"
+               "?api-version=2024-06-01")
+        self.assertEqual(self._call(url, model="gpt-4o"), "openai ok")
+        self.assert_azure_request(self.only_request(), deployment="url-deployment",
+                                  api_version="2024-06-01")
+
+    def test_config_mapping(self):
+        mapped = llm_processor.map_api_config({
+            "selected_api": "Azure",
+            "azure_endpoint": "https://res.openai.azure.com",
+            "azure_api_key": "k",
+            "azure_deployment": "dep",
+            "azure_api_version": "2024-10-21",
+        })
+        self.assertEqual(mapped, {
+            "provider": "azure",
+            "api_key": "k",
+            "model": "dep",
+            "api_url": "https://res.openai.azure.com",
+            "api_version": "2024-10-21",
+        })
+        llm_processor.validate_config(mapped)
+
+    def test_missing_endpoint_is_a_config_error(self):
+        with self.assertRaises(ValueError):
+            llm_processor.validate_config(
+                {"provider": "azure", "api_key": "k", "model": "dep"})
 
 
 class AnthropicRequestTest(MockServerTestCase):
