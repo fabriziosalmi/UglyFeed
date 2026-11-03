@@ -278,7 +278,7 @@ if selected == "Configuration":
         "Anthropic": {
             "anthropic_api_url": "https://api.anthropic.com/v1/messages",
             "anthropic_api_key": "your_anthropic_api_key",
-            "anthropic_model": "claude-3-haiku-20240307"
+            "anthropic_model": "claude-haiku-4-5-20251001"
         },
         "Ollama": {
             "ollama_api_url": "http://localhost:11434/api/chat",
