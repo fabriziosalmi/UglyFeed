@@ -13,10 +13,11 @@ import sys
 import time
 from pathlib import Path
 from datetime import datetime
+from urllib.parse import parse_qs, unquote, urlsplit, urlunsplit
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from openai import OpenAI
+from openai import AzureOpenAI, OpenAI
 from typing import Optional, Dict, Any, Union, List
 
 # Configure logging
@@ -26,12 +27,17 @@ logger = logging.getLogger(__name__)
 # Maximum context length for LLM APIs
 MAX_TOKENS = 32768
 
+# Azure OpenAI API version used when neither the config, the endpoint URL nor
+# OPENAI_API_VERSION names one.
+AZURE_DEFAULT_API_VERSION = "2024-10-21"
+
 class APIClientFactory:
     """Factory class to create appropriate API clients based on provider type."""
     
     @staticmethod
     def create_client(provider: str, api_key: str, api_url: Optional[str] = None,
-                      temperature: Optional[float] = None) -> 'BaseAPIClient':
+                      temperature: Optional[float] = None,
+                      api_version: Optional[str] = None) -> 'BaseAPIClient':
         """Create and return appropriate API client based on provider."""
         providers = {
             'openai': OpenAICompatibleClient,
@@ -47,7 +53,9 @@ class APIClientFactory:
         client_class = providers.get(provider.lower())
         if not client_class:
             raise ValueError(f"Unsupported provider: {provider}")
-            
+
+        if client_class is AzureOpenAIClient:
+            return client_class(api_key, api_url, temperature, api_version)
         return client_class(api_key, api_url, temperature)
 
 class BaseAPIClient:
@@ -166,10 +174,14 @@ class OpenAICompatibleClient(BaseAPIClient):
     def _get_default_api_url(self) -> str:
         return "https://api.openai.com/v1"
 
+    def _sdk_client(self) -> OpenAI:
+        """Return the openai SDK client the request goes through."""
+        return OpenAI(api_key=self.api_key, base_url=self.api_url)
+
     def call_api(self, content: str, model: str) -> Optional[str]:
         """Call API using the official OpenAI client."""
         try:
-            client = OpenAI(api_key=self.api_key, base_url=self.api_url)
+            client = self._sdk_client()
             response = client.chat.completions.create(
                 model=model,
                 messages=self.format_messages(content),
@@ -189,13 +201,38 @@ class OpenAICompatibleClient(BaseAPIClient):
             return None
 
 class AzureOpenAIClient(OpenAICompatibleClient):
-    """Client for Azure OpenAI Services."""
-    
-    def get_headers(self) -> Dict[str, str]:
-        return {
-            'Content-Type': 'application/json',
-            'api-key': self.api_key
-        }
+    """Client for Azure OpenAI Service.
+
+    Azure does not use OpenAI's URL scheme or bearer token: a chat request goes
+    to {endpoint}/openai/deployments/{deployment}/chat/completions?api-version=
+    with an `api-key` header. The openai SDK's AzureOpenAI client builds both,
+    so here api_url is the resource endpoint (https://<resource>.openai.azure.com),
+    the model is the deployment name, and api_version picks the API version.
+
+    A full deployment URL, as an older config may hold it, is also accepted:
+    the endpoint, the deployment and the api-version are read from it, and the
+    deployment in the URL takes precedence over the configured model.
+    """
+
+    def __init__(self, api_key: str, api_url: Optional[str] = None,
+                 temperature: Optional[float] = None,
+                 api_version: Optional[str] = None):
+        super().__init__(api_key, api_url, temperature)
+        self.api_url, self.deployment, url_version = parse_azure_url(self.api_url)
+        self.api_version = (api_version or url_version
+                            or os.getenv('OPENAI_API_VERSION')
+                            or AZURE_DEFAULT_API_VERSION)
+
+    def _get_default_api_url(self) -> str:
+        raise ValueError("Azure OpenAI needs api_url: the resource endpoint, "
+                         "such as https://<resource>.openai.azure.com")
+
+    def _sdk_client(self) -> AzureOpenAI:
+        return AzureOpenAI(api_key=self.api_key, azure_endpoint=self.api_url,
+                           api_version=self.api_version)
+
+    def call_api(self, content: str, model: str) -> Optional[str]:
+        return super().call_api(content, self.deployment or model)
 
 class AnthropicClient(BaseAPIClient):
     """Client for the Anthropic Messages API (POST /v1/messages).
@@ -364,6 +401,25 @@ def normalize_openai_base_url(url: str) -> str:
         base = base[:-len(suffix)].rstrip('/')
     return base
 
+def parse_azure_url(url: str) -> tuple:
+    """Split an Azure OpenAI URL into (endpoint, deployment, api_version).
+
+    https://res.openai.azure.com gives (https://res.openai.azure.com, None, None).
+    https://res.openai.azure.com/openai/deployments/gpt4o/chat/completions?api-version=2024-10-21
+    gives (https://res.openai.azure.com, gpt4o, 2024-10-21).
+    """
+    parts = urlsplit(url.strip())
+    api_version = parse_qs(parts.query).get('api-version', [None])[0]
+    path = parts.path.rstrip('/')
+    deployment = None
+    match = re.match(r'^(.*?)/openai/deployments/([^/]+)', path)
+    if match:
+        path, deployment = match.group(1), unquote(match.group(2))
+    elif path.endswith('/openai'):
+        path = path[:-len('/openai')]
+    endpoint = urlunsplit((parts.scheme, parts.netloc, path.rstrip('/'), '', ''))
+    return endpoint, deployment, api_version
+
 def estimate_token_count(text: str) -> int:
     """Estimate the number of tokens in a text."""
     return len(text) // 4
@@ -430,7 +486,8 @@ def process_json_file(filepath: str, api_config: Dict[str, Any], content_prefix:
             provider=api_config['provider'],
             api_key=api_config['api_key'],
             api_url=api_config.get('api_url'),
-            temperature=api_config.get('temperature')
+            temperature=api_config.get('temperature'),
+            api_version=api_config.get('api_version')
         )
 
         rewritten_content = client.call_api(combined_content, api_config['model'])
@@ -507,6 +564,10 @@ def validate_config(api_config: Dict[str, Any]) -> None:
     if provider == 'groq' and not api_config.get('api_key'):
         raise ValueError("Groq API requires an API key")
 
+    if provider == 'azure' and not api_config.get('api_url'):
+        raise ValueError("Azure OpenAI requires the resource endpoint "
+                         "(azure_endpoint), such as https://<resource>.openai.azure.com")
+
 def map_api_config(config_api_config: Dict[str, Any]) -> Dict[str, Any]:
     """Map configuration from GUI format to processor format."""
     selected_api = config_api_config.get('selected_api', '').lower()
@@ -544,6 +605,14 @@ def map_api_config(config_api_config: Dict[str, Any]) -> Dict[str, Any]:
             'api_key': config_api_config.get('gemini_api_key'),
             'model': config_api_config.get('gemini_model'),
             'api_url': config_api_config.get('gemini_api_url')
+        },
+        'azure': {
+            'provider': 'azure',
+            'api_key': config_api_config.get('azure_api_key'),
+            # Azure addresses a deployment, not a model.
+            'model': config_api_config.get('azure_deployment'),
+            'api_url': config_api_config.get('azure_endpoint'),
+            'api_version': config_api_config.get('azure_api_version')
         }
     }
     
@@ -555,7 +624,8 @@ def map_api_config(config_api_config: Dict[str, Any]) -> Dict[str, Any]:
             'provider': config_api_config.get('provider', selected_api),
             'api_key': config_api_config.get('api_key', ''),
             'model': config_api_config.get('model', ''),
-            'api_url': config_api_config.get('api_url')
+            'api_url': config_api_config.get('api_url'),
+            'api_version': config_api_config.get('api_version')
         }
 
 

@@ -33,7 +33,7 @@ similarity_options:
 # API configuration settings (llm_processor.py)
 # Only one API configuration should be active at any time.
 api_config:
-  selected_api: "Groq"  # Active API: "OpenAI", "Groq", "Anthropic", "Ollama", "Gemini"
+  selected_api: "Groq"  # Active API: "OpenAI", "Groq", "Anthropic", "Ollama", "Gemini", "Azure"
 
   # Example configurations for different APIs:
 
@@ -55,6 +55,16 @@ api_config:
   # Ollama API configuration
   # ollama_api_url: "http://localhost:11434/api/chat"
   # ollama_model: "phi3"
+
+  # Azure OpenAI configuration (selected_api: "Azure")
+  # Requests go to {endpoint}/openai/deployments/{deployment}/chat/completions
+  # with the api-version query parameter and the api-key header.
+  # azure_endpoint: "https://your-resource.openai.azure.com"
+  # azure_api_key: "your_azure_openai_api_key"
+  # azure_deployment: "your_deployment_name"  # the deployment name, not the model name
+  # azure_api_version: "2024-10-21"  # optional; defaults to OPENAI_API_VERSION, then 2024-10-21
+  # A full deployment URL (.../openai/deployments/<name>/chat/completions?api-version=...)
+  # in azure_endpoint also works: the deployment and api-version are read from it.
 
   # Google Gemini API configuration (Free tier models available)
   gemini_api_url: "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"

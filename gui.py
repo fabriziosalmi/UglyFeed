@@ -251,7 +251,7 @@ if selected == "Configuration":
     st.divider()
 
     st.subheader("API and LLM Options")
-    api_options = ["OpenAI", "Groq", "Ollama", "Anthropic", "Gemini"]
+    api_options = ["OpenAI", "Groq", "Ollama", "Anthropic", "Gemini", "Azure"]
     selected_api = st.selectbox("Select API", api_options, index=api_options.index(st.session_state.config_data['api_config']['selected_api']))
     st.session_state.config_data['api_config']['selected_api'] = selected_api
 
@@ -260,7 +260,8 @@ if selected == "Configuration":
         "Groq": ["groq_api_url", "groq_api_key", "groq_model"],
         "Anthropic": ["anthropic_api_url", "anthropic_api_key", "anthropic_model"],
         "Ollama": ["ollama_api_url", "ollama_model"],
-        "Gemini": ["gemini_api_url", "gemini_api_key", "gemini_model"]
+        "Gemini": ["gemini_api_url", "gemini_api_key", "gemini_model"],
+        "Azure": ["azure_endpoint", "azure_api_key", "azure_deployment", "azure_api_version"]
     }
 
     # Set default values for each API when selected
@@ -288,6 +289,12 @@ if selected == "Configuration":
             "gemini_api_url": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
             "gemini_api_key": "your_gemini_api_key",
             "gemini_model": "gemini-2.0-flash-exp"
+        },
+        "Azure": {
+            "azure_endpoint": "https://your-resource.openai.azure.com",
+            "azure_api_key": "your_azure_openai_api_key",
+            "azure_deployment": "your_deployment_name",
+            "azure_api_version": "2024-10-21"
         }
     }
 
