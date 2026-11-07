@@ -66,7 +66,7 @@ def ensure_default_config(config_data):
             'ollama_model': "phi3",
             'anthropic_api_key': "your_anthropic_api_key",
             'anthropic_api_url': "https://api.anthropic.com/v1/messages",
-            'anthropic_model': "claude-3-haiku-20240307"
+            'anthropic_model': "claude-haiku-4-5-20251001"
         },
         'folders': {
             'output_folder': "output",
