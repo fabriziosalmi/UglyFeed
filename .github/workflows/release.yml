@@ -22,8 +22,15 @@ permissions:
   packages: write
 
 jobs:
+  # Costruisce e controlla il pacchetto, non pubblica. Questo job esegue
+  # setup.py e installa dipendenze: per questo non riceve id-token, cosi' una
+  # dipendenza compromessa non puo' farsi dare un token di PyPI.
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.extract_version.outputs.version }}
 
     steps:
       - name: Check out code
@@ -40,6 +47,7 @@ jobs:
           VERSION=$(grep -oP "version=['\"]\K[^'\"]+" setup.py)
           echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
         shell: bash
 
       # Il tag e setup.py devono dire la stessa cosa. Senza questo controllo si
@@ -70,26 +78,59 @@ jobs:
       - name: Check the built artifacts
         run: twine check dist/*
 
+      # Il job di pubblicazione carica esattamente questi file, gia' controllati:
+      # non ricostruisce nulla.
+      - name: Hand the built artifacts to the publish job
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  # Pubblica su PyPI con Trusted Publishing: PyPI accetta l'upload solo da
+  # questo repo, da questo workflow e dall'environment `pypi`, con un token
+  # OIDC che vale per questo run. Nessuna password salvata nei secret.
+  # L'environment accetta solo i tag v*, quindi un avvio manuale non entra qui.
+  publish:
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/uglypy
+    permissions:
+      id-token: write
+    env:
+      VERSION: ${{ needs.release.outputs.version }}
+
+    steps:
+      - name: Fetch the built artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist/
+
       # Test PyPI e' una prova, non un cancello. Era un cancello per sbaglio, e
       # ha bloccato ogni rilascio dal 26/04/2026: ricaricava la stessa 0.0.51 e
       # Test PyPI rifiutava il duplicato con "400 File already exists", quindi
       # il job moriva qui e la pubblicazione su PyPI risultava `skipped`.
-      # --skip-existing rende innocuo un duplicato, e continue-on-error dice
+      # skip-existing rende innocuo un duplicato, e continue-on-error dice
       # esplicitamente che questo passo non decide del rilascio.
+      # Anche Test PyPI usa Trusted Publishing: serve lo stesso publisher
+      # configurato su test.pypi.org, altrimenti questo passo fallisce (senza
+      # fermare il rilascio).
       - name: Smoke test on Test PyPI (non blocking)
-        if: startsWith(github.ref, 'refs/tags/')
         continue-on-error: true
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
-        run: twine upload --skip-existing --repository-url https://test.pypi.org/legacy/ dist/* --verbose
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+          verbose: true
 
       - name: Publish package to PyPI
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: twine upload --skip-existing dist/*
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+        with:
+          skip-existing: true
 
       # La verifica vera e' da PyPI, non da Test PyPI: il vecchio passo
       # installava da un indice che non ha le dipendenze reali del progetto, e
@@ -121,7 +162,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           for i in $(seq 1 40); do
-            if pip download --no-cache-dir --no-deps --dest /tmp/verify "uglypy==${VERSION}" >/dev/null 2>&1; then
+            if python3 -m pip download --no-cache-dir --no-deps --dest /tmp/verify "uglypy==${VERSION}" >/dev/null 2>&1; then
               echo "uglypy==${VERSION} scaricabile da PyPI al tentativo $i"
               exit 0
             fi
@@ -156,7 +197,16 @@ jobs:
     # comunque. E' andata cosi' il 18 e 19/09/2026, e il risultato e' che
     # Docker Hub 0.0.51 e' stato riscritto il 19/09 mentre su PyPI 0.0.51 e'
     # del 26/04: lo stesso numero di versione per due codici diversi.
-    needs: release
+    #
+    # Su un tag serve che `publish` sia riuscito. Su un avvio manuale `publish`
+    # e' saltato per costruzione, e la build Docker (che non spinge) deve
+    # partire lo stesso: senza questa condizione un job saltato salterebbe
+    # anche questo.
+    needs: [release, publish]
+    if: >-
+      !cancelled() && needs.release.result == 'success' &&
+      (needs.publish.result == 'success' ||
+       (needs.publish.result == 'skipped' && !startsWith(github.ref, 'refs/tags/')))
 
     steps:
       - name: Check out code
