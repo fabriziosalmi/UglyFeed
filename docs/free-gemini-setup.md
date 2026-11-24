@@ -29,8 +29,10 @@ api_config:
 
 ### 4. One-Command Setup
 ```bash
-# Start with the best free model
-python main.py --api gemini --api_key "YOUR_KEY" --model "gemini-2.0-flash"
+# Fetch and group the feeds, rewrite them with Gemini, then build the RSS feed
+python main.py
+python llm_processor.py --api gemini --api_key "YOUR_KEY" --model "gemini-2.0-flash"
+python json2rss.py
 ```
 
 ### 5. GitHub Actions (Free Automation)
@@ -60,7 +62,9 @@ Add your API key as GitHub secret: `GEMINI_API_KEY`
 git clone https://github.com/fabriziosalmi/UglyFeed.git
 cd UglyFeed
 pip install -r requirements.txt
-python main.py --api gemini --api_key "YOUR_KEY" --model "gemini-2.0-flash"
+python main.py
+python llm_processor.py --api gemini --api_key "YOUR_KEY" --model "gemini-2.0-flash"
+python json2rss.py
 ```
 
 **That's it! You're now using cutting-edge AI for FREE! 🎉**
