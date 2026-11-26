@@ -40,7 +40,7 @@ setup(
         'lexical_diversity==0.1.1',
         'nltk==3.10.4',
         'numpy==2.2.6',
-        'openai==3.51.0',
+        'openai==3.55.1',
         'pandas==2.3.3',
         'psutil==7.2.2',
         'PyYAML==6.0.3',
